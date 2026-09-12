@@ -31,10 +31,11 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 #wrap{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #2a2a5a,0 0 40px #7b5cff44,0 20px 60px #0009;transition:box-shadow .7s ease;touch-action:none}
 #gc{display:block;touch-action:none}
 #danger{position:absolute;inset:0;background:linear-gradient(to bottom,#ff000033 0%,transparent 45%);pointer-events:none;opacity:0;transition:opacity .3s}
-.icon-btn{position:absolute;z-index:20;width:34px;height:34px;border:none;border-radius:50%;background:#ffffff15;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background .2s;line-height:1;color:#fff}
-.icon-btn:hover{background:#ffffff28}
-#mute{top:10px;right:10px}
-#pbtn{top:10px;right:50px}
+#board-container{display:flex;flex-direction:column;align-items:center}
+#board-header{width:100%;height:38px;display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:6px}
+.icon-btn{width:36px;height:36px;border:1px solid #ffffff18;border-radius:50%;background:#ffffff15;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;transition:background .2s,transform .15s,border-color .2s;line-height:1;color:#fff;backdrop-filter:blur(6px)}
+.icon-btn:hover{background:#ffffff28;border-color:#ffffff33;transform:scale(1.06)}
+.icon-btn:active{transform:scale(.95)}
 .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#0d0d1adc;backdrop-filter:blur(8px);z-index:10;padding:24px}
 .ov h1{font-size:52px;font-weight:900;background:linear-gradient(135deg,#2ed2ff,var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 20px var(--g));line-height:1}
 .ov h2{font-size:22px;font-weight:700;color:#fff9}
@@ -102,10 +103,24 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   .preview{justify-content:center;gap:2px}
   .pc{width:10px;height:10px;border-radius:2px}
 
+  #board-container{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  #board-header{
+    width:100%;
+    max-width:min(calc((100dvh - 120px) * (485 / 639)), 100vw - 20px, 440px);
+    height:34px;
+    margin-bottom:4px;
+    gap:8px;
+  }
+  .icon-btn{width:34px;height:34px;font-size:14px}
   /* Tahta - ekrana maksimum büyüklükte oturur */
   #wrap{
     width:100%;
-    max-width:min(calc((100dvh - 85px) * (485 / 639)), 100vw - 20px, 440px);
+    max-width:min(calc((100dvh - 120px) * (485 / 639)), 100vw - 20px, 440px);
     height:auto;
     aspect-ratio:485 / 639;
     border-radius:14px;
@@ -118,9 +133,6 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
     object-fit:contain;
     display:block;
   }
-  .icon-btn{width:34px;height:34px;font-size:14px}
-  #mute{top:8px;right:8px}
-  #pbtn{top:8px;right:46px}
   .ov{padding:14px;gap:10px}
   .ov h1{font-size:38px}
   .ov h2{font-size:18px}
@@ -144,58 +156,61 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
       <div class="preview" id="pr"></div>
     </div>
   </div>
-  <div id="wrap">
-    <canvas id="gc"></canvas>
-    <div id="danger"></div>
-    <button class="icon-btn" id="mute">🔊</button>
-    <button class="icon-btn" id="pbtn">⏸</button>
-    <div class="ov" id="ov-start">
-      <h1>GridPop</h1>
-      <p class="tag" style="margin-top:-4px">Pop color blocks & conquer the storm!</p>
-      <div class="dots">
-        <div class="dot" style="background:#ff4757;box-shadow:0 0 8px #ff475799" title="Red"></div>
-        <div class="dot" style="background:#2ed2ff;box-shadow:0 0 8px #2ed2ff99" title="Blue"></div>
-        <div class="dot" style="background:#ffd32a;box-shadow:0 0 8px #ffd32a99" title="Yellow"></div>
-        <div class="dot" style="background:#2ecc71;box-shadow:0 0 8px #2ecc7199" title="Green (Lv3)"></div>
-        <div class="dot" style="background:#b44fff;box-shadow:0 0 8px #b44fff99" title="Purple (Lv5)"></div>
-        <div class="dot" style="background:#ff7b00;box-shadow:0 0 8px #ff7b0099" title="Orange (Lv7)"></div>
-        <div class="dot" style="background:#ff3ea5;box-shadow:0 0 8px #ff3ea599" title="Pink (Lv9)"></div>
-        <div class="dot" style="background:#fff;box-shadow:0 0 8px #ffffff99" title="⚡ Lightning"></div>
-      </div>
-      <button class="btn" id="btn-s">PLAY</button>
-      <button class="btn ghost" id="btn-h">How to Play</button>
+  <div id="board-container">
+    <div id="board-header">
+      <button class="icon-btn hidden" id="pbtn" aria-label="Pause" title="Pause">⏸</button>
+      <button class="icon-btn" id="mute" aria-label="Mute" title="Mute/Unmute">🔊</button>
     </div>
-    <div class="ov hidden" id="ov-how">
-      <h2>How to Play</h2>
-      <div class="how-grid">
-        <div class="hi">🖱️</div><div class="ht">Tap any cluster of 2+ matching color blocks to pop them!</div>
-        <div class="hi">📈</div><div class="ht">Bigger clusters multiply points! <span style="color:#ffd32a">6 blocks = 360 pts</span></div>
-        <div class="hi">⚡</div><div class="ht">Rainbow-rimmed ⚡ Lightning Stone blasts full row & column!</div>
-        <div class="hi">🌈</div><div class="ht">Level up to unlock new colors (Green, Purple, Orange, Pink) & cosmic themes!</div>
-        <div class="hi">⏸</div><div class="ht">Press ESC or pause button to pause.</div>
+    <div id="wrap">
+      <canvas id="gc"></canvas>
+      <div id="danger"></div>
+      <div class="ov" id="ov-start">
+        <h1>GridPop</h1>
+        <p class="tag" style="margin-top:-4px">Pop color blocks & conquer the storm!</p>
+        <div class="dots">
+          <div class="dot" style="background:#ff4757;box-shadow:0 0 8px #ff475799" title="Red"></div>
+          <div class="dot" style="background:#2ed2ff;box-shadow:0 0 8px #2ed2ff99" title="Blue"></div>
+          <div class="dot" style="background:#ffd32a;box-shadow:0 0 8px #ffd32a99" title="Yellow"></div>
+          <div class="dot" style="background:#2ecc71;box-shadow:0 0 8px #2ecc7199" title="Green (Lv3)"></div>
+          <div class="dot" style="background:#b44fff;box-shadow:0 0 8px #b44fff99" title="Purple (Lv5)"></div>
+          <div class="dot" style="background:#ff7b00;box-shadow:0 0 8px #ff7b0099" title="Orange (Lv7)"></div>
+          <div class="dot" style="background:#ff3ea5;box-shadow:0 0 8px #ff3ea599" title="Pink (Lv9)"></div>
+          <div class="dot" style="background:#fff;box-shadow:0 0 8px #ffffff99" title="⚡ Lightning"></div>
+        </div>
+        <button class="btn" id="btn-s">PLAY</button>
+        <button class="btn ghost" id="btn-h">How to Play</button>
       </div>
-      <button class="btn" id="btn-hb">Got it!</button>
-    </div>
-    <div class="ov hidden" id="ov-pause">
-      <div class="ptitle">⏸ PAUSED</div>
-      <p class="tag">Press ESC to resume</p>
-      <div class="brow">
-        <button class="btn" id="btn-r">Resume</button>
-        <button class="btn ghost" id="btn-q">Main Menu</button>
+      <div class="ov hidden" id="ov-how">
+        <h2>How to Play</h2>
+        <div class="how-grid">
+          <div class="hi">🖱️</div><div class="ht">Tap any cluster of 2+ matching color blocks to pop them!</div>
+          <div class="hi">📈</div><div class="ht">Bigger clusters multiply points! <span style="color:#ffd32a">6 blocks = 360 pts</span></div>
+          <div class="hi">⚡</div><div class="ht">Rainbow-rimmed ⚡ Lightning Stone blasts full row & column!</div>
+          <div class="hi">🌈</div><div class="ht">Level up to unlock new colors (Green, Purple, Orange, Pink) & cosmic themes!</div>
+          <div class="hi">⏸</div><div class="ht">Tap the pause button to pause the game.</div>
+        </div>
+        <button class="btn" id="btn-hb">Got it!</button>
       </div>
-    </div>
-    <div class="ov hidden" id="ov-over">
-      <h2>GAME OVER</h2>
-      <div class="big-score" id="fs">0</div>
-      <p class="tag">points</p>
-      <div class="best-badge" id="best-badge">
-        <div class="bb-title" id="bb-title">BEST SCORE</div>
-        <div class="bb-val" id="bb-val">0</div>
+      <div class="ov hidden" id="ov-pause">
+        <div class="ptitle">⏸ PAUSED</div>
+        <div class="brow" style="margin-top:10px">
+          <button class="btn" id="btn-r">Resume</button>
+          <button class="btn ghost" id="btn-q">Main Menu</button>
+        </div>
       </div>
-      <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px">🎬 1 Extra Life (Continue)</button>
-      <div class="brow">
-        <button class="btn" id="btn-re">Play Again</button>
-        <button class="btn ghost" id="btn-m">Main Menu</button>
+      <div class="ov hidden" id="ov-over">
+        <h2>GAME OVER</h2>
+        <div class="big-score" id="fs">0</div>
+        <p class="tag">points</p>
+        <div class="best-badge" id="best-badge">
+          <div class="bb-title" id="bb-title">BEST SCORE</div>
+          <div class="bb-val" id="bb-val">0</div>
+        </div>
+        <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px">🎬 1 Extra Life (Continue)</button>
+        <div class="brow">
+          <button class="btn" id="btn-re">Play Again</button>
+          <button class="btn ghost" id="btn-m">Main Menu</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1105,10 +1120,10 @@ function renderSF(){
 
 // UI
 function updUI(){
-  document.getElementById('sc').textContent=score.toLocaleString('tr-TR');
+  document.getElementById('sc').textContent=score.toLocaleString('en-US');
   document.getElementById('lv').textContent=level;
   var b=updateBest(score);
-  document.getElementById('bs').textContent=b.toLocaleString('tr-TR');
+  document.getElementById('bs').textContent=b.toLocaleString('en-US');
 }
 function updBar(f){document.getElementById('tb').style.width=(Math.max(0,f)*100)+'%';}
 function updPreview(){
@@ -1128,12 +1143,18 @@ function showOv(id){
     var el=document.getElementById(oid);
     if(el) el.classList.toggle('hidden',oid!==id);
   });
+  var pbtn=document.getElementById('pbtn');
+  if(pbtn && (id==='ov-start'||id==='ov-how'||id==='ov-over')){
+    pbtn.classList.add('hidden');
+  }
 }
 function hideAll(){
   ['ov-start','ov-how','ov-pause','ov-over'].forEach(function(oid){
     var el=document.getElementById(oid);
     if(el) el.classList.add('hidden');
   });
+  var pbtn=document.getElementById('pbtn');
+  if(pbtn && state===ST.PLAY) pbtn.classList.remove('hidden');
 }
 
 function renderScoreBadge(finalScore){
@@ -1167,15 +1188,24 @@ function startGame(){
   state=ST.PLAY; lastT=performance.now();
   for(var r=ROWS-2;r<ROWS;r++) grid[r]=mkRow();
   updPreview(); updUI(); hideAll();
+  var pbtn=document.getElementById('pbtn');
+  if(pbtn){
+    pbtn.classList.remove('hidden');
+    pbtn.textContent='⏸';
+  }
 }
 
 function togglePause(){
+  var pbtn=document.getElementById('pbtn');
   if(state===ST.PLAY||state===ST.ANIM){
     state=ST.PAUSE; sndPause(); showOv('ov-pause');
-    document.getElementById('pbtn').textContent='▶';
+    if(pbtn) pbtn.textContent='▶';
   } else if(state===ST.PAUSE){
     state=ST.PLAY; lastT=performance.now(); hideAll(); sndPause();
-    document.getElementById('pbtn').textContent='⏸';
+    if(pbtn){
+      pbtn.classList.remove('hidden');
+      pbtn.textContent='⏸';
+    }
   }
 }
 
@@ -1184,7 +1214,11 @@ function goMenu(){
   activeColors=['RED','BLUE','YELLOW'];
   applyTheme(THEMES[0]);
   showOv('ov-start');
-  document.getElementById('pbtn').textContent='⏸';
+  var pbtn=document.getElementById('pbtn');
+  if(pbtn){
+    pbtn.classList.add('hidden');
+    pbtn.textContent='⏸';
+  }
   updUI();
 }
 

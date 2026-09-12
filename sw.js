@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-cache-v1';
+const CACHE_NAME = 'gridpop-cache-v3-clean';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

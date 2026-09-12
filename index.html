@@ -164,18 +164,6 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
       </div>
       <button class="btn" id="btn-s">PLAY</button>
       <button class="btn ghost" id="btn-h">How to Play</button>
-      <button class="btn ghost" id="btn-ph" style="border-color:#2ed2ff44;color:#2ed2ff;font-size:13px;padding:7px 18px">📱 Play on Phone (QR)</button>
-    </div>
-    <div class="ov hidden" id="ov-phone" style="text-align:center;gap:10px">
-      <h2 style="font-size:24px;color:#fff">📱 Play on Mobile</h2>
-      <p class="tag" style="max-width:270px;line-height:1.4">Open this on your mobile device browser.</p>
-      <div style="background:#fff;padding:8px;border-radius:14px;box-shadow:0 0 25px #2ed2ff44;margin:4px 0">
-        <img src="assets/qr.png" alt="QR Code" style="width:160px;height:160px;display:block;border-radius:6px">
-      </div>
-      <div style="font-size:15px;color:#2ed2ff;font-weight:700;background:#2ed2ff15;padding:6px 14px;border-radius:8px;border:1px solid #2ed2ff44;user-select:all;-webkit-user-select:all">
-        https://sytex10.github.io/gridpop/
-      </div>
-      <button class="btn" id="btn-pb" style="margin-top:4px">Back</button>
     </div>
     <div class="ov hidden" id="ov-how">
       <h2>How to Play</h2>
@@ -1136,13 +1124,13 @@ function updPreview(){
 function updDanger(){document.getElementById('danger').style.opacity=grid[0].some(function(x){return x;})?'1':'0';}
 
 function showOv(id){
-  ['ov-start','ov-how','ov-phone','ov-pause','ov-over'].forEach(function(oid){
+  ['ov-start','ov-how','ov-pause','ov-over'].forEach(function(oid){
     var el=document.getElementById(oid);
     if(el) el.classList.toggle('hidden',oid!==id);
   });
 }
 function hideAll(){
-  ['ov-start','ov-how','ov-phone','ov-pause','ov-over'].forEach(function(oid){
+  ['ov-start','ov-how','ov-pause','ov-over'].forEach(function(oid){
     var el=document.getElementById(oid);
     if(el) el.classList.add('hidden');
   });
@@ -1567,8 +1555,6 @@ gc.addEventListener('touchend',function(e){
 document.getElementById('btn-s').onclick=function(){ensureAudio();startGame();};
 document.getElementById('btn-h').onclick=function(){showOv('ov-how');};
 document.getElementById('btn-hb').onclick=function(){showOv('ov-start');};
-document.getElementById('btn-ph').onclick=function(){showOv('ov-phone');};
-document.getElementById('btn-pb').onclick=function(){showOv('ov-start');};
 document.getElementById('btn-r').onclick=function(){togglePause();};
 document.getElementById('btn-q').onclick=function(){goMenu();};
 document.getElementById('btn-re').onclick=function(){ensureAudio();startGame();};

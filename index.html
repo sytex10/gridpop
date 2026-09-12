@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>GridPop</title>
+  <meta name="theme-color" content="#0a0a18">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GridPop">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a18;--panel:#121226;--g:#7b5cff;--dim:#6a6a9a}
+html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex;justify-content:center;align-items:center;font-family:'Outfit',sans-serif;color:#e8e8ff;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-touch-callout:none;transition:background .7s ease}
+#sf{position:fixed;inset:0;pointer-events:none;z-index:0}
+#app{position:relative;z-index:1;display:flex;gap:20px;align-items:flex-start}
+#sidebar{width:150px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid #2a2a4a;border-radius:14px;padding:12px;box-shadow:0 4px 24px #0006;transition:background .7s ease,border-color .7s ease}
+.card h3{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.val{font-size:28px;font-weight:900;background:linear-gradient(135deg,#fff,var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;transition:background .7s ease}
+.bar-bg{width:100%;height:8px;background:#1e1e3a;border-radius:4px;overflow:hidden;margin-bottom:8px}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--g),#2ed2ff);border-radius:4px;width:100%}
+.preview{display:flex;gap:4px;flex-wrap:wrap}
+.pc{width:15px;height:15px;border-radius:3px}
+#wrap{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #2a2a5a,0 0 40px #7b5cff44,0 20px 60px #0009;transition:box-shadow .7s ease;touch-action:none}
+#gc{display:block;touch-action:none}
+#danger{position:absolute;inset:0;background:linear-gradient(to bottom,#ff000033 0%,transparent 45%);pointer-events:none;opacity:0;transition:opacity .3s}
+.icon-btn{position:absolute;z-index:20;width:34px;height:34px;border:none;border-radius:50%;background:#ffffff15;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background .2s;line-height:1;color:#fff}
+.icon-btn:hover{background:#ffffff28}
+#mute{top:10px;right:10px}
+#pbtn{top:10px;right:50px}
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#0d0d1adc;backdrop-filter:blur(8px);z-index:10;padding:24px}
+.ov h1{font-size:52px;font-weight:900;background:linear-gradient(135deg,#2ed2ff,var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 20px var(--g));line-height:1}
+.ov h2{font-size:22px;font-weight:700;color:#fff9}
+.big-score{font-size:58px;font-weight:900;background:linear-gradient(135deg,#ffd32a,#ff4757);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.btn{padding:11px 28px;border:none;border-radius:100px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--g),#2ed2ff);color:#fff;box-shadow:0 4px 24px #7b5cff55;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:scale(1.06);box-shadow:0 6px 30px #7b5cff99}
+.btn:active{transform:scale(.97)}
+.ghost{background:transparent;border:1.5px solid #ffffff33;color:#ffffff88;box-shadow:none;font-size:14px;padding:8px 20px}
+.ghost:hover{border-color:#ffffff66;color:#ffffffbb;transform:scale(1.04)}
+.tag{font-size:12px;color:var(--dim);letter-spacing:1px}
+.hidden{display:none!important}
+.how-grid{display:grid;grid-template-columns:34px 1fr;gap:10px 12px;text-align:left;max-width:276px}
+.hi{font-size:20px;display:flex;align-items:center;justify-content:center}
+.ht{font-size:13px;color:#c0c0e8;line-height:1.4;display:flex;align-items:center}
+.dots{display:flex;gap:5px;margin:4px 0 8px}
+.dot{width:12px;height:12px;border-radius:50%}
+.best-badge{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 22px;background:#ffffff0a;border:1px solid #ffffff18;border-radius:12px;margin:2px 0 6px;min-width:170px;transition:all .3s}
+.bb-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);font-weight:700}
+.bb-val{font-size:24px;font-weight:900;color:#ffd32a}
+.best-badge.is-record{background:linear-gradient(135deg,#ffd32a22,#ff475718);border-color:#ffd32a88;box-shadow:0 0 25px #ffd32a44}
+.best-badge.is-record .bb-title{color:#ffd32a}
+.brow{display:flex;gap:10px}
+.ptitle{font-size:36px;font-weight:900;color:#fff}
+
+/* 📱 Mobil Uyumlu Düzen (Tüm Telefonlarda Maksimum Boyut & Ortalı Yerleşim) */
+@media (max-width: 720px), (max-height: 720px) {
+  html,body{padding:0;margin:0;height:100%;height:100dvh;overflow:hidden;display:flex;justify-content:center;align-items:center}
+  #app{
+    flex-direction:column;
+    width:100vw;
+    max-width:440px;
+    height:100%;
+    height:100dvh;
+    justify-content:center; /* 🌟 Ekranın dikeyinde tam ortalar, alttaki ölü boşluk yok olur */
+    align-items:center;
+    padding:max(6px, env(safe-area-inset-top)) 10px max(8px, env(safe-area-inset-bottom));
+    gap:10px;
+    box-sizing:border-box;
+  }
+  #sidebar{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr 1.35fr;
+    gap:5px;
+    flex-shrink:0;
+  }
+  .card{
+    padding:6px 5px;
+    border-radius:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+  .card h3{
+    font-size:8px;
+    letter-spacing:1px;
+    margin-bottom:2px;
+  }
+  .val{
+    font-size:16px;
+  }
+  .bar-bg{height:5px;width:100%;margin-bottom:3px}
+  .preview{justify-content:center;gap:2px}
+  .pc{width:10px;height:10px;border-radius:2px}
+
+  /* Tahta - ekrana maksimum büyüklükte oturur */
+  #wrap{
+    width:100%;
+    max-width:min(calc((100dvh - 85px) * (485 / 639)), 100vw - 20px, 440px);
+    height:auto;
+    aspect-ratio:485 / 639;
+    border-radius:14px;
+    display:block;
+    flex-shrink:1;
+  }
+  #gc{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+  }
+  .icon-btn{width:34px;height:34px;font-size:14px}
+  #mute{top:8px;right:8px}
+  #pbtn{top:8px;right:46px}
+  .ov{padding:14px;gap:10px}
+  .ov h1{font-size:38px}
+  .ov h2{font-size:18px}
+  .big-score{font-size:44px}
+  .how-grid{max-width:100%;gap:6px 8px}
+  .ht{font-size:12px}
+  .btn{padding:8px 22px;font-size:14px}
+}
+  </style>
+</head>
+<body>
+<canvas id="sf"></canvas>
+<div id="app">
+  <div id="sidebar">
+    <div class="card" id="card-sc"><h3>Skor</h3><div class="val" id="sc">0</div></div>
+    <div class="card" id="card-lv"><h3>Seviye</h3><div class="val" id="lv">1</div></div>
+    <div class="card" id="card-bs"><h3>En İyi</h3><div class="val" id="bs">0</div></div>
+    <div class="card" id="card-nx">
+      <h3>Sıra</h3>
+      <div class="bar-bg"><div class="bar-fill" id="tb"></div></div>
+      <div class="preview" id="pr"></div>
+    </div>
+  </div>
+  <div id="wrap">
+    <canvas id="gc"></canvas>
+    <div id="danger"></div>
+    <button class="icon-btn" id="mute">🔊</button>
+    <button class="icon-btn" id="pbtn">⏸</button>
+    <div class="ov" id="ov-start">
+      <h1>GridPop</h1>
+      <p class="tag" style="margin-top:-4px">Renkli blokları patlatın, tufanı durdurun!</p>
+      <div class="dots">
+        <div class="dot" style="background:#ff4757;box-shadow:0 0 8px #ff475799" title="Kırmızı"></div>
+        <div class="dot" style="background:#2ed2ff;box-shadow:0 0 8px #2ed2ff99" title="Mavi"></div>
+        <div class="dot" style="background:#ffd32a;box-shadow:0 0 8px #ffd32a99" title="Sarı"></div>
+        <div class="dot" style="background:#2ecc71;box-shadow:0 0 8px #2ecc7199" title="Yeşil (Lv3)"></div>
+        <div class="dot" style="background:#b44fff;box-shadow:0 0 8px #b44fff99" title="Mor (Lv5)"></div>
+        <div class="dot" style="background:#ff7b00;box-shadow:0 0 8px #ff7b0099" title="Turuncu (Lv7)"></div>
+        <div class="dot" style="background:#ff3ea5;box-shadow:0 0 8px #ff3ea599" title="Pembe (Lv9)"></div>
+        <div class="dot" style="background:#fff;box-shadow:0 0 8px #ffffff99" title="⚡ Joker"></div>
+      </div>
+      <button class="btn" id="btn-s">Oyna</button>
+      <button class="btn ghost" id="btn-h">Nasıl Oynanır?</button>
+      <button class="btn ghost" id="btn-ph" style="border-color:#2ed2ff44;color:#2ed2ff;font-size:13px;padding:7px 18px">📱 Telefonda Oyna (QR)</button>
+    </div>
+    <div class="ov hidden" id="ov-phone" style="text-align:center;gap:10px">
+      <h2 style="font-size:24px;color:#fff">📱 Telefonda Oyna</h2>
+      <p class="tag" style="max-width:270px;line-height:1.4">Telefonun bilgisayarınla <b>aynı Wi-Fi</b> ağına bağlı olsun.</p>
+      <div style="background:#fff;padding:8px;border-radius:14px;box-shadow:0 0 25px #2ed2ff44;margin:4px 0">
+        <img src="assets/qr.png" alt="QR Kod" style="width:160px;height:160px;display:block;border-radius:6px">
+      </div>
+      <div style="font-size:15px;color:#2ed2ff;font-weight:700;background:#2ed2ff15;padding:6px 14px;border-radius:8px;border:1px solid #2ed2ff44;user-select:all;-webkit-user-select:all">
+        http://192.168.1.169:8080
+      </div>
+      <button class="btn" id="btn-pb" style="margin-top:4px">Geri Dön</button>
+    </div>
+    <div class="ov hidden" id="ov-how">
+      <h2>Nasıl Oynanır?</h2>
+      <div class="how-grid">
+        <div class="hi">🖱️</div><div class="ht">En az 2 komşu aynı renkli bloğa tıkla — hepsi patlar!</div>
+        <div class="hi">📈</div><div class="ht">Büyük grup = katlanarak puan. <span style="color:#ffd32a">6 blok = 360 puan</span></div>
+        <div class="hi">⚡</div><div class="ht">Gökkuşağı çerçeveli ⚡ joker blok hem tüm sütunu hem satırı şimşekle patlatır!</div>
+        <div class="hi">🌈</div><div class="ht">Seviye atladıkça yeni renkler (Yeşil, Mor, Turuncu, Pembe) ve yeni temalar açılır!</div>
+        <div class="hi">⏸</div><div class="ht">ESC ile duraklat.</div>
+      </div>
+      <button class="btn" id="btn-hb">Anladım!</button>
+    </div>
+    <div class="ov hidden" id="ov-pause">
+      <div class="ptitle">⏸ Duraklatıldı</div>
+      <p class="tag">ESC ile devam et</p>
+      <div class="brow">
+        <button class="btn" id="btn-r">Devam Et</button>
+        <button class="btn ghost" id="btn-q">Ana Menü</button>
+      </div>
+    </div>
+    <div class="ov hidden" id="ov-over">
+      <h2>Oyun Bitti</h2>
+      <div class="big-score" id="fs">0</div>
+      <p class="tag">puan</p>
+      <div class="best-badge" id="best-badge">
+        <div class="bb-title" id="bb-title">EN İYİ SKOR</div>
+        <div class="bb-val" id="bb-val">0</div>
+      </div>
+      <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px">🎬 1 Can Kurtar (Devam Et)</button>
+      <div class="brow">
+        <button class="btn" id="btn-re">Tekrar Oyna</button>
+        <button class="btn ghost" id="btn-m">Ana Menü</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+// ── Constants ──
+var COLS=6,ROWS=8,SZ=72,GAP=5,PAD=14;
+var W=COLS*SZ+(COLS-1)*GAP+PAD*2;
+var H=ROWS*SZ+(ROWS-1)*GAP+PAD*2;
+
+var PAL={
+  RED:    {f:'#ff4757',h:'#ff8a96',s:'#c0001d',g:'#ff475766'},
+  BLUE:   {f:'#2ed2ff',h:'#8aeeff',s:'#007fbb',g:'#2ed2ff66'},
+  YELLOW: {f:'#ffd32a',h:'#fff38a',s:'#c49a00',g:'#ffd32a66'},
+  GREEN:  {f:'#2ecc71',h:'#7fffb2',s:'#007a3d',g:'#2ecc7166'},
+  PURPLE: {f:'#b44fff',h:'#d99fff',s:'#6a009a',g:'#b44fff66'},
+  ORANGE: {f:'#ff7b00',h:'#ffb566',s:'#a34a00',g:'#ff7b0066'},
+  PINK:   {f:'#ff3ea5',h:'#ff9dd2',s:'#aa005e',g:'#ff3ea566'},
+  WILD:   {f:'#ffffff',h:'#ffffff',s:'#aaaaaa',g:'#ffffff88'}
+};
+
+// Themes per level group: style, pageBg, panel, bg=canvas bg, grid=empty stroke, accent, wrapGlow, star
+var THEMES=[
+  {name:'Gece Mavisi',  style:'jelly', pageBg:'#0a0a18', panel:'#121226', bg:'#111124', grid:'#7b5cff', accent:'#7b5cff', wrapGlow:'#7b5cff44', star:'#ffffff'},
+  {name:'Zümrüt Orman', style:'rune',  pageBg:'#05140b', panel:'#092315', bg:'#071a10', grid:'#2ecc71', accent:'#2ecc71', wrapGlow:'#2ecc7155', star:'#7fffb2'},
+  {name:'Cyber Neon',   style:'cyber', pageBg:'#12041f', panel:'#1d0733', bg:'#18062b', grid:'#b44fff', accent:'#b44fff', wrapGlow:'#b44fff55', star:'#d99fff'},
+  {name:'Lav Kıyameti', style:'magma', pageBg:'#1a0800', panel:'#291003', bg:'#220c02', grid:'#ff7b00', accent:'#ff7b00', wrapGlow:'#ff7b0055', star:'#ffb566'},
+  {name:'Kaos Boyutu',  style:'prism', pageBg:'#1a0016', panel:'#290224', bg:'#21011d', grid:'#ff3ea5', accent:'#ff3ea5', wrapGlow:'#ff3ea555', star:'#ff9dd2'}
+];
+var curTheme=THEMES[0];
+function applyTheme(th){
+  curTheme=th;
+  document.documentElement.style.setProperty('--bg', th.pageBg);
+  document.documentElement.style.setProperty('--panel', th.panel);
+  document.documentElement.style.setProperty('--g', th.accent);
+  var wrap=document.getElementById('wrap');
+  if(wrap) wrap.style.boxShadow='0 0 0 2px '+th.grid+'55, 0 0 45px '+th.wrapGlow+', 0 20px 60px #0009';
+}
+
+// Level defs: score threshold, spawn interval (ms), active colors, theme index
+// 🎯 "Tatlı Nokta" Dengeleme: Çok kolay değil ama 4k barajını boğmayan, akıcı ve ferah tempo!
+var LVL=[
+  {t:0,     ms:5200, c:['RED','BLUE','YELLOW'],                                   th:0},
+  {t:1000,  ms:4800, c:['RED','BLUE','YELLOW'],                                   th:0},
+  {t:2200,  ms:4300, c:['RED','BLUE','YELLOW','GREEN'],                           th:1},
+  {t:3600,  ms:3900, c:['RED','BLUE','YELLOW','GREEN'],                           th:1},
+  {t:5200,  ms:3500, c:['RED','BLUE','YELLOW','GREEN','PURPLE'],                  th:2},
+  {t:7200,  ms:3100, c:['RED','BLUE','YELLOW','GREEN','PURPLE'],                  th:2},
+  {t:9800,  ms:2700, c:['RED','BLUE','YELLOW','GREEN','PURPLE','ORANGE'],         th:3},
+  {t:13000, ms:2400, c:['RED','BLUE','YELLOW','GREEN','PURPLE','ORANGE'],         th:3},
+  {t:17000, ms:2100, c:['RED','BLUE','GREEN','PURPLE','ORANGE','PINK'],           th:4}
+];
+function getLvl(s){var d=LVL[0];for(var i=0;i<LVL.length;i++){if(s>=LVL[i].t)d=LVL[i];}return d;}
+function getLvlNum(s){var n=1;for(var i=0;i<LVL.length;i++){if(s>=LVL[i].t)n=i+1;}return n;}
+
+var ST={PLAY:1,ANIM:2,OVER:3,PAUSE:4,START:0};
+var ANIM_DUR=180;
+var WILD_EVERY=5; // ⚡ Yıldırım jokeri her 5 sırada bir (daha ferah kurtarma şansı)
+
+// Canvas
+var gc=document.getElementById('gc');
+var ctx=gc.getContext('2d');
+gc.width=W; gc.height=H;
+var sf=document.getElementById('sf');
+var sf2=sf.getContext('2d');
+sf.width=innerWidth; sf.height=innerHeight;
+var STARS=[];
+for(var _i=0;_i<130;_i++){
+  STARS.push({x:Math.random()*sf.width,y:Math.random()*sf.height,r:Math.random()*1.3+.3,a:Math.random(),sp:Math.random()*.005+.001});
+}
+
+// Scores - Tek ve sürekli yenilenen en iyi skor
+function getBest(){
+  try{
+    var v=localStorage.getItem('gp_best');
+    if(v!==null)return parseInt(v,10)||0;
+    var old=JSON.parse(localStorage.getItem('gp_sc')||'[]');
+    return old.length?old[0]:0;
+  }catch(e){return 0;}
+}
+function updateBest(s){
+  var b=getBest();
+  if(s>b){
+    b=s;
+    try{localStorage.setItem('gp_best',b);}catch(e){}
+  }
+  return b;
+}
+
+// Mute
+var muted=false;
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('mute').textContent=muted?'🔇':'🔊';
+}
+document.getElementById('mute').onclick=toggleMute;
+
+// Audio
+var aCtx=null;
+function ensureAudio(){if(!aCtx)aCtx=new(window.AudioContext||window.webkitAudioContext)();}
+function beep(freq,type,dur,vol,sweep){
+  if(!aCtx||muted)return;
+  var o=aCtx.createOscillator(),g=aCtx.createGain(),t=aCtx.currentTime;
+  o.type=type; o.frequency.setValueAtTime(freq,t);
+  if(sweep)o.frequency.exponentialRampToValueAtTime(sweep,t+dur*.8);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.connect(g); g.connect(aCtx.destination); o.start(t); o.stop(t+dur+.05);
+}
+function sndPop(n){beep(380+n*25,'sawtooth',.22,.38,70);}
+function sndRow(){beep(180,'sine',.09,.16);}
+function sndOver(){[440,349,293,196].forEach(function(f,i){setTimeout(function(){beep(f,'triangle',.38,.34);},i*170);});}
+function sndPause(){beep(300,'sine',.12,.18);}
+function sndLvlUp(){[[0,523],[1,659],[2,784],[3,1047]].forEach(function(x){setTimeout(function(){beep(x[1],'sine',.18,.38);},x[0]*80);});}
+function sndGreen(){[[0,880],[1,1109],[2,1318],[3,1760]].forEach(function(x){setTimeout(function(){beep(x[1],'triangle',.14,.28);},x[0]*60);});}
+function sndWild(){
+  [[0,523],[1,784],[2,1047],[3,1319],[4,1568],[5,2093]].forEach(function(x){
+    setTimeout(function(){beep(x[1],'sawtooth',.12,.36);},x[0]*35);
+  });
+  setTimeout(function(){beep(140,'triangle',.25,.44,40);},70);
+}
+
+// ⚡ Gerçekçi Sinematik Yıldırım ve Gök Gürültüsü Sentezleyici (Akustik Fiziksel Model)
+function playThunderSound(){
+  if(!aCtx||muted)return;
+  var now=aCtx.currentTime;
+
+  // 1. Master Mastering Kompresörü & Limiter (Doygun, patlamasız sinematik mastering)
+  var comp=aCtx.createDynamicsCompressor();
+  comp.threshold.setValueAtTime(-18, now);
+  comp.knee.setValueAtTime(4, now);
+  comp.ratio.setValueAtTime(14, now);
+  comp.attack.setValueAtTime(0.001, now);
+  comp.release.setValueAtTime(0.38, now);
+  comp.connect(aCtx.destination);
+
+  // --- A. KESKİN VE ŞİDDETLİ ŞİMŞEK ÇATLAĞI (Sonic Crack / Whip Snap) ---
+  // Gerçek yıldırımın ilk 40ms içindeki kulak yırtan patlayıcı şaklaması
+  try {
+    var crackLen=Math.floor(aCtx.sampleRate*0.09);
+    var crackBuf=aCtx.createBuffer(1, crackLen, aCtx.sampleRate);
+    var cData=crackBuf.getChannelData(0);
+    for(var i=0; i<crackLen; i++){
+      var env=Math.exp(-i/(aCtx.sampleRate*0.011));
+      cData[i]=(Math.random()*2-1)*env*(Math.random()<0.1?2.6:1.2);
+    }
+    var cSrc=aCtx.createBufferSource();
+    cSrc.buffer=crackBuf;
+
+    var cFlt=aCtx.createBiquadFilter();
+    cFlt.type='bandpass';
+    cFlt.frequency.setValueAtTime(2300, now);
+    cFlt.Q.setValueAtTime(2.6, now);
+
+    var cGain=aCtx.createGain();
+    cGain.gain.setValueAtTime(1.4, now);
+    cGain.gain.exponentialRampToValueAtTime(0.001, now+0.088);
+
+    cSrc.connect(cFlt); cFlt.connect(cGain); cGain.connect(comp);
+    cSrc.start(now);
+
+    // İkincil Zemin Yankı Çatlağı (Slapback Echo - 35ms sonra)
+    var cSrc2=aCtx.createBufferSource();
+    cSrc2.buffer=crackBuf;
+    var cFlt2=aCtx.createBiquadFilter();
+    cFlt2.type='bandpass';
+    cFlt2.frequency.setValueAtTime(1350, now+0.035);
+    cFlt2.Q.setValueAtTime(2.0, now+0.035);
+    var cGain2=aCtx.createGain();
+    cGain2.gain.setValueAtTime(0.9, now+0.035);
+    cGain2.gain.exponentialRampToValueAtTime(0.001, now+0.12);
+    cSrc2.connect(cFlt2); cFlt2.connect(cGain2); cGain2.connect(comp);
+    cSrc2.start(now+0.035);
+  } catch(e){}
+
+  // --- B. HAVA YIRTILMA & İYONİZE GAZ ÇATIRTISI (Tearing Atmosphere "Krrrr-Shhh") ---
+  // Şimşek kanalının havayı yarıp geçmesiyle oluşan yırtılma sesi
+  try {
+    var ripLen=Math.floor(aCtx.sampleRate*0.6);
+    var ripBuf=aCtx.createBuffer(1, ripLen, aCtx.sampleRate);
+    var rData=ripBuf.getChannelData(0);
+    var b1=0;
+    for(var j=0; j<ripLen; j++){
+      var w1=Math.random()*2-1;
+      b1=0.86*b1+0.14*w1;
+      var flutter=0.55+0.45*Math.sin(j*0.085);
+      rData[j]=b1*flutter*2.4;
+    }
+    var rSrc=aCtx.createBufferSource();
+    rSrc.buffer=ripBuf;
+
+    var rFlt=aCtx.createBiquadFilter();
+    rFlt.type='lowpass';
+    rFlt.Q.setValueAtTime(3.8, now+0.012);
+    rFlt.frequency.setValueAtTime(2800, now+0.012);
+    rFlt.frequency.exponentialRampToValueAtTime(260, now+0.52);
+
+    var rGain=aCtx.createGain();
+    rGain.gain.setValueAtTime(1.15, now+0.012);
+    rGain.gain.exponentialRampToValueAtTime(0.001, now+0.58);
+
+    rSrc.connect(rFlt); rFlt.connect(rGain); rGain.connect(comp);
+    rSrc.start(now+0.012);
+  } catch(e){}
+
+  // --- C. DERİN VE UĞULTULU GÖK GÜRÜLTÜSÜ (Rolling Deep Thunder Rumble) ---
+  // Dağlarda ve bulutlarda 2.2 saniye boyunca gümbürdeyerek yuvarlanan gerçek gök gürültüsü
+  try {
+    var rumLen=Math.floor(aCtx.sampleRate*2.3);
+    var rumBuf=aCtx.createBuffer(1, rumLen, aCtx.sampleRate);
+    var rmData=rumBuf.getChannelData(0);
+    var lastB=0;
+    for(var k=0; k<rumLen; k++){
+      var rw=Math.random()*2-1;
+      lastB=(lastB+0.02*rw)/1.02; // Saf Brownian gürültüsü
+      // Gökyüzünde yuvarlanan akustik dalga modülasyonu
+      var roll=0.55+0.45*Math.sin(k*0.0032+Math.sin(k*0.00075)*2.8);
+      rmData[k]=lastB*roll*8.5;
+    }
+    var rumSrc=aCtx.createBufferSource();
+    rumSrc.buffer=rumBuf;
+
+    var flt1=aCtx.createBiquadFilter();
+    flt1.type='lowpass';
+    flt1.frequency.setValueAtTime(240, now+0.03);
+    flt1.frequency.exponentialRampToValueAtTime(42, now+2.1);
+
+    var flt2=aCtx.createBiquadFilter();
+    flt2.type='lowpass';
+    flt2.frequency.setValueAtTime(170, now+0.03);
+    flt2.frequency.exponentialRampToValueAtTime(36, now+2.1);
+
+    var rumGain=aCtx.createGain();
+    rumGain.gain.setValueAtTime(0.02, now);
+    rumGain.gain.linearRampToValueAtTime(1.45, now+0.07);
+    rumGain.gain.exponentialRampToValueAtTime(0.001, now+2.25);
+
+    rumSrc.connect(flt1); flt1.connect(flt2); flt2.connect(rumGain); rumGain.connect(comp);
+    rumSrc.start(now+0.03);
+  } catch(e){}
+
+  // --- D. SİSMİK DERİN BAS DARBESİ (Chest-Rumbling Sub Bass) ---
+  // Göğsü titreten organik sismik darbe
+  var sub=aCtx.createOscillator(), sGain=aCtx.createGain();
+  sub.type='triangle';
+  sub.frequency.setValueAtTime(78, now+0.02);
+  sub.frequency.exponentialRampToValueAtTime(22, now+1.35);
+  sGain.gain.setValueAtTime(0.95, now+0.02);
+  sGain.gain.exponentialRampToValueAtTime(0.001, now+1.42);
+  sub.connect(sGain); sGain.connect(comp);
+  sub.start(now+0.02); sub.stop(now+1.45);
+}
+
+// Game state
+var grid,state=ST.START,score=0,level=1,prevLevel=1;
+var elapsed=0,lastSpawn=0,spawnInt=4000,lastT=0,animT=0;
+var activeColors=['RED','BLUE','YELLOW'];
+var rowsSinceWild=0;
+var shX=0,shY=0,shM=0;
+var parts=[],nextRow=[],floats=[];
+var hoverGrp=new Set();
+var flashAlpha=0,flashColor='#ffffff';
+var comboCount=0,lastComboTime=0;
+var wildAnim=null; // ⚡ Merkeze uçan & şimşek çakan joker animasyon durumu
+
+// Grid helpers
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function mkGrid(){return Array.from({length:ROWS},function(){return Array(COLS).fill(null);});}
+function mkRow(){
+  var row=[];
+  for(var c=0; c<COLS; c++){
+    // %44 ihtimalle yanındaki bloğun rengini alır; doğal, doyurucu ve patlatması tatmin edici kombolar oluşturur!
+    if(c>0 && Math.random()<0.44){
+      row.push(row[c-1]);
+    } else {
+      row.push(pick(activeColors));
+    }
+  }
+  rowsSinceWild++;
+  if(rowsSinceWild>=WILD_EVERY){
+    rowsSinceWild=0;
+    row[Math.floor(Math.random()*COLS)]='WILD';
+  }
+  return row;
+}
+
+// BFS
+function bfs(g,sr,sc){
+  var col=g[sr][sc]; if(!col)return[];
+  var vis=new Set(),q=[[sr,sc]],res=[];
+  while(q.length){
+    var cur=q.shift(),r=cur[0],c=cur[1],k=r*100+c;
+    if(vis.has(k)||r<0||r>=ROWS||c<0||c>=COLS||g[r][c]!==col)continue;
+    vis.add(k); res.push([r,c]);
+    q.push([r-1,c],[r+1,c],[r,c-1],[r,c+1]);
+  }
+  return res;
+}
+
+// Gravity
+function gravity(g){
+  for(var c=0;c<COLS;c++){
+    var w=ROWS-1;
+    for(var r=ROWS-1;r>=0;r--)if(g[r][c]){g[w][c]=g[r][c];if(w!==r)g[r][c]=null;w--;}
+    while(w>=0)g[w--][c]=null;
+  }
+}
+
+function pushRow(){
+  for(var c=0;c<COLS;c++)if(grid[0][c])return false;
+  for(var r=0;r<ROWS-1;r++)grid[r]=grid[r+1].slice();
+  grid[ROWS-1]=nextRow.slice();
+  return true;
+}
+
+// Hover
+function setHover(px,py){
+  if(state!==ST.PLAY){hoverGrp=new Set();return;}
+  var c=Math.floor((px-PAD)/(SZ+GAP)),r=Math.floor((py-PAD)/(SZ+GAP));
+  if(r<0||r>=ROWS||c<0||c>=COLS||!grid[r][c]){hoverGrp=new Set();return;}
+  if(grid[r][c]==='WILD'){
+    var s=new Set();
+    for(var i=0;i<ROWS;i++)if(grid[i][c])s.add(i*100+c);
+    for(var j=0;j<COLS;j++)if(grid[r][j])s.add(r*100+j);
+    hoverGrp=s;
+    return;
+  }
+  var grp=bfs(grid,r,c);
+  hoverGrp=grp.length>=2?new Set(grp.map(function(x){return x[0]*100+x[1];})):new Set();
+}
+
+// Particles
+function spawnParts(cells,mult){
+  var extra=Math.min(mult-1,3);
+  cells.forEach(function(cell){
+    var r=cell[0],c=cell[1];
+    var p=PAL[grid[r][c]]||PAL.RED;
+    var cx=PAD+c*(SZ+GAP)+SZ/2, cy=PAD+r*(SZ+GAP)+SZ/2;
+    var n=8+Math.floor(Math.random()*5)+extra*2;
+    for(var i=0;i<n;i++){
+      var a=Math.PI*2*i/n+Math.random()*.5;
+      var sp=(2+Math.random()*4)*Math.min(mult*.6+.4,2.2);
+      parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,dc:.02+Math.random()*.018,sz:3+Math.random()*5,col:p.f});
+    }
+  });
+}
+
+function addFloat(x,y,txt,color,big){
+  floats.push({x:x,y:y,vy:big?-2.5:-1.8,life:1,text:txt,color:color,sz:big?30:22});
+}
+
+// Shake
+function shake(m){shM=Math.max(shM,m);}
+function updShake(){if(shM<.5){shX=shY=shM=0;return;}shX=(Math.random()*2-1)*shM;shY=(Math.random()*2-1)*shM;shM*=.77;}
+
+// Flash
+function flash(color,alpha){flashColor=color;flashAlpha=alpha;}
+
+// Unlock sounds per new color
+function sndPurple(){[[0,700],[1,880],[2,1109],[3,1400]].forEach(function(x){setTimeout(function(){beep(x[1],'square',.13,.28);},x[0]*70);});}
+function sndOrange(){[[0,600],[1,800],[2,950],[3,1200]].forEach(function(x){setTimeout(function(){beep(x[1],'sawtooth',.12,.3);},x[0]*60);});}
+function sndPink(){[[0,900],[1,1200],[2,1500],[3,2000]].forEach(function(x){setTimeout(function(){beep(x[1],'sine',.1,.34);},x[0]*55);});}
+
+// Level check
+function checkLvl(){
+  var nd=getLvl(score);
+  var nl=getLvlNum(score);
+  spawnInt=nd.ms;
+  if(nl!==prevLevel){
+    // color & theme unlock
+    activeColors=nd.c.slice();
+    applyTheme(THEMES[nd.th]);
+    var wasGreen =prevLevel<3 &&nl>=3;
+    var wasPurple=prevLevel<5 &&nl>=5;
+    var wasOrange=prevLevel<7 &&nl>=7;
+    var wasPink  =prevLevel<9 &&nl>=9;
+    if(wasPink)  {flash('#ff3ea5',.45);sndPink();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'🌸 PEMBE RENK AÇILDI!',color:'#ff3ea5',sz:20});}
+    else if(wasOrange){flash('#ff7b00',.42);sndOrange();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'🔥 TURUNCU RENK AÇILDI!',color:'#ff7b00',sz:20});}
+    else if(wasPurple){flash('#b44fff',.4); sndPurple();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'💜 MOR RENK AÇILDI!',color:'#b44fff',sz:20});}
+    else if(wasGreen) {flash('#2ecc71',.38);sndGreen();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'🌿 YEŞİL RENK AÇILDI!',color:'#2ecc71',sz:20});}
+    else{flash('#7b5cff',.3);sndLvlUp();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.4,text:'⚡ SEVİYE '+nl+'!',color:'#7b5cff',sz:22});}
+    prevLevel=nl;level=nl;updUI();
+  }
+}
+
+// Draw rounded rect path
+function rr(x,y,w,h,rd){
+  ctx.beginPath();
+  ctx.moveTo(x+rd,y);ctx.lineTo(x+w-rd,y);ctx.quadraticCurveTo(x+w,y,x+w,y+rd);
+  ctx.lineTo(x+w,y+h-rd);ctx.quadraticCurveTo(x+w,y+h,x+w-rd,y+h);
+  ctx.lineTo(x+rd,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-rd);
+  ctx.lineTo(x,y+rd);ctx.quadraticCurveTo(x,y,x+rd,y);
+  ctx.closePath();
+}
+
+// ⚡ Yüksek Hızlı Elektrik Kıvılcımı & Ark Parçacığı Üretici
+function spawnElectricSparks(x, y, count, color, speedMul){
+  for(var i=0; i<count; i++){
+    var a=Math.random()*Math.PI*2;
+    var sp=(2.8+Math.random()*6.2)*(speedMul||1);
+    parts.push({
+      x: x, y: y,
+      vx: Math.cos(a)*sp, vy: Math.sin(a)*sp,
+      life: 0.75+Math.random()*0.45,
+      dc: 0.032+Math.random()*0.024,
+      sz: 2.2+Math.random()*3.6,
+      col: color||(Math.random()<0.65?'#00e5ff':'#ffffff')
+    });
+  }
+}
+
+// ⚡ Çok Kollu, Organik ve Ultra Şaşalı Fraktal Şimşek Segmenti Çizici
+function drawLightningSegment(ctx, p1, p2, depth, maxDepth, color, width){
+  var dx=p2.x-p1.x, dy=p2.y-p1.y;
+  var dist=Math.hypot(dx, dy);
+  if(dist<4)return;
+
+  var segments=Math.max(5, Math.min(14, Math.floor(dist/11)));
+  var pts=[p1];
+  var nx=-dy/dist, ny=dx/dist;
+
+  for(var i=1; i<segments; i++){
+    var t=i/segments;
+    var bx=p1.x+dx*t, by=p1.y+dy*t;
+    var envelope=Math.sin(t*Math.PI);
+    var jitter=(Math.random()-0.5)*(dist*0.32)*envelope;
+    pts.push({x: bx+nx*jitter, y: by+ny*jitter});
+  }
+  pts.push(p2);
+
+  ctx.save();
+  ctx.lineCap='round'; ctx.lineJoin='round';
+
+  // 1. En Dış Parlayan Atmosferik Elektrik Difüzyonu (Devasa Glow)
+  ctx.shadowColor=color||'#00f0ff';
+  ctx.shadowBlur=depth===0?36:18;
+  ctx.strokeStyle=color||'#00f0ff';
+  ctx.lineWidth=width*1.5;
+  ctx.globalAlpha=0.55;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(var j=1; j<pts.length; j++) ctx.lineTo(pts[j].x, pts[j].y);
+  ctx.stroke();
+
+  // 2. Yoğun Neon Ark Hattı
+  ctx.globalAlpha=1;
+  ctx.shadowBlur=depth===0?20:10;
+  ctx.lineWidth=width;
+  ctx.stroke();
+
+  // 3. Ultra Parlak Saf Beyaz İyonize Çekirdek
+  ctx.shadowColor='#ffffff';
+  ctx.shadowBlur=6;
+  ctx.strokeStyle='#ffffff';
+  ctx.lineWidth=Math.max(1.5, width*0.38);
+  ctx.stroke();
+  ctx.restore();
+
+  // 4. Organik Yan Çatallanmalar (Recursive Forking)
+  if(depth<maxDepth && pts.length>3){
+    var numForks=depth===0?(Math.random()<0.95?2:1):(Math.random()<0.5?1:0);
+    for(var f=0; f<numForks; f++){
+      var idx=1+Math.floor(Math.random()*(pts.length-2));
+      var fp=pts[idx];
+      var baseAngle=Math.atan2(dy, dx);
+      var side=(f%2===0)?1:-1;
+      var branchAngle=baseAngle+side*(0.32+Math.random()*0.48);
+      var branchLen=dist*(0.35+Math.random()*0.35);
+      var ep={
+        x: fp.x+Math.cos(branchAngle)*branchLen,
+        y: fp.y+Math.sin(branchAngle)*branchLen
+      };
+      drawLightningSegment(ctx, fp, ep, depth+1, maxDepth, color, Math.max(1.5, width*0.52));
+    }
+  }
+}
+
+// Çatallı Gerçekçi Şimşek Çizici
+function drawLightning(ctx, x1, y1, x2, y2, color, width, forks){
+  drawLightningSegment(ctx, {x:x1, y:y1}, {x:x2, y:y2}, 0, forks?2:1, color||'#00e5ff', width||5.2);
+}
+
+// ⚡ Dönen Elektrik Işık Huzmeleri (Sunburst Rays)
+function drawElectricSunburst(cx, cy, count, radius, rot, alpha){
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rot);
+  ctx.globalAlpha=alpha;
+  for(var i=0; i<count; i++){
+    var a=(i/count)*Math.PI*2;
+    var len=radius*(0.75+Math.sin(rot*3+i*1.5)*0.25);
+    var w=14+Math.sin(rot*2+i)*6;
+    ctx.save();
+    ctx.rotate(a);
+    var rg=ctx.createLinearGradient(0, 0, len, 0);
+    rg.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+    rg.addColorStop(0.35, 'rgba(0, 229, 255, 0.45)');
+    rg.addColorStop(1, 'rgba(0, 100, 255, 0)');
+    ctx.fillStyle=rg;
+    ctx.beginPath();
+    ctx.moveTo(0, -w/2);
+    ctx.lineTo(len, 0);
+    ctx.lineTo(0, w/2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+// Çift Katmanlı Yıldırım Taşı Çizici (Hem tabloda hem havada uçarken kullanılır)
+function drawWildStone(cx, cy, sz, scale, rot, alpha){
+  var t0=performance.now()*.0025;
+  var pulse=Math.sin(t0*2)*.35+.65;
+  var pulse2=Math.sin(t0*1.7+1)*.5+.5;
+  var rd=10;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  if(rot) ctx.rotate(rot);
+  if(scale && scale!==1) ctx.scale(scale, scale);
+  if(alpha!==undefined && alpha<1) ctx.globalAlpha*=alpha;
+
+  var x=-sz/2, y=-sz/2;
+
+  // Dış elektrik arkları (Havada süzülürken ve merkezdeyken çıtırdar)
+  if(scale && scale>1.05){
+    ctx.save();
+    var arcCount=4;
+    for(var ai=0; ai<arcCount; ai++){
+      var ang=t0*4.5+ai*(Math.PI*2/arcCount);
+      var rIn=sz*0.52;
+      var rOut=sz*(0.85+Math.random()*0.38);
+      var p1x=Math.cos(ang)*rIn, p1y=Math.sin(ang)*rIn;
+      var p2x=Math.cos(ang+(Math.random()-0.5)*0.5)*rOut, p2y=Math.sin(ang+(Math.random()-0.5)*0.5)*rOut;
+      ctx.strokeStyle=Math.random()<0.5?'#00f0ff':'#ffd32a';
+      ctx.shadowColor='#00f0ff';
+      ctx.shadowBlur=12;
+      ctx.lineWidth=2.2;
+      ctx.beginPath();
+      ctx.moveTo(p1x, p1y);
+      ctx.lineTo((p1x+p2x)*0.5+(Math.random()-0.5)*10, (p1y+p2y)*0.5+(Math.random()-0.5)*10);
+      ctx.lineTo(p2x, p2y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Koyu arkaplan
+  ctx.save();
+  rr(x,y,sz,sz,rd);
+  ctx.fillStyle='#110826';
+  ctx.fill();
+  ctx.restore();
+
+  // Dönen gökkuşağı kenarlık
+  var wc=['#ff4757','#ffd32a','#2ed2ff','#2ecc71','#7b5cff','#ff8a00'];
+  var ci=Math.floor((t0*.8)%wc.length);
+  var wg=ctx.createLinearGradient(x,y,x+sz,y+sz);
+  wg.addColorStop(0,wc[ci%wc.length]);
+  wg.addColorStop(.4,wc[(ci+2)%wc.length]);
+  wg.addColorStop(.8,wc[(ci+4)%wc.length]);
+  wg.addColorStop(1,wc[(ci+1)%wc.length]);
+  ctx.save();
+  ctx.shadowColor='#ffffff'; ctx.shadowBlur=22*pulse;
+  ctx.strokeStyle=wg; ctx.lineWidth=4.5;
+  rr(x,y,sz,sz,rd); ctx.stroke();
+  ctx.restore();
+
+  // Merkezi sarı iç parıltısı
+  var ig=ctx.createRadialGradient(0,0,1,0,0,sz*.5);
+  var ia=(.4*pulse2).toFixed(2);
+  ig.addColorStop(0,'rgba(255,240,100,'+ia+')');
+  ig.addColorStop(.6,'rgba(180,100,255,.08)');
+  ig.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.save();
+  rr(x,y,sz,sz,rd); ctx.fillStyle=ig; ctx.fill();
+  ctx.restore();
+
+  // Çift katmanlı parlayan şimşek ikonu
+  ctx.save();
+  ctx.shadowColor='#ffffaa'; ctx.shadowBlur=24*pulse;
+  ctx.font='bold 40px serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='#ffffff';
+  ctx.fillText('\u26a1',0,2);
+  ctx.shadowColor='#ffdd00'; ctx.shadowBlur=12*pulse;
+  ctx.globalAlpha=.55;
+  ctx.fillText('\u26a1',0,2);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function drawBlock(r,c){
+  var col=grid[r][c]; if(!col)return;
+  var x=PAD+c*(SZ+GAP), y=PAD+r*(SZ+GAP);
+  var isH=hoverGrp.has(r*100+c);
+
+  if(col==='WILD'){
+    drawWildStone(x+SZ/2, y+SZ/2, SZ, 1, 0, 1);
+    return;
+  }
+
+  var p=PAL[col];
+  var style=curTheme.style||'jelly';
+
+  if(style==='jelly'){
+    // 🍬 Lv1-2: Klasik Parlak Jelibon (Sulu & Canlı)
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':p.g; ctx.shadowBlur=isH?22:12;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,p.h); gr.addColorStop(1,p.f);
+    rr(x,y,SZ,SZ,12); ctx.fillStyle=gr; ctx.fill();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,12);ctx.stroke();}
+    ctx.restore();
+    // Üst sol parlak cam balonu
+    ctx.save(); ctx.globalAlpha=.5; ctx.fillStyle='#ffffff';
+    ctx.beginPath(); ctx.ellipse(x+SZ*.32,y+SZ*.24,SZ*.2,SZ*.1,-0.25,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    // Alt 3D gölge kavis
+    ctx.save(); ctx.globalAlpha=.25; ctx.fillStyle=p.s;
+    rr(x+4,y+SZ-10,SZ-8,7,3); ctx.fill(); ctx.restore();
+  }
+  else if(style==='rune'){
+    // 🌿 Lv3-4: Zümrüt Orman - Fasetli Kraliyet Mücevheri (Temiz & Parlak)
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':p.g; ctx.shadowBlur=isH?24:14;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,p.h); gr.addColorStop(.75,p.f); gr.addColorStop(1,p.s);
+    rr(x,y,SZ,SZ,12); ctx.fillStyle=gr; ctx.fill();
+    // İç zarif faset çerçevesi
+    ctx.strokeStyle='rgba(255,255,255,0.45)'; ctx.lineWidth=1.8;
+    rr(x+5,y+5,SZ-10,SZ-10,8); ctx.stroke();
+    // Üst cam parlama çizgisi
+    ctx.fillStyle='rgba(255,255,255,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(x+SZ*.32,y+SZ*.22,SZ*.18,SZ*.08,-0.2,0,Math.PI*2);
+    ctx.fill();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,12);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='cyber'){
+    // ⚡ Lv5-6: Cyber Neon - Elektrikli Neon Küp (Keskin & Doygun)
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':p.f; ctx.shadowBlur=isH?26:16;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,p.h); gr.addColorStop(.8,p.f); gr.addColorStop(1,p.s);
+    rr(x,y,SZ,SZ,8); ctx.fillStyle=gr; ctx.fill();
+    // Üst parlak neon ışık şeridi
+    ctx.fillStyle='rgba(255,255,255,0.55)';
+    rr(x+6,y+5,SZ-12,4,2); ctx.fill();
+    // İnce neon iç hat
+    ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1.5;
+    rr(x+3,y+3,SZ-6,SZ-6,6); ctx.stroke();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,8);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='magma'){
+    // 🔥 Lv7-8: Lav Kıyameti - Akkor Lav Yakutu (Tertemiz, Alevli & Canlı)
+    // NOT: Çirkin beyaz 'Y' çatlakları ve soluk daireler tamamen kaldırıldı!
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':'#ff7b00'; ctx.shadowBlur=isH?26:16;
+    var gr=ctx.createLinearGradient(x,y,x,y+SZ);
+    gr.addColorStop(0,p.h);
+    gr.addColorStop(.65,p.f);
+    gr.addColorStop(1,p.s);
+    rr(x,y,SZ,SZ,12); ctx.fillStyle=gr; ctx.fill();
+    // Üstte sıcak akkor altın cam parıltısı (Tertemiz ve kavisli)
+    ctx.save(); ctx.globalAlpha=.55;
+    var ag=ctx.createLinearGradient(x,y,x,y+SZ*.4);
+    ag.addColorStop(0,'#ffffff'); ag.addColorStop(1,'rgba(255,240,180,0)');
+    ctx.fillStyle=ag;
+    ctx.beginPath();
+    ctx.ellipse(x+SZ*.32,y+SZ*.22,SZ*.22,SZ*.1,-0.25,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+    // İnce altın-ateş aurası çerçevesi
+    ctx.strokeStyle=isH?'#ffffff':'rgba(255,220,130,0.5)';
+    ctx.lineWidth=isH?3:1.8;
+    rr(x,y,SZ,SZ,12); ctx.stroke();
+    // Alt sıcak gölge bandı
+    ctx.save(); ctx.globalAlpha=.3; ctx.fillStyle=p.s;
+    rr(x+4,y+SZ-9,SZ-8,6,3); ctx.fill(); ctx.restore();
+    ctx.restore();
+  }
+  else if(style==='prism'){
+    // 💎 Lv9+: Kaos Boyutu - Prizmatik Elmas Kesim (Kristal & Göz Alıcı)
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':p.g; ctx.shadowBlur=isH?26:16;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,p.h); gr.addColorStop(.7,p.f); gr.addColorStop(1,p.s);
+    rr(x,y,SZ,SZ,10); ctx.fillStyle=gr; ctx.fill();
+    // Üst elmas faset parıltısı
+    ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.beginPath();
+    ctx.moveTo(x+4,y+4); ctx.lineTo(x+SZ-4,y+4); ctx.lineTo(x+SZ*.7,y+SZ*.35); ctx.lineTo(x+SZ*.3,y+SZ*.35);
+    ctx.closePath(); ctx.fill();
+    // İnce faset çerçevesi
+    ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
+    rr(x+4,y+4,SZ-8,SZ-8,7); ctx.stroke();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,10);ctx.stroke();}
+    ctx.restore();
+  }
+}
+
+function drawEmpty(r,c){
+  var x=PAD+c*(SZ+GAP),y=PAD+r*(SZ+GAP);
+  ctx.save(); ctx.globalAlpha=.13; ctx.strokeStyle=curTheme.grid; ctx.lineWidth=1.5;
+  var style=curTheme.style||'jelly';
+  var crd=(style==='cyber'?6:(style==='magma'?8:(style==='rune'?14:12)));
+  rr(x,y,SZ,SZ,crd); ctx.stroke(); ctx.restore();
+}
+
+function render(){
+  ctx.save(); ctx.translate(shX,shY);
+  ctx.fillStyle=curTheme.bg; ctx.fillRect(0,0,W,H);
+  if(grid)for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)grid[r][c]?drawBlock(r,c):drawEmpty(r,c);
+
+  // ⚡ Şimşek Taşı ve Yıldırım Efektleri (Ortaya uçuş, gökten inen yıldırımlar, çatallı arklar ve şok dalgaları)
+  if(wildAnim){
+    // Aşama 1: Hedef blokların etrafında elektriklenme aurası & kilitlenme ve gerilim titremesi
+    if(wildAnim.t < wildAnim.dur1){
+      var p1Ratio=wildAnim.t/wildAnim.dur1;
+      ctx.save();
+      var pa=(Math.sin(performance.now()*0.035)*0.35+0.65);
+      wildAnim.targets.forEach(function(tgt){
+        // Yüksek gerilim titremesi (Jitter)
+        var jx = (Math.random()-0.5)*3.4*p1Ratio;
+        var jy = (Math.random()-0.5)*3.4*p1Ratio;
+        var bx=tgt.x-SZ/2 + jx, by=tgt.y-SZ/2 + jy;
+
+        // İç dolgu elektrik parıltısı
+        ctx.fillStyle='rgba(0, 240, 255, '+(0.24*pa*p1Ratio)+')';
+        rr(bx, by, SZ, SZ, 10);
+        ctx.fill();
+
+        // Neon elektrik çerçevesi
+        ctx.shadowColor='#00f0ff';
+        ctx.shadowBlur=20;
+        ctx.strokeStyle='rgba(0, 240, 255, '+(pa)+')';
+        ctx.lineWidth=2.8;
+        rr(bx, by, SZ, SZ, 10);
+        ctx.stroke();
+
+        // Köşe kilitlenme hedefleme işaretleri
+        ctx.strokeStyle='#ffffff';
+        ctx.lineWidth=2.2;
+        var cLen=8;
+        ctx.beginPath(); ctx.moveTo(bx, by+cLen); ctx.lineTo(bx, by); ctx.lineTo(bx+cLen, by); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx+SZ-cLen, by); ctx.lineTo(bx+SZ, by); ctx.lineTo(bx+SZ, by+cLen); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx, by+SZ-cLen); ctx.lineTo(bx, by+SZ); ctx.lineTo(bx+cLen, by+SZ); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx+SZ-cLen, by+SZ); ctx.lineTo(bx+SZ, by+SZ); ctx.lineTo(bx+SZ, by+SZ-cLen); ctx.stroke();
+
+        // Kilitlenen taşların üstünde gezinen mini elektrik arkları
+        if(Math.random()<0.3){
+          var ax1=bx+Math.random()*SZ, ay1=by+Math.random()*SZ;
+          var ax2=bx+Math.random()*SZ, ay2=by+Math.random()*SZ;
+          drawLightning(ctx, ax1, ay1, ax2, ay2, '#8aeeff', 2.0, false);
+        }
+      });
+      ctx.restore();
+    }
+
+    // Aşama 2: GÖKTEN İNEN YILDIRIM SÜTUNLARI VE TÜM TAHTAYA ÇATALLI ŞİMŞEK FIRTINASI!
+    if(wildAnim.t >= wildAnim.dur1 && wildAnim.t < wildAnim.dur1 + wildAnim.dur2){
+      var tInStage=wildAnim.t-wildAnim.dur1;
+      var stageProgress=tInStage/wildAnim.dur2;
+
+      // 1. Atmosferik Fırtına Karartması (Şimşekler çok daha canlı ve kör edici görünsün diye)
+      ctx.save();
+      var darkAlpha = Math.sin(stageProgress*Math.PI)*0.75;
+      ctx.fillStyle='rgba(3, 6, 24, '+darkAlpha+')';
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+
+      // 2. Gökyüzünün tepesinden merkeze inen 2 devasa atmosferik yıldırım sütunu (Sky-to-Stone Titans)
+      drawLightning(ctx, W*0.22, 0, wildAnim.curX, wildAnim.curY, '#00f0ff', 7.5, true);
+      drawLightning(ctx, W*0.78, 0, wildAnim.curX, wildAnim.curY, '#ffd32a', 6.0, true);
+
+      // 3. Merkezden dönen 16 elektrik ışık huzmesi (Sunburst Rays)
+      var rayAlpha=Math.sin(stageProgress*Math.PI)*0.85;
+      drawElectricSunburst(wildAnim.cx, wildAnim.cy, 16, 260, performance.now()*0.0035, rayAlpha);
+
+      // 4. Merkez çevresinde patlayan devasa beyaz/mavi/mor plazma aurası
+      ctx.save();
+      var cg=ctx.createRadialGradient(wildAnim.cx, wildAnim.cy, 8, wildAnim.cx, wildAnim.cy, 130);
+      cg.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      cg.addColorStop(0.28, 'rgba(0, 240, 255, 0.6)');
+      cg.addColorStop(0.65, 'rgba(120, 50, 255, 0.3)');
+      cg.addColorStop(1, 'rgba(0, 100, 255, 0)');
+      ctx.fillStyle=cg;
+      ctx.beginPath();
+      ctx.arc(wildAnim.cx, wildAnim.cy, 130, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+
+      // 5. Her hedef bloğa birincil ve ikincil çatallı yıldırım
+      wildAnim.targets.forEach(function(tgt){
+        drawLightning(ctx, wildAnim.curX, wildAnim.curY, tgt.x, tgt.y, '#00f0ff', 6.5, true);
+        drawLightning(ctx, wildAnim.curX, wildAnim.curY, tgt.x, tgt.y, '#ffd32a', 3.5, false);
+
+        // Hedef blok patlama yıldızı / 4-köşeli süpernova parlaması (Flare starburst)
+        ctx.save();
+        ctx.shadowColor='#00f0ff';
+        ctx.shadowBlur=30;
+        ctx.fillStyle='#ffffff';
+        ctx.beginPath();
+        var fsz = 16 + Math.random()*8;
+        ctx.arc(tgt.x, tgt.y, fsz*0.42, 0, Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle='rgba(255,255,255,0.9)';
+        ctx.lineWidth=2.5;
+        ctx.beginPath();
+        ctx.moveTo(tgt.x-fsz, tgt.y); ctx.lineTo(tgt.x+fsz, tgt.y);
+        ctx.moveTo(tgt.x, tgt.y-fsz); ctx.lineTo(tgt.x, tgt.y+fsz);
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // 6. Hedef bloklar arasında ağ şimşekleri (Inter-target cross arcs)
+      if(wildAnim.targets.length > 1 && Math.random() < 0.75){
+        var i1=Math.floor(Math.random()*wildAnim.targets.length);
+        var i2=Math.floor(Math.random()*wildAnim.targets.length);
+        if(i1!==i2){
+          var t1=wildAnim.targets[i1], t2=wildAnim.targets[i2];
+          if(Math.hypot(t1.x-t2.x, t1.y-t2.y) < 220){
+            drawLightning(ctx, t1.x, t1.y, t2.x, t2.y, '#c75cff', 3.2, false);
+          }
+        }
+      }
+
+      // 7. Ekranda rastgele çakan atmosferik statik arklar
+      if(Math.random()<0.45){
+        var rx1=PAD+Math.random()*(W-PAD*2), ry1=PAD+Math.random()*(H-PAD*2);
+        var rx2=rx1+(Math.random()-0.5)*80, ry2=ry1+(Math.random()-0.5)*80;
+        drawLightning(ctx, rx1, ry1, rx2, ry2, '#8aeeff', 2.2, false);
+      }
+    }
+
+    // Aşama 3: Genişleyen elektrik şok dalgası halkaları (Concentric Shockwaves)
+    if(wildAnim.t >= wildAnim.dur1 + wildAnim.dur2){
+      var p3=(wildAnim.t-(wildAnim.dur1+wildAnim.dur2))/wildAnim.dur3;
+      var fade=1-p3;
+      ctx.save();
+      // 1. Dış Mavi Şok Dalgası
+      ctx.strokeStyle='rgba(0, 240, 255, '+fade+')';
+      ctx.shadowColor='#00f0ff';
+      ctx.shadowBlur=32;
+      ctx.lineWidth=6.5*fade;
+      ctx.beginPath();
+      ctx.arc(wildAnim.cx, wildAnim.cy, p3*250, 0, Math.PI*2);
+      ctx.stroke();
+
+      // 2. Orta Altın/Mor Şok Dalgası
+      ctx.strokeStyle='rgba(255, 211, 42, '+(fade*0.9)+')';
+      ctx.shadowColor='#ffd32a';
+      ctx.shadowBlur=22;
+      ctx.lineWidth=4.5*fade;
+      ctx.beginPath();
+      ctx.arc(wildAnim.cx, wildAnim.cy, p3*185, 0, Math.PI*2);
+      ctx.stroke();
+
+      // 3. İç Parlak Beyaz Halka
+      ctx.strokeStyle='rgba(255, 255, 255, '+(fade*0.95)+')';
+      ctx.shadowColor='#ffffff';
+      ctx.shadowBlur=16;
+      ctx.lineWidth=3*fade;
+      ctx.beginPath();
+      ctx.arc(wildAnim.cx, wildAnim.cy, p3*120, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Merkeze uçan ve dönen şimşek taşı
+    drawWildStone(wildAnim.curX, wildAnim.curY, SZ, wildAnim.scale, wildAnim.rot, wildAnim.alpha);
+  }
+
+  parts.forEach(function(p){
+    ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.col;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.sz*p.life,0,Math.PI*2); ctx.fill();
+  });
+  ctx.textAlign='center';
+  floats.forEach(function(t){
+    ctx.globalAlpha=Math.max(0,t.life);
+    ctx.fillStyle=t.color;
+    ctx.font='bold '+t.sz+'px Outfit,sans-serif';
+    ctx.shadowColor=t.color; ctx.shadowBlur=12;
+    ctx.fillText(t.text,t.x,t.y);
+  });
+  if(flashAlpha>0.005){
+    ctx.globalAlpha=flashAlpha; ctx.fillStyle=flashColor;
+    ctx.fillRect(0,0,W,H); flashAlpha*=.82;
+  }
+  ctx.globalAlpha=1; ctx.shadowBlur=0; ctx.restore();
+}
+
+function renderSF(){
+  sf2.clearRect(0,0,sf.width,sf.height);
+  var sc=curTheme.star||'#fff';
+  STARS.forEach(function(s){
+    s.a+=s.sp; sf2.globalAlpha=(Math.sin(s.a)+1)/2*.65+.1;
+    sf2.fillStyle=sc; sf2.beginPath(); sf2.arc(s.x,s.y,s.r,0,Math.PI*2); sf2.fill();
+  });
+  sf2.globalAlpha=1;
+}
+
+// UI
+function updUI(){
+  document.getElementById('sc').textContent=score.toLocaleString('tr-TR');
+  document.getElementById('lv').textContent=level;
+  var b=updateBest(score);
+  document.getElementById('bs').textContent=b.toLocaleString('tr-TR');
+}
+function updBar(f){document.getElementById('tb').style.width=(Math.max(0,f)*100)+'%';}
+function updPreview(){
+  nextRow=mkRow();
+  var el=document.getElementById('pr'); el.innerHTML='';
+  nextRow.forEach(function(col){
+    var d=document.createElement('div');
+    d.className='pc';
+    d.style.background=col==='WILD'?'#ffffff':(PAL[col]?PAL[col].f:'#444');
+    el.appendChild(d);
+  });
+}
+function updDanger(){document.getElementById('danger').style.opacity=grid[0].some(function(x){return x;})?'1':'0';}
+
+function showOv(id){
+  ['ov-start','ov-how','ov-phone','ov-pause','ov-over'].forEach(function(oid){
+    var el=document.getElementById(oid);
+    if(el) el.classList.toggle('hidden',oid!==id);
+  });
+}
+function hideAll(){
+  ['ov-start','ov-how','ov-phone','ov-pause','ov-over'].forEach(function(oid){
+    var el=document.getElementById(oid);
+    if(el) el.classList.add('hidden');
+  });
+}
+
+function renderScoreBadge(finalScore){
+  var prevBest=getBest();
+  var isRecord=finalScore>0 && finalScore>=prevBest;
+  var b=updateBest(finalScore);
+  var badge=document.getElementById('best-badge');
+  var title=document.getElementById('bb-title');
+  var val=document.getElementById('bb-val');
+  if(badge && title && val){
+    if(isRecord && finalScore>0){
+      badge.className='best-badge is-record';
+      title.textContent='👑 YENİ REKOR!';
+      val.textContent=finalScore.toLocaleString('tr-TR');
+    }else{
+      badge.className='best-badge';
+      title.textContent='EN İYİ SKOR';
+      val.textContent=b.toLocaleString('tr-TR');
+    }
+  }
+}
+
+// Game logic
+function startGame(){
+  grid=mkGrid(); score=0; elapsed=0; lastSpawn=0;
+  level=1; prevLevel=1; spawnInt=LVL[0].ms;
+  activeColors=['RED','BLUE','YELLOW'];
+  applyTheme(THEMES[0]);
+  rowsSinceWild=0; parts=[]; floats=[]; shM=0; flashAlpha=0; wildAnim=null;
+  hoverGrp=new Set(); comboCount=0; lastComboTime=0; hasRevived=false;
+  state=ST.PLAY; lastT=performance.now();
+  for(var r=ROWS-2;r<ROWS;r++) grid[r]=mkRow();
+  updPreview(); updUI(); hideAll();
+}
+
+function togglePause(){
+  if(state===ST.PLAY||state===ST.ANIM){
+    state=ST.PAUSE; sndPause(); showOv('ov-pause');
+    document.getElementById('pbtn').textContent='▶';
+  } else if(state===ST.PAUSE){
+    state=ST.PLAY; lastT=performance.now(); hideAll(); sndPause();
+    document.getElementById('pbtn').textContent='⏸';
+  }
+}
+
+function goMenu(){
+  state=ST.START; grid=mkGrid(); parts=[]; floats=[]; wildAnim=null;
+  activeColors=['RED','BLUE','YELLOW'];
+  applyTheme(THEMES[0]);
+  showOv('ov-start');
+  document.getElementById('pbtn').textContent='⏸';
+  updUI();
+}
+
+function handleClick(px,py){
+  if(state!==ST.PLAY)return;
+  var c=Math.floor((px-PAD)/(SZ+GAP)), r=Math.floor((py-PAD)/(SZ+GAP));
+  if(r<0||r>=ROWS||c<0||c>=COLS||!grid[r][c])return;
+
+  // ⚡ WILD bloğu: Yıldırım taşı sahne ortasına uçar, şimşekler çakar, gök gürültüsü ile taşları yok eder!
+  if(grid[r][c]==='WILD'){
+    var hitSet={};
+    for(var rr2=0;rr2<ROWS;rr2++)if(grid[rr2][c]!==null && !(rr2===r && c===c))hitSet[rr2*100+c]=[rr2,c];
+    for(var cc2=0;cc2<COLS;cc2++)if(grid[r][cc2]!==null && !(r===r && cc2===c))hitSet[r*100+cc2]=[r,cc2];
+    var targets=[];
+    for(var k in hitSet){
+      var cell=hitSet[k];
+      targets.push({
+        r: cell[0], c: cell[1],
+        x: PAD + cell[1]*(SZ+GAP) + SZ/2,
+        y: PAD + cell[0]*(SZ+GAP) + SZ/2,
+        col: grid[cell[0]][cell[1]]
+      });
+    }
+
+    grid[r][c]=null;
+    hoverGrp=new Set();
+
+    var wpts=(targets.length + 1)*75 + 150;
+    var startX=PAD + c*(SZ+GAP) + SZ/2;
+    var startY=PAD + r*(SZ+GAP) + SZ/2;
+
+    wildAnim={
+      t: 0,
+      dur1: 320, // sahne ortasına süzülüş ve kilitlenme (ms)
+      dur2: 520, // atmosferik fırtına, şimşekler ve gök gürültüsü (ms)
+      dur3: 240, // dev şok dalgası ve çözünme (ms)
+      x0: startX, y0: startY,
+      cx: W / 2, cy: H / 2,
+      curX: startX, curY: startY,
+      scale: 1, rot: 0, alpha: 1,
+      targets: targets,
+      wpts: wpts,
+      strikeDone: false
+    };
+
+    state=ST.ANIM;
+    animT=1200;
+    ensureAudio();
+    // Yükselen manyetik rezonans şarj sesi (Elektrik birikmesi)
+    beep(260, 'triangle', 0.36, 0.38, 1020);
+    vib([35, 45, 55]);
+    return;
+  }
+
+  var grp=bfs(grid,r,c);
+  if(grp.length<2)return;
+
+  // Combo
+  var now=performance.now();
+  if(now-lastComboTime<1500)comboCount++;else comboCount=1;
+  lastComboTime=now;
+
+  var mult=Math.min(comboCount,4);
+  var pts=grp.length*grp.length*10*mult;
+  var cx=grp.reduce(function(s,x){return s+PAD+x[1]*(SZ+GAP)+SZ/2;},0)/grp.length;
+  var cy=grp.reduce(function(s,x){return s+PAD+x[0]*(SZ+GAP)+SZ/2;},0)/grp.length;
+
+  var big=grp.length>=5||comboCount>=3;
+  var fcol=comboCount>=3?'#ffd32a':(big?'#ffffff':(PAL[grid[grp[0][0]][grp[0][1]]]||PAL.RED).h);
+  addFloat(cx,cy,'+'+pts.toLocaleString('tr-TR'),fcol,big);
+  if(comboCount>=2){
+    var lbls=['','','COMBO!','HOT! \uD83D\uDD25','INSANE!! \uD83D\uDD25\uD83D\uDD25'];
+    floats.push({x:cx,y:cy+34,vy:-1.1,life:1,text:lbls[Math.min(comboCount,4)],color:'#ffd32a',sz:15});
+  }
+  spawnParts(grp,mult);
+  shake(Math.min(grp.length*1.5+mult*2,18));
+  ensureAudio(); sndPop(grp.length); vib(comboCount>=2?[25, 30, 40]:16);
+  score+=pts;
+  grp.forEach(function(x){grid[x[0]][x[1]]=null;});
+  gravity(grid);
+  hoverGrp=new Set();
+  checkLvl();
+  state=ST.ANIM; animT=ANIM_DUR;
+  updUI();
+  return;
+}
+
+// ── Google Play & AdMob Entegrasyon Köprüsü (GridPop Arcade - Pro Sürüm) ──
+var roundCount = 0;
+var hasRevived = false;
+var lastAdTime = 0;
+var MIN_AD_COOLDOWN_MS = 45000; // ⏱️ 3. KURAL: En az 45 saniyelik zaman kilidi (peş peşe spam reklamı engeller)
+
+window.AdMobBridge = {
+  // 🔑 Senin Resmi Google AdMob Kimliklerin:
+  appId: 'ca-app-pub-6987515412706191~9242593403',
+  interstitialId: 'ca-app-pub-6987515412706191/9705627838',
+  rewardedId: 'ca-app-pub-6987515412706191/8901268896',
+
+  // 🛡️ Otomatik IP / Geliştirici Koruması:
+  // Localhost veya yerel ağda (192.168.x.x) çalışırken gerçek reklam istekleri engellenir, hesabın %100 güvende kalır!
+  isDevSafe: function(){
+    var h = location.hostname;
+    return h === 'localhost' || h === '127.0.0.1' || h.indexOf('192.168.') === 0;
+  },
+
+  // ⚡ 1. KURAL: Önceden Yükleme (Preload)
+  // Oyun başlar başlamaz ve reklamlar kapandığı an bir sonrakini arka planda hazır bekletir
+  preloadInterstitial: function(){
+    if(this.isDevSafe()) return;
+    if(window.AndroidBridge && window.AndroidBridge.preloadInterstitial){
+      window.AndroidBridge.preloadInterstitial();
+    }
+  },
+
+  preloadRewarded: function(){
+    if(this.isDevSafe()) return;
+    if(window.AndroidBridge && window.AndroidBridge.preloadRewarded){
+      window.AndroidBridge.preloadRewarded();
+    }
+  },
+
+  // ⚡ 2 & 3. KURAL: Akıllı Gösterim & Zaman Aşımı Kilidi
+  showInterstitial: function(){
+    var now = Date.now();
+    // Zaman kilidi kontrolü (en az 45 sn geçmiş olmalı):
+    if(now - lastAdTime < MIN_AD_COOLDOWN_MS){
+      console.log('[AdMob] Zaman kilidi aktif (<45 sn). Hızlı yanma nedeniyle geçiş reklamı pas geçildi.');
+      return false;
+    }
+
+    if(this.isDevSafe()){
+      console.log('[AdMob Kalkanı] Yerel ağ/IP tespit edildi: Gerçek geçiş reklamı engellendi (Hesap korumada).');
+      lastAdTime = now;
+      return true;
+    }
+
+    if(window.AndroidBridge && window.AndroidBridge.showInterstitial){
+      var res = window.AndroidBridge.showInterstitial();
+      lastAdTime = now;
+      this.preloadInterstitial(); // Bir sonraki geçiş reklamını hemen arkada yükle
+      return res !== false;
+    }
+    return false;
+  },
+
+  showRewarded: function(onSuccess){
+    var now = Date.now();
+    if(this.isDevSafe()){
+      console.log('[AdMob Kalkanı] Yerel geliştirme ortamı: Ödüllü reklam simülasyonu çalıştırıldı (Can kurtarma başarılı).');
+      lastAdTime = now;
+      if(onSuccess) onSuccess();
+      return;
+    }
+    if(window.AndroidBridge && window.AndroidBridge.showRewarded){
+      var self = this;
+      window.AndroidBridge.showRewarded(function(){
+        lastAdTime = Date.now();
+        if(onSuccess) onSuccess();
+        self.preloadRewarded(); // Bir sonraki ödüllü reklamı hemen arkada yükle
+      });
+    } else if(onSuccess){
+      lastAdTime = now;
+      onSuccess();
+    }
+  }
+};
+
+function reviveGame(){
+  // Üstteki en tehlikeli 3 sırayı temizleyerek oyuncuyu kurtar
+  for(var r=0; r<3; r++){
+    for(var c=0; c<COLS; c++) grid[r][c] = null;
+  }
+  gravity(grid);
+  hasRevived = true;
+
+  // ⚡ 2. KURAL: Ödüllü reklam izlendiği için geçiş reklamı sayacı SIFIRLANIR ve süre güncellenir (Çakışma Önleyici)
+  roundCount = 0;
+  lastAdTime = Date.now();
+
+  state = ST.PLAY;
+  lastT = performance.now();
+  ensureAudio();
+  sndGreen();
+  shake(16);
+  flash('#2ecc71', 0.45);
+  floats.push({x: W/2, y: H/2, vy: -1.2, life: 1.8, text: '💖 CAN KURTARILDI!', color: '#2ecc71', sz: 22});
+  hideAll();
+  updUI();
+}
+
+function gameOver(){
+  state=ST.OVER; ensureAudio(); sndOver(); vib([50, 70, 50, 70, 120]);
+  document.getElementById('fs').textContent=score.toLocaleString('tr-TR');
+  renderScoreBadge(score); updUI();
+
+  // 1 Can Kurtarma butonunu kontrol et (her oyunda en fazla 1 kez kurtarılabilir)
+  var revBtn = document.getElementById('btn-revive');
+  if(revBtn) revBtn.style.display = hasRevived ? 'none' : 'block';
+
+  showOv('ov-over');
+
+  // ⚡ 2 & 3. KURAL: Oyuncu zaten ödüllü reklamla can kurtardıysa o tur geçiş reklamı gösterilmez!
+  if(!hasRevived){
+    roundCount++;
+    // En az 3 tur oynandıysa ve en az 45 saniyelik zaman aşımı dolduysa göster
+    if(roundCount >= 3){
+      var shown = window.AdMobBridge.showInterstitial();
+      if(shown){
+        roundCount = 0;
+      }
+    }
+  }
+}
+
+// Main loop
+function loop(ts){
+  var dt=Math.min(ts-lastT,50); lastT=ts;
+  renderSF();
+  if(state===ST.PLAY||state===ST.ANIM){
+    elapsed+=dt;
+
+    // ⚡ Şimşek Animasyonu Güncellemesi
+    if(wildAnim){
+      wildAnim.t += dt;
+      if(wildAnim.t < wildAnim.dur1){
+        // Aşama 1: Merkeze kavisli süzülüş ve dönme
+        var p = wildAnim.t / wildAnim.dur1;
+        var ease = 1 - Math.pow(1 - p, 3);
+        wildAnim.curX = wildAnim.x0 + (wildAnim.cx - wildAnim.x0) * ease;
+        wildAnim.curY = wildAnim.y0 + (wildAnim.cy - wildAnim.y0) * ease;
+        wildAnim.scale = 1 + ease * 0.52;
+        wildAnim.rot = ease * Math.PI * 2.5;
+        wildAnim.alpha = 1;
+
+        // İçe çekilen elektrik vorteks parçacıkları
+        var aV = Math.random() * Math.PI * 2;
+        var rV = 45 + Math.random() * 65;
+        var sx = wildAnim.curX + Math.cos(aV) * rV;
+        var sy = wildAnim.curY + Math.sin(aV) * rV;
+        parts.push({
+          x: sx, y: sy,
+          vx: (wildAnim.curX - sx) * 0.095,
+          vy: (wildAnim.curY - sy) * 0.095,
+          life: 0.75, dc: 0.035, sz: 3.4,
+          col: Math.random() < 0.6 ? '#00f0ff' : '#ffd32a'
+        });
+      } else if(wildAnim.t < wildAnim.dur1 + wildAnim.dur2){
+        // Aşama 2: Merkezde şimşekler çakar ve gök gürültüsü patlar!
+        wildAnim.curX = wildAnim.cx;
+        wildAnim.curY = wildAnim.cy;
+        wildAnim.scale = 1.58 + Math.sin(performance.now()*0.03)*0.2;
+        wildAnim.rot += dt * 0.009;
+        wildAnim.alpha = 1;
+
+        if(!wildAnim.strikeDone){
+          wildAnim.strikeDone = true;
+          playThunderSound();
+          shake(44);
+          // 4-Kademeli Gerçekçi Şimşek Strobosu (Göz kamaştırıcı yıldırım çakmaları)
+          flash('#ffffff', 0.96);
+          setTimeout(function(){ flash('#00f0ff', 0.85); }, 38);
+          setTimeout(function(){ flash('#7a30ff', 0.55); }, 95);
+          setTimeout(function(){ flash('#00e5ff', 0.35); }, 165);
+          vib([90, 45, 100, 45, 160]);
+
+          addFloat(W/2, H/2 - 80, '+' + wildAnim.wpts.toLocaleString('tr-TR'), '#ffd32a', true);
+          floats.push({x: W/2, y: H/2 - 38, vy: -1.2, life: 1.6, text: '⚡ GÖK GÜRÜLTÜSÜ! ⚡', color: '#ffffff', sz: 23});
+
+          // Hedef blokları yok et ve yoğun elektrik kıvılcımları saç
+          wildAnim.targets.forEach(function(tgt){
+            spawnElectricSparks(tgt.x, tgt.y, 18, '#00f0ff', 1.4);
+            spawnElectricSparks(tgt.x, tgt.y, 8, '#ffffff', 1.8);
+            if(grid[tgt.r][tgt.c]){
+              grid[tgt.r][tgt.c] = null;
+            }
+          });
+          // Merkezden devasa radyal elektrik patlaması
+          spawnElectricSparks(wildAnim.cx, wildAnim.cy, 36, '#ffd32a', 2.0);
+          spawnElectricSparks(wildAnim.cx, wildAnim.cy, 24, '#00f0ff', 1.6);
+
+          score += wildAnim.wpts;
+          checkLvl();
+          updUI();
+        }
+
+        // Şimşek çakarken her kare ekranda elektrik saçılması
+        if(Math.random() < 0.75){
+          var rt = wildAnim.targets[Math.floor(Math.random() * wildAnim.targets.length)];
+          if(rt) spawnElectricSparks(rt.x, rt.y, 3, '#8aeeff', 0.9);
+        }
+      } else if(wildAnim.t < wildAnim.dur1 + wildAnim.dur2 + wildAnim.dur3){
+        // Aşama 3: Yok oluş
+        var p3 = (wildAnim.t - (wildAnim.dur1 + wildAnim.dur2)) / wildAnim.dur3;
+        wildAnim.scale = 1.58 + p3 * 1.2;
+        wildAnim.alpha = Math.max(0, 1 - p3);
+      } else {
+        // Tamamlandı
+        wildAnim = null;
+        gravity(grid);
+        state = ST.PLAY;
+        updUI();
+      }
+    } else if(state===ST.ANIM){
+      animT-=dt;if(animT<=0)state=ST.PLAY;
+    }
+
+    var tss=elapsed-lastSpawn, frac=1-tss/spawnInt;
+    updBar(frac);
+    if(!wildAnim && tss>=spawnInt){
+      lastSpawn=elapsed;
+      if(!pushRow())gameOver();
+      else{ensureAudio();sndRow();updPreview();}
+    }
+    updShake();
+    for(var i=parts.length-1;i>=0;i--){
+      var p=parts[i];p.x+=p.vx*dt*.06;p.y+=p.vy*dt*.06;p.vy+=.08*dt*.06;p.life-=p.dc*dt*.06;
+      if(p.life<=0)parts.splice(i,1);
+    }
+    for(var j=floats.length-1;j>=0;j--){
+      var t=floats[j];t.y+=t.vy*dt*.06;t.life-=.018*dt*.06;
+      if(t.life<=0)floats.splice(j,1);
+    }
+    updDanger();
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+
+// Vibration helper for mobile devices
+function vib(p){if(navigator.vibrate)try{navigator.vibrate(p);}catch(e){}}
+
+// Input
+gc.addEventListener('mousemove',function(e){
+  var rc=gc.getBoundingClientRect();
+  setHover((e.clientX-rc.left)*(W/rc.width),(e.clientY-rc.top)*(H/rc.height));
+  gc.style.cursor=hoverGrp.size>0?'pointer':'default';
+});
+gc.addEventListener('mouseleave',function(){hoverGrp=new Set();gc.style.cursor='default';});
+gc.addEventListener('click',function(e){
+  var rc=gc.getBoundingClientRect();
+  handleClick((e.clientX-rc.left)*(W/rc.width),(e.clientY-rc.top)*(H/rc.height));
+});
+
+// Mobile touch handlers: touch to highlight group, release to pop!
+var tStartX=0, tStartY=0;
+gc.addEventListener('touchstart',function(e){
+  e.preventDefault(); ensureAudio();
+  var t=e.touches[0], rc=gc.getBoundingClientRect();
+  tStartX=t.clientX; tStartY=t.clientY;
+  setHover((t.clientX-rc.left)*(W/rc.width),(t.clientY-rc.top)*(H/rc.height));
+},{passive:false});
+gc.addEventListener('touchmove',function(e){
+  e.preventDefault();
+  var t=e.touches[0], rc=gc.getBoundingClientRect();
+  setHover((t.clientX-rc.left)*(W/rc.width),(t.clientY-rc.top)*(H/rc.height));
+},{passive:false});
+gc.addEventListener('touchend',function(e){
+  e.preventDefault();
+  var t=e.changedTouches[0], rc=gc.getBoundingClientRect();
+  var dx=t.clientX-tStartX, dy=t.clientY-tStartY;
+  if(Math.hypot(dx,dy)<30){
+    handleClick((t.clientX-rc.left)*(W/rc.width),(t.clientY-rc.top)*(H/rc.height));
+  }
+  hoverGrp=new Set();
+},{passive:false});
+
+document.getElementById('btn-s').onclick=function(){ensureAudio();startGame();};
+document.getElementById('btn-h').onclick=function(){showOv('ov-how');};
+document.getElementById('btn-hb').onclick=function(){showOv('ov-start');};
+document.getElementById('btn-ph').onclick=function(){showOv('ov-phone');};
+document.getElementById('btn-pb').onclick=function(){showOv('ov-start');};
+document.getElementById('btn-r').onclick=function(){togglePause();};
+document.getElementById('btn-q').onclick=function(){goMenu();};
+document.getElementById('btn-re').onclick=function(){ensureAudio();startGame();};
+document.getElementById('btn-revive').onclick=function(){
+  ensureAudio();
+  window.AdMobBridge.showRewarded(reviveGame);
+};
+document.getElementById('btn-m').onclick=function(){goMenu();};
+document.getElementById('pbtn').onclick=function(){
+  if(state===ST.PLAY||state===ST.ANIM||state===ST.PAUSE){ensureAudio();togglePause();}
+};
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&(state===ST.PLAY||state===ST.ANIM||state===ST.PAUSE)){ensureAudio();togglePause();}
+});
+
+updUI();
+requestAnimationFrame(loop);
+
+// İlk reklamları arka planda sessizce hazırla
+window.AdMobBridge.preloadInterstitial();
+window.AdMobBridge.preloadRewarded();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(e){
+      console.log('SW reg:', e);
+    });
+  });
+}
+</script>
+</body>
+</html>

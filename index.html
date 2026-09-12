@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -134,11 +134,11 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 <canvas id="sf"></canvas>
 <div id="app">
   <div id="sidebar">
-    <div class="card" id="card-sc"><h3>Skor</h3><div class="val" id="sc">0</div></div>
-    <div class="card" id="card-lv"><h3>Seviye</h3><div class="val" id="lv">1</div></div>
-    <div class="card" id="card-bs"><h3>En İyi</h3><div class="val" id="bs">0</div></div>
+    <div class="card" id="card-sc"><h3>Score</h3><div class="val" id="sc">0</div></div>
+    <div class="card" id="card-lv"><h3>Level</h3><div class="val" id="lv">1</div></div>
+    <div class="card" id="card-bs"><h3>Best</h3><div class="val" id="bs">0</div></div>
     <div class="card" id="card-nx">
-      <h3>Sıra</h3>
+      <h3>Next</h3>
       <div class="bar-bg"><div class="bar-fill" id="tb"></div></div>
       <div class="preview" id="pr"></div>
     </div>
@@ -150,63 +150,63 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
     <button class="icon-btn" id="pbtn">⏸</button>
     <div class="ov" id="ov-start">
       <h1>GridPop</h1>
-      <p class="tag" style="margin-top:-4px">Renkli blokları patlatın, tufanı durdurun!</p>
+      <p class="tag" style="margin-top:-4px">Pop color blocks & conquer the storm!</p>
       <div class="dots">
-        <div class="dot" style="background:#ff4757;box-shadow:0 0 8px #ff475799" title="Kırmızı"></div>
-        <div class="dot" style="background:#2ed2ff;box-shadow:0 0 8px #2ed2ff99" title="Mavi"></div>
-        <div class="dot" style="background:#ffd32a;box-shadow:0 0 8px #ffd32a99" title="Sarı"></div>
-        <div class="dot" style="background:#2ecc71;box-shadow:0 0 8px #2ecc7199" title="Yeşil (Lv3)"></div>
-        <div class="dot" style="background:#b44fff;box-shadow:0 0 8px #b44fff99" title="Mor (Lv5)"></div>
-        <div class="dot" style="background:#ff7b00;box-shadow:0 0 8px #ff7b0099" title="Turuncu (Lv7)"></div>
-        <div class="dot" style="background:#ff3ea5;box-shadow:0 0 8px #ff3ea599" title="Pembe (Lv9)"></div>
-        <div class="dot" style="background:#fff;box-shadow:0 0 8px #ffffff99" title="⚡ Joker"></div>
+        <div class="dot" style="background:#ff4757;box-shadow:0 0 8px #ff475799" title="Red"></div>
+        <div class="dot" style="background:#2ed2ff;box-shadow:0 0 8px #2ed2ff99" title="Blue"></div>
+        <div class="dot" style="background:#ffd32a;box-shadow:0 0 8px #ffd32a99" title="Yellow"></div>
+        <div class="dot" style="background:#2ecc71;box-shadow:0 0 8px #2ecc7199" title="Green (Lv3)"></div>
+        <div class="dot" style="background:#b44fff;box-shadow:0 0 8px #b44fff99" title="Purple (Lv5)"></div>
+        <div class="dot" style="background:#ff7b00;box-shadow:0 0 8px #ff7b0099" title="Orange (Lv7)"></div>
+        <div class="dot" style="background:#ff3ea5;box-shadow:0 0 8px #ff3ea599" title="Pink (Lv9)"></div>
+        <div class="dot" style="background:#fff;box-shadow:0 0 8px #ffffff99" title="⚡ Lightning"></div>
       </div>
-      <button class="btn" id="btn-s">Oyna</button>
-      <button class="btn ghost" id="btn-h">Nasıl Oynanır?</button>
-      <button class="btn ghost" id="btn-ph" style="border-color:#2ed2ff44;color:#2ed2ff;font-size:13px;padding:7px 18px">📱 Telefonda Oyna (QR)</button>
+      <button class="btn" id="btn-s">PLAY</button>
+      <button class="btn ghost" id="btn-h">How to Play</button>
+      <button class="btn ghost" id="btn-ph" style="border-color:#2ed2ff44;color:#2ed2ff;font-size:13px;padding:7px 18px">📱 Play on Phone (QR)</button>
     </div>
     <div class="ov hidden" id="ov-phone" style="text-align:center;gap:10px">
-      <h2 style="font-size:24px;color:#fff">📱 Telefonda Oyna</h2>
-      <p class="tag" style="max-width:270px;line-height:1.4">Telefonun bilgisayarınla <b>aynı Wi-Fi</b> ağına bağlı olsun.</p>
+      <h2 style="font-size:24px;color:#fff">📱 Play on Mobile</h2>
+      <p class="tag" style="max-width:270px;line-height:1.4">Open this on your mobile device browser.</p>
       <div style="background:#fff;padding:8px;border-radius:14px;box-shadow:0 0 25px #2ed2ff44;margin:4px 0">
-        <img src="assets/qr.png" alt="QR Kod" style="width:160px;height:160px;display:block;border-radius:6px">
+        <img src="assets/qr.png" alt="QR Code" style="width:160px;height:160px;display:block;border-radius:6px">
       </div>
       <div style="font-size:15px;color:#2ed2ff;font-weight:700;background:#2ed2ff15;padding:6px 14px;border-radius:8px;border:1px solid #2ed2ff44;user-select:all;-webkit-user-select:all">
-        http://192.168.1.169:8080
+        https://sytex10.github.io/gridpop/
       </div>
-      <button class="btn" id="btn-pb" style="margin-top:4px">Geri Dön</button>
+      <button class="btn" id="btn-pb" style="margin-top:4px">Back</button>
     </div>
     <div class="ov hidden" id="ov-how">
-      <h2>Nasıl Oynanır?</h2>
+      <h2>How to Play</h2>
       <div class="how-grid">
-        <div class="hi">🖱️</div><div class="ht">En az 2 komşu aynı renkli bloğa tıkla — hepsi patlar!</div>
-        <div class="hi">📈</div><div class="ht">Büyük grup = katlanarak puan. <span style="color:#ffd32a">6 blok = 360 puan</span></div>
-        <div class="hi">⚡</div><div class="ht">Gökkuşağı çerçeveli ⚡ joker blok hem tüm sütunu hem satırı şimşekle patlatır!</div>
-        <div class="hi">🌈</div><div class="ht">Seviye atladıkça yeni renkler (Yeşil, Mor, Turuncu, Pembe) ve yeni temalar açılır!</div>
-        <div class="hi">⏸</div><div class="ht">ESC ile duraklat.</div>
+        <div class="hi">🖱️</div><div class="ht">Tap any cluster of 2+ matching color blocks to pop them!</div>
+        <div class="hi">📈</div><div class="ht">Bigger clusters multiply points! <span style="color:#ffd32a">6 blocks = 360 pts</span></div>
+        <div class="hi">⚡</div><div class="ht">Rainbow-rimmed ⚡ Lightning Stone blasts full row & column!</div>
+        <div class="hi">🌈</div><div class="ht">Level up to unlock new colors (Green, Purple, Orange, Pink) & cosmic themes!</div>
+        <div class="hi">⏸</div><div class="ht">Press ESC or pause button to pause.</div>
       </div>
-      <button class="btn" id="btn-hb">Anladım!</button>
+      <button class="btn" id="btn-hb">Got it!</button>
     </div>
     <div class="ov hidden" id="ov-pause">
-      <div class="ptitle">⏸ Duraklatıldı</div>
-      <p class="tag">ESC ile devam et</p>
+      <div class="ptitle">⏸ PAUSED</div>
+      <p class="tag">Press ESC to resume</p>
       <div class="brow">
-        <button class="btn" id="btn-r">Devam Et</button>
-        <button class="btn ghost" id="btn-q">Ana Menü</button>
+        <button class="btn" id="btn-r">Resume</button>
+        <button class="btn ghost" id="btn-q">Main Menu</button>
       </div>
     </div>
     <div class="ov hidden" id="ov-over">
-      <h2>Oyun Bitti</h2>
+      <h2>GAME OVER</h2>
       <div class="big-score" id="fs">0</div>
-      <p class="tag">puan</p>
+      <p class="tag">points</p>
       <div class="best-badge" id="best-badge">
-        <div class="bb-title" id="bb-title">EN İYİ SKOR</div>
+        <div class="bb-title" id="bb-title">BEST SCORE</div>
         <div class="bb-val" id="bb-val">0</div>
       </div>
-      <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px">🎬 1 Can Kurtar (Devam Et)</button>
+      <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px">🎬 1 Extra Life (Continue)</button>
       <div class="brow">
-        <button class="btn" id="btn-re">Tekrar Oyna</button>
-        <button class="btn ghost" id="btn-m">Ana Menü</button>
+        <button class="btn" id="btn-re">Play Again</button>
+        <button class="btn ghost" id="btn-m">Main Menu</button>
       </div>
     </div>
   </div>
@@ -231,11 +231,11 @@ var PAL={
 
 // Themes per level group: style, pageBg, panel, bg=canvas bg, grid=empty stroke, accent, wrapGlow, star
 var THEMES=[
-  {name:'Gece Mavisi',  style:'jelly', pageBg:'#0a0a18', panel:'#121226', bg:'#111124', grid:'#7b5cff', accent:'#7b5cff', wrapGlow:'#7b5cff44', star:'#ffffff'},
-  {name:'Zümrüt Orman', style:'rune',  pageBg:'#05140b', panel:'#092315', bg:'#071a10', grid:'#2ecc71', accent:'#2ecc71', wrapGlow:'#2ecc7155', star:'#7fffb2'},
-  {name:'Cyber Neon',   style:'cyber', pageBg:'#12041f', panel:'#1d0733', bg:'#18062b', grid:'#b44fff', accent:'#b44fff', wrapGlow:'#b44fff55', star:'#d99fff'},
-  {name:'Lav Kıyameti', style:'magma', pageBg:'#1a0800', panel:'#291003', bg:'#220c02', grid:'#ff7b00', accent:'#ff7b00', wrapGlow:'#ff7b0055', star:'#ffb566'},
-  {name:'Kaos Boyutu',  style:'prism', pageBg:'#1a0016', panel:'#290224', bg:'#21011d', grid:'#ff3ea5', accent:'#ff3ea5', wrapGlow:'#ff3ea555', star:'#ff9dd2'}
+  {name:'Midnight Blue',  style:'jelly', pageBg:'#0a0a18', panel:'#121226', bg:'#111124', grid:'#7b5cff', accent:'#7b5cff', wrapGlow:'#7b5cff44', star:'#ffffff'},
+  {name:'Emerald Forest', style:'rune',  pageBg:'#05140b', panel:'#092315', bg:'#071a10', grid:'#2ecc71', accent:'#2ecc71', wrapGlow:'#2ecc7155', star:'#7fffb2'},
+  {name:'Cyber Neon',     style:'cyber', pageBg:'#12041f', panel:'#1d0733', bg:'#18062b', grid:'#b44fff', accent:'#b44fff', wrapGlow:'#b44fff55', star:'#d99fff'},
+  {name:'Magma Storm',    style:'magma', pageBg:'#1a0800', panel:'#291003', bg:'#220c02', grid:'#ff7b00', accent:'#ff7b00', wrapGlow:'#ff7b0055', star:'#ffb566'},
+  {name:'Prism Chaos',    style:'prism', pageBg:'#1a0016', panel:'#290224', bg:'#21011d', grid:'#ff3ea5', accent:'#ff3ea5', wrapGlow:'#ff3ea555', star:'#ff9dd2'}
 ];
 var curTheme=THEMES[0];
 function applyTheme(th){
@@ -583,11 +583,11 @@ function checkLvl(){
     var wasPurple=prevLevel<5 &&nl>=5;
     var wasOrange=prevLevel<7 &&nl>=7;
     var wasPink  =prevLevel<9 &&nl>=9;
-    if(wasPink)  {flash('#ff3ea5',.45);sndPink();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'🌸 PEMBE RENK AÇILDI!',color:'#ff3ea5',sz:20});}
-    else if(wasOrange){flash('#ff7b00',.42);sndOrange();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'🔥 TURUNCU RENK AÇILDI!',color:'#ff7b00',sz:20});}
-    else if(wasPurple){flash('#b44fff',.4); sndPurple();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'💜 MOR RENK AÇILDI!',color:'#b44fff',sz:20});}
-    else if(wasGreen) {flash('#2ecc71',.38);sndGreen();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'🌿 YEŞİL RENK AÇILDI!',color:'#2ecc71',sz:20});}
-    else{flash('#7b5cff',.3);sndLvlUp();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.4,text:'⚡ SEVİYE '+nl+'!',color:'#7b5cff',sz:22});}
+    if(wasPink)  {flash('#ff3ea5',.45);sndPink();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'🌸 PINK COLOR UNLOCKED!',color:'#ff3ea5',sz:20});}
+    else if(wasOrange){flash('#ff7b00',.42);sndOrange();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'🔥 ORANGE COLOR UNLOCKED!',color:'#ff7b00',sz:20});}
+    else if(wasPurple){flash('#b44fff',.4); sndPurple();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'💜 PURPLE COLOR UNLOCKED!',color:'#b44fff',sz:20});}
+    else if(wasGreen) {flash('#2ecc71',.38);sndGreen();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.6,text:'🌿 GREEN COLOR UNLOCKED!',color:'#2ecc71',sz:20});}
+    else{flash('#7b5cff',.3);sndLvlUp();floats.push({x:W/2,y:H/2,vy:-1.2,life:1.4,text:'⚡ LEVEL '+nl+'!',color:'#7b5cff',sz:22});}
     prevLevel=nl;level=nl;updUI();
   }
 }
@@ -1157,12 +1157,12 @@ function renderScoreBadge(finalScore){
   if(badge && title && val){
     if(isRecord && finalScore>0){
       badge.className='best-badge is-record';
-      title.textContent='👑 YENİ REKOR!';
-      val.textContent=finalScore.toLocaleString('tr-TR');
+      title.textContent='👑 NEW BEST!';
+      val.textContent=finalScore.toLocaleString('en-US');
     }else{
       badge.className='best-badge';
-      title.textContent='EN İYİ SKOR';
-      val.textContent=b.toLocaleString('tr-TR');
+      title.textContent='BEST SCORE';
+      val.textContent=b.toLocaleString('en-US');
     }
   }
 }
@@ -1265,7 +1265,7 @@ function handleClick(px,py){
 
   var big=grp.length>=5||comboCount>=3;
   var fcol=comboCount>=3?'#ffd32a':(big?'#ffffff':(PAL[grid[grp[0][0]][grp[0][1]]]||PAL.RED).h);
-  addFloat(cx,cy,'+'+pts.toLocaleString('tr-TR'),fcol,big);
+  addFloat(cx,cy,'+'+pts.toLocaleString('en-US'),fcol,big);
   if(comboCount>=2){
     var lbls=['','','COMBO!','HOT! \uD83D\uDD25','INSANE!! \uD83D\uDD25\uD83D\uDD25'];
     floats.push({x:cx,y:cy+34,vy:-1.1,life:1,text:lbls[Math.min(comboCount,4)],color:'#ffd32a',sz:15});
@@ -1382,14 +1382,14 @@ function reviveGame(){
   sndGreen();
   shake(16);
   flash('#2ecc71', 0.45);
-  floats.push({x: W/2, y: H/2, vy: -1.2, life: 1.8, text: '💖 CAN KURTARILDI!', color: '#2ecc71', sz: 22});
+  floats.push({x: W/2, y: H/2, vy: -1.2, life: 1.8, text: '💖 REVIVED!', color: '#2ecc71', sz: 22});
   hideAll();
   updUI();
 }
 
 function gameOver(){
   state=ST.OVER; ensureAudio(); sndOver(); vib([50, 70, 50, 70, 120]);
-  document.getElementById('fs').textContent=score.toLocaleString('tr-TR');
+  document.getElementById('fs').textContent=score.toLocaleString('en-US');
   renderScoreBadge(score); updUI();
 
   // 1 Can Kurtarma butonunu kontrol et (her oyunda en fazla 1 kez kurtarılabilir)
@@ -1462,8 +1462,8 @@ function loop(ts){
           setTimeout(function(){ flash('#00e5ff', 0.35); }, 165);
           vib([90, 45, 100, 45, 160]);
 
-          addFloat(W/2, H/2 - 80, '+' + wildAnim.wpts.toLocaleString('tr-TR'), '#ffd32a', true);
-          floats.push({x: W/2, y: H/2 - 38, vy: -1.2, life: 1.6, text: '⚡ GÖK GÜRÜLTÜSÜ! ⚡', color: '#ffffff', sz: 23});
+          addFloat(W/2, H/2 - 80, '+' + wildAnim.wpts.toLocaleString('en-US'), '#ffd32a', true);
+          floats.push({x: W/2, y: H/2 - 38, vy: -1.2, life: 1.6, text: '⚡ THUNDER STRIKE! ⚡', color: '#ffffff', sz: 23});
 
           // Hedef blokları yok et ve yoğun elektrik kıvılcımları saç
           wildAnim.targets.forEach(function(tgt){

@@ -1,7 +1,7 @@
 {
   "name": "GridPop Arcade",
   "short_name": "GridPop",
-  "description": "Renkli blokları patlatın, fırtınayı yönetin! Hızlı ve heyecan dolu refleks bulmaca oyunu.",
+  "description": "Pop colorful blocks, unleash thunder, and conquer the storm! Fast and thrilling reflex arcade puzzle game.",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",

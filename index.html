@@ -2373,6 +2373,17 @@ function initModeButtons(){
 }
 
 // Game logic
+function countBlocks(){
+  var count = 0;
+  if(!grid) return 0;
+  for(var r=0; r<ROWS; r++){
+    for(var c=0; c<COLS; c++){
+      if(grid[r] && grid[r][c]) count++;
+    }
+  }
+  return count;
+}
+
 function startGame(){
   grid=mkGrid(); score=0; elapsed=0; lastSpawn=0;
   level=1; prevLevel=1; spawnInt=LVL[0].ms;
@@ -2394,7 +2405,8 @@ function startGame(){
     showToast('🔥 Combo Surge Active: 1.5x on 4+ Clusters!');
   }
   state=ST.PLAY; lastT=performance.now();
-  for(var r=ROWS-2;r<ROWS;r++) grid[r]=mkRow();
+  var startRows = (currentMode === 'blitz' || currentMode === 'zen') ? 3 : 2;
+  for(var r=ROWS-startRows; r<ROWS; r++) grid[r]=mkRow();
   updPreview(); updUI(); hideAll();
   var pbtn=document.getElementById('pbtn');
   if(pbtn){
@@ -2485,14 +2497,7 @@ function handleClick(px,py){
   }
 
   var grp=bfs(grid,r,c);
-  // 🛡️ Tekil Kenar Blok Kurtarma: Eğer blok tek kalmışsa ve üst danger bölgesindeyse (r <= 3), tek tıkla minik kıvılcımla patlatılmasına izin verilir!
-  if(grp.length < 2){
-    if((r <= 3 || isOrphanCell(r, c)) && grid[r][c] && grid[r][c] !== 'WILD'){
-      grp = [[r, c]];
-    } else {
-      return;
-    }
-  }
+  if(grp.length < 2) return;
 
   // Combo
   var now=performance.now();
@@ -2536,6 +2541,38 @@ function handleClick(px,py){
   gravity(grid);
   hoverGrp=new Set();
   checkLvl();
+
+  // 🔄 CHALLENGE VE KESİNTİSİZ BLOK DÖNGÜSÜ:
+  // Bloklar kırıldığında tahtada bloksuz kalınmaz, alttan yeni sıralar taze bloklarla besler!
+  if(currentMode === 'zen'){
+    // Zen Modu: Her hamlede veya tahtadaki bloklar azaldığında sakin bir şekilde alttan yeni sıra gelir
+    if(countBlocks() < 24 || Math.random() < 0.75){
+      if(!grid[0].some(function(cell){ return cell !== null; })){
+        pushRow();
+        sndRow();
+        updPreview();
+      }
+    }
+  } else if(currentMode === 'blitz'){
+    // Blitz Modu: Seri combo için tahtada blok azaldığı an (20'nin altı) beklemeden sıra fırlar!
+    if(countBlocks() < 20){
+      if(!grid[0].some(function(cell){ return cell !== null; })){
+        pushRow();
+        sndRow();
+        updPreview();
+      }
+    }
+  } else {
+    // Classic Mod: Eğer oyuncu tahtadaki neredeyse tüm blokları temizlediyse beklemesin, taze sıra gelsin
+    if(countBlocks() < 10){
+      if(!grid[0].some(function(cell){ return cell !== null; })){
+        pushRow();
+        sndRow();
+        updPreview();
+      }
+    }
+  }
+
   state=ST.ANIM; animT=ANIM_DUR;
   updUI();
   return;
@@ -2792,9 +2829,29 @@ function loop(ts){
       updBar(Math.max(0, blitzTimer / 60));
       var tb = document.getElementById('tb');
       if(tb) tb.style.width = Math.min(100, (blitzTimer / 60) * 100) + '%';
+
+      // ⏱️ Blitz Modu: Her 2.4 saniyede bir yeni sıra yükselir!
+      var blitzSpawnInt = 2400;
+      var tss = elapsed - lastSpawn;
+      if(!wildAnim && tss >= blitzSpawnInt){
+        lastSpawn = elapsed;
+        if(!pushRow()) gameOver();
+        else { ensureAudio(); sndRow(); updPreview(); }
+      }
     } else if(currentMode === 'zen'){
+      // 🧘 Zen Modu: Zaman baskısı yok, bar daima dolu
       lastSpawn = elapsed;
       updBar(1);
+
+      // Zen Modu: Tahtada blok sayısı 14'ün altına düşerse otomatik sıra iter
+      if(!wildAnim && countBlocks() < 14){
+        if(!grid[0].some(function(cell){ return cell !== null; })){
+          pushRow();
+          ensureAudio();
+          sndRow();
+          updPreview();
+        }
+      }
     } else {
       var tss=elapsed-lastSpawn, frac=1-tss/spawnInt;
       updBar(frac);

@@ -20,7 +20,8 @@
 html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex;justify-content:center;align-items:center;font-family:'Outfit',sans-serif;color:#e8e8ff;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-touch-callout:none;transition:background .7s ease}
 #sf{position:fixed;inset:0;pointer-events:none;z-index:0}
 #app{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px}
-#top-bar{width:100%;max-width:809px;height:38px;display:flex;justify-content:space-between;align-items:center;padding:0 2px;box-sizing:border-box}
+#stage-box{display:flex;flex-direction:column;gap:10px;width:fit-content;margin:0 auto}
+#top-bar{width:100%;height:38px;display:flex;justify-content:space-between;align-items:center;padding:0 2px;box-sizing:border-box}
 #brand-tag{font-size:22px;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,#fff 20%,var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 14px var(--g));line-height:1;user-select:none;transition:filter .7s ease}
 #header-actions{display:flex;align-items:center;gap:8px}
 #game-stage{display:flex;gap:20px;align-items:flex-start;justify-content:center}
@@ -533,9 +534,14 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
     gap:8px;
     box-sizing:border-box;
   }
-  #top-bar{
+  #stage-box{
     width:100%;
     max-width:min(calc(100dvh - 120px), 100vw - 16px, 440px);
+    align-items:center;
+    gap:8px;
+  }
+  #top-bar{
+    width:100%;
     height:34px;
     padding:0 2px;
   }
@@ -609,7 +615,8 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 <body>
 <canvas id="sf"></canvas>
 <div id="app">
-  <div id="top-bar">
+  <div id="stage-box">
+    <div id="top-bar">
     <div id="brand-tag">GridPop</div>
     <div id="header-actions">
       <div id="coin-badge" title="Coin Balance (Click to open Shop)">🪙 <span class="coin-val">0</span></div>
@@ -721,6 +728,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
       </div>
 
     </div>
+  </div>
   </div>
 </div>
 <script>
@@ -3017,17 +3025,96 @@ function challengeFriend(){
   }
 }
 
-// Tag Save Button
+// 🔒 Strict Username Validation & Case-Insensitive Unique Cloud Reservation
+function validatePlayerTag(rawName){
+  if(!rawName) return { valid: false, error: 'Please enter a player tag!' };
+  // Disallow spaces
+  if(/\s/.test(rawName)) return { valid: false, error: 'No spaces allowed in player tag!' };
+  // Disallow Turkish and non-ASCII characters
+  if(/[çğıöşüÇĞİÖŞÜ]/.test(rawName)) return { valid: false, error: 'English characters only (no ç, ğ, ı, ö, ş, ü)!' };
+  // Only alphanumeric and underscore
+  if(!/^[a-zA-Z0-9_]+$/.test(rawName)) return { valid: false, error: 'Only letters (A-Z), numbers (0-9) & underscore (_)!' };
+  // Length check (3 to 12)
+  if(rawName.length < 3) return { valid: false, error: 'Tag must be at least 3 characters!' };
+  if(rawName.length > 12) return { valid: false, error: 'Tag cannot exceed 12 characters!' };
+
+  return { valid: true, normalized: rawName.toLowerCase(), original: rawName };
+}
+
 function saveTagFromInput(){
   ensureAudio();
   var input = document.getElementById('player-tag-input');
   if(!input) return;
-  var newName = setPlayerName(input.value);
-  input.value = newName;
-  showToast('✓ Tag saved: ' + newName);
-  cachedGlobalScores = null;
-  syncScoreToCloud(getBest(), getLvlNum(getBest()));
-  renderRanksView();
+  var raw = input.value.trim();
+
+  var val = validatePlayerTag(raw);
+  if(!val.valid){
+    showToast('⚠️ ' + val.error);
+    return;
+  }
+
+  var norm = val.normalized;
+  var orig = val.original;
+  var pid = getPlayerId();
+  var btnSave = document.getElementById('btn-save-tag');
+  if(btnSave) { btnSave.disabled = true; btnSave.textContent = '...'; }
+
+  if(!firestore){
+    // Offline fallback
+    localStorage.setItem('gp_player_name', orig);
+    input.value = orig;
+    showToast('✓ Tag saved locally: ' + orig);
+    if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
+    renderRanksView();
+    return;
+  }
+
+  // Check unique username in Firestore (case-insensitive via document ID)
+  firestore.collection('usernames').doc(norm).get().then(function(doc){
+    if(doc.exists){
+      var data = doc.data();
+      if(data.playerId && data.playerId !== pid){
+        // Username is already claimed by someone else!
+        showToast('❌ "' + orig + '" is already taken! Try another.');
+        if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
+        return;
+      }
+    }
+
+    // Free or belongs to current player -> Claim it!
+    var oldNorm = (localStorage.getItem('gp_player_name_norm') || '').toLowerCase();
+    
+    // Write claim to usernames collection
+    firestore.collection('usernames').doc(norm).set({
+      playerId: pid,
+      displayName: orig,
+      normalized: norm,
+      claimedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).then(function(){
+      // Clean up previous claimed username doc if name changed
+      if(oldNorm && oldNorm !== norm){
+        firestore.collection('usernames').doc(oldNorm).delete().catch(function(){});
+      }
+
+      localStorage.setItem('gp_player_name', orig);
+      localStorage.setItem('gp_player_name_norm', norm);
+      input.value = orig;
+      showToast('✓ Tag claimed: ' + orig);
+
+      if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
+      cachedGlobalScores = null;
+      syncScoreToCloud(getBest(), getLvlNum(getBest()));
+      renderRanksView();
+    }).catch(function(err){
+      console.warn('Tag claim error:', err);
+      showToast('⚠️ Could not verify tag. Try again.');
+      if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
+    });
+  }).catch(function(err){
+    console.warn('Username check error:', err);
+    showToast('⚠️ Network error checking tag.');
+    if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
+  });
 }
 
 var btnSaveTag = document.getElementById('btn-save-tag');

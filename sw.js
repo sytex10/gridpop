@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-cache-v8-global-ranks';
+const CACHE_NAME = 'gridpop-cache-v9-perfect-align';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

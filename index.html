@@ -20,7 +20,7 @@
 html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex;justify-content:center;align-items:center;font-family:'Outfit',sans-serif;color:#e8e8ff;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-touch-callout:none;transition:background .7s ease}
 #sf{position:fixed;inset:0;pointer-events:none;z-index:0}
 #app{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px}
-#top-bar{width:100%;max-width:655px;height:38px;display:flex;justify-content:space-between;align-items:center;padding:0 2px;box-sizing:border-box}
+#top-bar{width:100%;max-width:809px;height:38px;display:flex;justify-content:space-between;align-items:center;padding:0 2px;box-sizing:border-box}
 #brand-tag{font-size:22px;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,#fff 20%,var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 14px var(--g));line-height:1;user-select:none;transition:filter .7s ease}
 #header-actions{display:flex;align-items:center;gap:8px}
 #game-stage{display:flex;gap:20px;align-items:flex-start;justify-content:center}
@@ -30,8 +30,8 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 .val{font-size:28px;font-weight:900;background:linear-gradient(135deg,#fff,var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;transition:background .7s ease}
 .bar-bg{width:100%;height:8px;background:#1e1e3a;border-radius:4px;overflow:hidden;margin-bottom:8px}
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--g),#2ed2ff);border-radius:4px;width:100%}
-.preview{display:flex;gap:4px;flex-wrap:wrap}
-.pc{width:15px;height:15px;border-radius:3px}
+.preview{display:flex;gap:3px;flex-wrap:nowrap;justify-content:center}
+.pc{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 #wrap{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #2a2a5a,0 0 40px #7b5cff44,0 20px 60px #0009;transition:box-shadow .7s ease;touch-action:none}
 #gc{display:block;touch-action:none}
 #danger{position:absolute;inset:0;background:linear-gradient(to bottom,#ff000033 0%,transparent 45%);pointer-events:none;opacity:0;transition:opacity .3s}
@@ -256,6 +256,239 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   border:1px solid #ffffff15;
   cursor:not-allowed;
 }
+/* 🏆 Leaderboard / Hall of Fame Modal */
+#ov-ranks{
+  padding:14px 12px;
+  justify-content:flex-start;
+  gap:10px;
+  overflow:hidden;
+}
+.ranks-header{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-bottom:8px;
+  border-bottom:1px solid #ffffff18;
+}
+.ranks-title{
+  font-size:18px;
+  font-weight:900;
+  background:linear-gradient(135deg,#fff,#ffd32a);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.ranks-tag{
+  font-size:11px;
+  font-weight:800;
+  color:#2ed2ff;
+  background:#2ed2ff18;
+  border:1px solid #2ed2ff44;
+  padding:3px 9px;
+  border-radius:16px;
+}
+.ranks-close{
+  width:30px;
+  height:30px;
+  font-size:14px;
+}
+.ranks-tabs{
+  width:100%;
+  display:flex;
+  gap:8px;
+}
+.ranks-tab{
+  flex:1;
+  padding:7px 0;
+  background:#ffffff0d;
+  border:1px solid #ffffff15;
+  border-radius:8px;
+  color:#ffffffaa;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  transition:all .2s;
+  letter-spacing:.5px;
+}
+.ranks-tab.active{
+  background:linear-gradient(135deg,#ffd32a,#ff7b00);
+  color:#0a0a18;
+  border-color:transparent;
+  box-shadow:0 2px 12px #ffd32a44;
+}
+
+.player-tag-bar{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#ffffff0d;
+  border:1px solid #ffffff18;
+  border-radius:10px;
+  padding:5px 10px;
+  box-sizing:border-box;
+}
+.ptb-lbl{
+  font-size:11px;
+  color:#a0a0d0;
+  font-weight:700;
+  white-space:nowrap;
+}
+#player-tag-input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:#2ed2ff;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.5px;
+}
+#player-tag-input::placeholder{color:#ffffff44}
+.ptb-save{
+  width:26px;
+  height:26px;
+  font-size:12px;
+  background:#2ed2ff22;
+  border-color:#2ed2ff55;
+  color:#2ed2ff;
+  flex-shrink:0;
+}
+.ptb-save:hover{background:#2ed2ff44}
+.rank-spinner{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:40px 0;
+  color:#2ed2ff;
+  font-weight:800;
+  font-size:13px;
+}
+.spinner-icon{
+  width:28px;
+  height:28px;
+  border:3px solid #2ed2ff33;
+  border-top-color:#2ed2ff;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.ranks-content{
+  width:100%;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  overflow-y:auto;
+  padding-right:2px;
+}
+.rank-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#ffffff0a;
+  border:1px solid #ffffff15;
+  border-radius:12px;
+  padding:8px 12px;
+  transition:transform .15s,border-color .15s;
+}
+.rank-row.rank-1{
+  background:linear-gradient(135deg,#ffd32a18,#ff7b0010);
+  border-color:#ffd32a66;
+  box-shadow:0 0 15px #ffd32a22;
+}
+.rank-row.is-self{
+  border-color:#2ed2ff88;
+  background:linear-gradient(135deg,#2ed2ff22,#7b5cff15);
+  box-shadow:0 0 18px #2ed2ff33;
+}
+.rank-badge{
+  width:26px;
+  height:26px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  font-weight:900;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.rank-info{
+  flex:1;
+  text-align:left;
+}
+.rank-name{
+  font-size:13px;
+  font-weight:800;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.rank-you-tag{
+  font-size:9px;
+  font-weight:900;
+  background:#2ed2ff;
+  color:#0a0a18;
+  padding:1px 5px;
+  border-radius:4px;
+  letter-spacing:.5px;
+}
+.rank-meta{
+  font-size:10px;
+  color:#8c8cb8;
+  margin-top:1px;
+}
+.rank-score{
+  font-size:16px;
+  font-weight:900;
+  color:#ffd32a;
+  text-align:right;
+  letter-spacing:.5px;
+}
+.stats-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  width:100%;
+}
+.stat-card{
+  background:#ffffff0a;
+  border:1px solid #ffffff15;
+  border-radius:12px;
+  padding:12px 8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:4px;
+}
+.stat-icon{
+  font-size:20px;
+}
+.stat-val{
+  font-size:20px;
+  font-weight:900;
+  background:linear-gradient(135deg,#fff,#2ed2ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.stat-lbl{
+  font-size:10px;
+  color:#8c8cb8;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:700;
+}
+
 
 /* 🎁 Toast Daily Reward */
 .toast-daily{
@@ -302,7 +535,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   }
   #top-bar{
     width:100%;
-    max-width:min(calc((100dvh - 130px) * (485 / 639)), 100vw - 20px, 440px);
+    max-width:min(calc(100dvh - 120px), 100vw - 16px, 440px);
     height:34px;
     padding:0 2px;
   }
@@ -317,7 +550,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   }
   #sidebar{
     width:100%;
-    max-width:min(calc((100dvh - 130px) * (485 / 639)), 100vw - 20px, 440px);
+    max-width:min(calc(100dvh - 120px), 100vw - 16px, 440px);
     display:grid;
     grid-template-columns:1fr 1fr 1fr 1.35fr;
     gap:5px;
@@ -341,15 +574,15 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
     font-size:16px;
   }
   .bar-bg{height:5px;width:100%;margin-bottom:3px}
-  .preview{justify-content:center;gap:2px}
-  .pc{width:10px;height:10px;border-radius:2px}
+  .preview{justify-content:center;gap:2px;flex-wrap:nowrap}
+  .pc{width:8px;height:8px;border-radius:2px}
   .icon-btn{width:34px;height:34px;font-size:14px}
-  /* Tahta - ekrana maksimum büyüklükte oturur */
+  /* Tahta - 8x8 ferah kare tam ekran */
   #wrap{
     width:100%;
-    max-width:min(calc((100dvh - 130px) * (485 / 639)), 100vw - 20px, 440px);
+    max-width:min(calc(100dvh - 120px), 100vw - 16px, 440px);
     height:auto;
-    aspect-ratio:485 / 639;
+    aspect-ratio:1 / 1;
     border-radius:14px;
     display:block;
     flex-shrink:1;
@@ -369,6 +602,9 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   .btn{padding:8px 22px;font-size:14px}
 }
   </style>
+  <!-- Firebase SDK for Realtime Global Leaderboard -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <canvas id="sf"></canvas>
@@ -411,6 +647,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
         <button class="btn" id="btn-s">PLAY</button>
         <div class="brow" style="gap:8px">
           <button class="btn ghost" id="btn-shop">🛍️ Shop</button>
+          <button class="btn ghost" id="btn-ranks">🏆 Ranks</button>
           <button class="btn ghost" id="btn-h">How to Play</button>
         </div>
       </div>
@@ -442,11 +679,15 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
         </div>
         <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px">🎬 1 Extra Life (Continue)</button>
         <div id="coin-reward-badge" class="coin-reward" style="display:none"></div>
+        <button class="btn" id="btn-challenge" style="background:linear-gradient(135deg,#ff3ea5,#b44fff);box-shadow:0 4px 20px #ff3ea555;font-size:14px;padding:8px 22px;margin:2px 0 4px;font-weight:800">⚔️ Challenge Friends</button>
         <div class="brow">
           <button class="btn" id="btn-re">Play Again</button>
           <button class="btn ghost" id="btn-m">Main Menu</button>
         </div>
-        <button class="btn ghost" id="btn-shop-over" style="margin-top:6px;font-size:13px;padding:6px 18px">🛍️ Shop</button>
+        <div class="brow" style="margin-top:6px;gap:8px">
+          <button class="btn ghost" id="btn-shop-over" style="font-size:13px;padding:6px 16px">🛍️ Shop</button>
+          <button class="btn ghost" id="btn-ranks-over" style="font-size:13px;padding:6px 16px">🏆 Ranks</button>
+        </div>
       </div>
       <div class="ov hidden" id="ov-shop">
         <div class="shop-header">
@@ -460,6 +701,24 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
         </div>
         <div class="shop-list" id="shop-items-container"></div>
       </div>
+      <div class="ov hidden" id="ov-ranks">
+        <div class="ranks-header">
+          <div class="ranks-title">🏆 GLOBAL RANKS</div>
+          <div class="ranks-tag" id="ranks-sync-status">🟢 Live Cloud</div>
+          <button class="icon-btn ranks-close" id="btn-ranks-close" title="Close">✕</button>
+        </div>
+        <div class="player-tag-bar">
+          <span class="ptb-lbl">👤 Player Tag:</span>
+          <input type="text" id="player-tag-input" maxlength="12" placeholder="Your Name" autocomplete="off" spellcheck="false">
+          <button class="icon-btn ptb-save" id="btn-save-tag" title="Save Tag">✓</button>
+        </div>
+        <div class="ranks-tabs">
+          <button class="ranks-tab active" id="tab-ranks-global">🌐 World Top 20</button>
+          <button class="ranks-tab" id="tab-ranks-career">📊 Career</button>
+          <button class="ranks-tab" id="tab-ranks-local">📱 Local</button>
+        </div>
+        <div class="ranks-content" id="ranks-content-area"></div>
+      </div>
 
     </div>
   </div>
@@ -467,7 +726,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 <script>
 'use strict';
 // ── Constants ──
-var COLS=6,ROWS=8,SZ=72,GAP=5,PAD=14;
+var COLS=8,ROWS=8,SZ=72,GAP=5,PAD=14;
 var W=COLS*SZ+(COLS-1)*GAP+PAD*2;
 var H=ROWS*SZ+(ROWS-1)*GAP+PAD*2;
 
@@ -1417,17 +1676,17 @@ function updPreview(){
 function updDanger(){document.getElementById('danger').style.opacity=grid[0].some(function(x){return x;})?'1':'0';}
 
 function showOv(id){
-  ['ov-start','ov-how','ov-pause','ov-over','ov-shop'].forEach(function(oid){
+  ['ov-start','ov-how','ov-pause','ov-over','ov-shop','ov-ranks'].forEach(function(oid){
     var el=document.getElementById(oid);
     if(el) el.classList.toggle('hidden',oid!==id);
   });
   var pbtn=document.getElementById('pbtn');
-  if(pbtn && (id==='ov-start'||id==='ov-how'||id==='ov-over')){
+  if(pbtn && (id==='ov-start'||id==='ov-how'||id==='ov-over'||id==='ov-ranks')){
     pbtn.classList.add('hidden');
   }
 }
 function hideAll(){
-  ['ov-start','ov-how','ov-pause','ov-over','ov-shop'].forEach(function(oid){
+  ['ov-start','ov-how','ov-pause','ov-over','ov-shop','ov-ranks'].forEach(function(oid){
     var el=document.getElementById(oid);
     if(el) el.classList.add('hidden');
   });
@@ -1575,6 +1834,7 @@ function handleClick(px,py){
   shake(Math.min(grp.length*1.5+mult*2,18));
   ensureAudio(); sndPop(grp.length); vib(comboCount>=2?[25, 30, 40]:16);
   score+=pts;
+  addCareerBlocks(grp.length);
   if(grp.length>=6){
     addCoins(5, true, cx, cy - 25);
     beep(950, 'sine', 0.09, 0.14, 1320);
@@ -1696,6 +1956,9 @@ function gameOver(){
   state=ST.OVER; ensureAudio(); sndOver(); vib([50, 70, 50, 70, 120]);
   document.getElementById('fs').textContent=score.toLocaleString('en-US');
   renderScoreBadge(score);
+  var curLv=getLvlNum(score);
+  recordLeaderboardEntry(score, curLv);
+  updateCareerEndGame(score, curLv);
   var earnedCoins=Math.floor(score/100);
   var crb=document.getElementById('coin-reward-badge');
   if(crb){
@@ -1795,6 +2058,8 @@ function loop(ts){
           spawnElectricSparks(wildAnim.cx, wildAnim.cy, 24, '#00f0ff', 1.6);
 
           score += wildAnim.wpts;
+          addCareerBlocks(wildAnim.targets.length);
+          addCareerLightning();
           checkLvl();
           updUI();
         }
@@ -2419,6 +2684,382 @@ if('serviceWorker' in navigator){
     });
   });
 }
+
+// ── 🌐 Firebase Realtime Global Leaderboard & Player Engine ──
+const firebaseConfig = {
+  apiKey: "AIzaSyBdn1iqg3jRigyuL2Vp2D6xUcTZZaRcwtk",
+  authDomain: "gridpop-d8614.firebaseapp.com",
+  projectId: "gridpop-d8614",
+  storageBucket: "gridpop-d8614.firebasestorage.app",
+  messagingSenderId: "487383656259",
+  appId: "1:487383656259:web:1d73bee285915416faf1f6",
+  measurementId: "G-1MRDGB74JR"
+};
+
+var fbApp = null;
+var firestore = null;
+try {
+  if (typeof firebase !== 'undefined') {
+    fbApp = firebase.initializeApp(firebaseConfig);
+    firestore = firebase.firestore();
+  }
+} catch(e) {
+  console.warn('Firebase init:', e);
+}
+
+// Player Identity
+function getPlayerId(){
+  var pid = localStorage.getItem('gp_player_id');
+  if(!pid){
+    pid = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
+    localStorage.setItem('gp_player_id', pid);
+  }
+  return pid;
+}
+
+function getPlayerName(){
+  var name = localStorage.getItem('gp_player_name');
+  if(!name){
+    name = 'Player' + Math.floor(1000 + Math.random() * 9000);
+    localStorage.setItem('gp_player_name', name);
+  }
+  return name;
+}
+
+function setPlayerName(name){
+  name = (name || '').trim().replace(/[^a-zA-Z0-9_.-]/g, '').substr(0, 12);
+  if(!name) name = 'Player' + Math.floor(1000 + Math.random() * 9000);
+  localStorage.setItem('gp_player_name', name);
+  return name;
+}
+
+var currentRanksTab = 'global';
+var ranksPrevOverlay = 'ov-start';
+var cachedGlobalScores = null;
+var lastGlobalFetchTime = 0;
+
+function syncScoreToCloud(finalScore, finalLevel){
+  if(finalScore <= 0 || !firestore) return;
+  var pid = getPlayerId();
+  var pname = getPlayerName();
+  var best = Math.max(finalScore, getBest());
+
+  try {
+    firestore.collection('leaderboard').doc(pid).set({
+      name: pname,
+      score: best,
+      level: finalLevel,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).then(function(){
+      cachedGlobalScores = null; // Invalidate cache to fetch fresh
+    }).catch(function(err){
+      console.warn('Cloud sync error:', err);
+    });
+  } catch(e){}
+}
+
+function loadCareerStats(){
+  var def = { games: 0, blocks: 0, highestLevel: 1, lightningUsed: 0, bestScore: 0 };
+  try{
+    var raw = localStorage.getItem('gp_career_stats');
+    if(raw) return Object.assign(def, JSON.parse(raw));
+  }catch(e){}
+  return def;
+}
+
+function saveCareerStats(stats){
+  try{
+    localStorage.setItem('gp_career_stats', JSON.stringify(stats));
+  }catch(e){}
+}
+
+function updateCareerEndGame(finalScore, finalLevel){
+  var s = loadCareerStats();
+  s.games++;
+  if(finalScore > s.bestScore) s.bestScore = finalScore;
+  if(finalLevel > s.highestLevel) s.highestLevel = finalLevel;
+  saveCareerStats(s);
+}
+
+function addCareerBlocks(n){
+  if(!n) return;
+  var s = loadCareerStats();
+  s.blocks += n;
+  saveCareerStats(s);
+}
+
+function addCareerLightning(){
+  var s = loadCareerStats();
+  s.lightningUsed++;
+  saveCareerStats(s);
+}
+
+// Local high scores fallback
+function loadLocalLeaderboard(){
+  try{
+    var raw = localStorage.getItem('gp_local_ranks');
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return [
+    { name: getPlayerName(), score: getBest(), level: getLvlNum(getBest()), date: 'Personal Best', isSelf: true }
+  ];
+}
+
+function recordLeaderboardEntry(finalScore, finalLevel){
+  if(finalScore <= 0) return;
+  var list = loadLocalLeaderboard();
+  var today = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric' });
+  list.push({
+    name: getPlayerName(),
+    score: finalScore,
+    level: finalLevel,
+    date: today,
+    isSelf: true
+  });
+  list.sort(function(a,b){ return b.score - a.score; });
+  list = list.slice(0, 5);
+  try{ localStorage.setItem('gp_local_ranks', JSON.stringify(list)); }catch(e){}
+  syncScoreToCloud(finalScore, finalLevel);
+}
+
+function openRanks(){
+  ensureAudio();
+  ranksPrevOverlay = (state === ST.OVER) ? 'ov-over' : 'ov-start';
+  showOv('ov-ranks');
+
+  var tagInput = document.getElementById('player-tag-input');
+  if(tagInput) tagInput.value = getPlayerName();
+
+  showRanksTab(currentRanksTab);
+}
+
+function closeRanks(){
+  ensureAudio();
+  showOv(ranksPrevOverlay);
+}
+
+function showRanksTab(tab){
+  ensureAudio();
+  currentRanksTab = tab;
+  var btnG = document.getElementById('tab-ranks-global');
+  var btnC = document.getElementById('tab-ranks-career');
+  var btnL = document.getElementById('tab-ranks-local');
+  if(btnG) btnG.classList.toggle('active', tab === 'global');
+  if(btnC) btnC.classList.toggle('active', tab === 'career');
+  if(btnL) btnL.classList.toggle('active', tab === 'local');
+  renderRanksView();
+}
+
+function renderRanksView(){
+  var cont = document.getElementById('ranks-content-area');
+  if(!cont) return;
+
+  if(currentRanksTab === 'global'){
+    renderGlobalRanks(cont);
+  } else if(currentRanksTab === 'career'){
+    renderCareerRanks(cont);
+  } else {
+    renderLocalRanks(cont);
+  }
+}
+
+function renderGlobalRanks(cont){
+  cont.innerHTML = '<div class="rank-spinner"><div class="spinner-icon"></div><span>Loading World Ranks...</span></div>';
+
+  var now = Date.now();
+  if(cachedGlobalScores && (now - lastGlobalFetchTime < 15000)){
+    drawScoreList(cont, cachedGlobalScores, true);
+    return;
+  }
+
+  if(!firestore){
+    cont.innerHTML = '<div style="padding:20px;text-align:center;color:#8c8cb8;font-size:12px">Connecting to Cloud... Falling back to local.</div>';
+    drawScoreList(cont, loadLocalLeaderboard(), false);
+    return;
+  }
+
+  firestore.collection('leaderboard')
+    .orderBy('score', 'desc')
+    .limit(20)
+    .get()
+    .then(function(snapshot){
+      var list = [];
+      var myPid = getPlayerId();
+      snapshot.forEach(function(doc){
+        var d = doc.data();
+        list.push({
+          id: doc.id,
+          name: d.name || 'Anonymous',
+          score: d.score || 0,
+          level: d.level || 1,
+          isSelf: (doc.id === myPid)
+        });
+      });
+
+      // If database has no scores yet, add player's current best
+      if(list.length === 0){
+        var myBest = getBest();
+        list.push({
+          id: myPid,
+          name: getPlayerName(),
+          score: myBest,
+          level: getLvlNum(myBest),
+          isSelf: true
+        });
+      }
+
+      cachedGlobalScores = list;
+      lastGlobalFetchTime = Date.now();
+      drawScoreList(cont, list, true);
+    })
+    .catch(function(err){
+      console.warn('Leaderboard fetch error:', err);
+      drawScoreList(cont, loadLocalLeaderboard(), false);
+    });
+}
+
+function drawScoreList(cont, list, isGlobal){
+  cont.innerHTML = '';
+  var badges = ['🥇', '🥈', '🥉'];
+
+  list.forEach(function(item, idx){
+    var row = document.createElement('div');
+    row.className = 'rank-row' + (idx === 0 ? ' rank-1' : '') + (item.isSelf ? ' is-self' : '');
+
+    var badge = document.createElement('div');
+    badge.className = 'rank-badge';
+    badge.textContent = badges[idx] || ('#' + (idx + 1));
+
+    var info = document.createElement('div');
+    info.className = 'rank-info';
+
+    var nameDiv = document.createElement('div');
+    nameDiv.className = 'rank-name';
+    nameDiv.textContent = item.name + ' ';
+    if(item.isSelf){
+      var youTag = document.createElement('span');
+      youTag.className = 'rank-you-tag';
+      youTag.textContent = 'YOU';
+      nameDiv.appendChild(youTag);
+    }
+
+    var meta = document.createElement('div');
+    meta.className = 'rank-meta';
+    meta.textContent = 'Level ' + (item.level || 1) + (isGlobal ? ' • 🌍 Global' : ' • 📱 Device');
+
+    info.appendChild(nameDiv);
+    info.appendChild(meta);
+
+    var scoreDiv = document.createElement('div');
+    scoreDiv.className = 'rank-score';
+    scoreDiv.textContent = (item.score || 0).toLocaleString('en-US');
+
+    row.appendChild(badge);
+    row.appendChild(info);
+    row.appendChild(scoreDiv);
+    cont.appendChild(row);
+  });
+}
+
+function renderCareerRanks(cont){
+  cont.innerHTML = '';
+  var stats = loadCareerStats();
+  var allBest = Math.max(stats.bestScore, getBest());
+
+  var grid = document.createElement('div');
+  grid.className = 'stats-grid';
+
+  var cards = [
+    { icon: '🎮', val: stats.games.toLocaleString('en-US'), lbl: 'Rounds Played' },
+    { icon: '💥', val: stats.blocks.toLocaleString('en-US'), lbl: 'Blocks Popped' },
+    { icon: '⚡', val: stats.lightningUsed.toLocaleString('en-US'), lbl: 'Lightning Blasts' },
+    { icon: '👑', val: allBest.toLocaleString('en-US'), lbl: 'All-Time Best' }
+  ];
+
+  cards.forEach(function(c){
+    var card = document.createElement('div');
+    card.className = 'stat-card';
+    card.innerHTML = '<div class="stat-icon">' + c.icon + '</div>' +
+                     '<div class="stat-val">' + c.val + '</div>' +
+                     '<div class="stat-lbl">' + c.lbl + '</div>';
+    grid.appendChild(card);
+  });
+
+  cont.appendChild(grid);
+}
+
+function renderLocalRanks(cont){
+  var list = loadLocalLeaderboard();
+  drawScoreList(cont, list, false);
+}
+
+function challengeFriend(){
+  ensureAudio();
+  var finalScore = score || getBest();
+  var finalLevel = getLvlNum(finalScore);
+  var msg = '🔥 I just scored ' + finalScore.toLocaleString('en-US') + ' points (Level ' + finalLevel + ') in GridPop Arcade! Can you beat my high score? Play now:';
+  var url = 'https://sytex10.github.io/gridpop/';
+
+  if(navigator.share){
+    navigator.share({
+      title: 'GridPop Arcade Challenge',
+      text: msg,
+      url: url
+    }).catch(function(e){});
+  } else if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(msg + ' ' + url).then(function(){
+      showToast('📋 Challenge copied to clipboard! Share it with your friends!');
+    }).catch(function(){
+      showToast('Share link: ' + url);
+    });
+  } else {
+    showToast('Share link: ' + url);
+  }
+}
+
+// Tag Save Button
+function saveTagFromInput(){
+  ensureAudio();
+  var input = document.getElementById('player-tag-input');
+  if(!input) return;
+  var newName = setPlayerName(input.value);
+  input.value = newName;
+  showToast('✓ Tag saved: ' + newName);
+  cachedGlobalScores = null;
+  syncScoreToCloud(getBest(), getLvlNum(getBest()));
+  renderRanksView();
+}
+
+var btnSaveTag = document.getElementById('btn-save-tag');
+if(btnSaveTag) btnSaveTag.onclick = saveTagFromInput;
+
+var inputTag = document.getElementById('player-tag-input');
+if(inputTag) {
+  inputTag.onkeydown = function(e){ if(e.key === 'Enter') saveTagFromInput(); };
+}
+
+// Attach Leaderboard & Challenge Event Listeners
+var btnRanksStart = document.getElementById('btn-ranks');
+if(btnRanksStart) btnRanksStart.onclick = openRanks;
+
+var btnRanksOver = document.getElementById('btn-ranks-over');
+if(btnRanksOver) btnRanksOver.onclick = openRanks;
+
+var btnRanksClose = document.getElementById('btn-ranks-close');
+if(btnRanksClose) btnRanksClose.onclick = closeRanks;
+
+var tabRanksGlobal = document.getElementById('tab-ranks-global');
+if(tabRanksGlobal) tabRanksGlobal.onclick = function(){ showRanksTab('global'); };
+
+var tabRanksCareer = document.getElementById('tab-ranks-career');
+if(tabRanksCareer) tabRanksCareer.onclick = function(){ showRanksTab('career'); };
+
+var tabRanksLocal = document.getElementById('tab-ranks-local');
+if(tabRanksLocal) tabRanksLocal.onclick = function(){ showRanksTab('local'); };
+
+var btnChallenge = document.getElementById('btn-challenge');
+if(btnChallenge) btnChallenge.onclick = challengeFriend;
+
 </script>
 </body>
 </html>

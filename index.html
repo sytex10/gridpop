@@ -1564,6 +1564,10 @@ function drawBlock(r,c){
   else if(UserState.equippedBlock==='block_obsidian') style='obsidian';
   else if(UserState.equippedBlock==='block_prism') style='rainbow';
   else if(UserState.equippedBlock==='block_matrix') style='matrix';
+  else if(UserState.equippedBlock==='block_ice') style='ice';
+  else if(UserState.equippedBlock==='block_sakura') style='sakura';
+  else if(UserState.equippedBlock==='block_supernova') style='supernova';
+  else if(UserState.equippedBlock==='block_choco') style='choco';
 
   if(style==='jelly'){
     // 🍬 Lv1-2: Klasik Parlak Jelibon (Sulu & Canlı)
@@ -1767,6 +1771,93 @@ function drawBlock(r,c){
     ctx.fillStyle=p.h;
     ctx.fillRect(x+SZ*0.38, y+SZ*0.38, SZ*0.24, SZ*0.24);
     if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,6);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='ice'){
+    // 🧊 Sub-Zero Glacial Ice: Translucent frost crystal, fracture veins & cold blue aura
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':'#38bdf8'; ctx.shadowBlur=isH?26:16;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,'#e0f2fe'); gr.addColorStop(0.35,'#7dd3fc'); gr.addColorStop(0.75,p.f); gr.addColorStop(1,'#0369a1');
+    rr(x,y,SZ,SZ,10); ctx.fillStyle=gr; ctx.fill();
+    // Inner frost cracks (sharp fractured crystal lines)
+    ctx.strokeStyle='rgba(255,255,255,0.75)'; ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(x+4, y+SZ*0.3); ctx.lineTo(x+SZ*0.45, y+SZ*0.5); ctx.lineTo(x+SZ*0.35, y+SZ-4);
+    ctx.moveTo(x+SZ*0.45, y+SZ*0.5); ctx.lineTo(x+SZ-4, y+SZ*0.4);
+    ctx.stroke();
+    // Frosted top glaze
+    ctx.fillStyle='rgba(255,255,255,0.55)';
+    ctx.beginPath(); ctx.ellipse(x+SZ*0.3, y+SZ*0.2, SZ*0.2, SZ*0.08, -0.2, 0, Math.PI*2); ctx.fill();
+    // Frost edge rim
+    ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=1.8; rr(x+2,y+2,SZ-4,SZ-4,8); ctx.stroke();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,10);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='sakura'){
+    // 🌸 Sakura Blossom: Soft ethereal pastel petals with glowing golden core
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':'#f472b6'; ctx.shadowBlur=isH?26:14;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,'#fff1f2'); gr.addColorStop(0.4,'#fbcfe8'); gr.addColorStop(0.8,p.f); gr.addColorStop(1,'#9d174d');
+    rr(x,y,SZ,SZ,12); ctx.fillStyle=gr; ctx.fill();
+    // Curved petal highlight
+    ctx.save(); ctx.globalAlpha=0.6; ctx.fillStyle='#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(x+SZ*0.32, y+SZ*0.24, SZ*0.22, SZ*0.12, -0.3, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+    // Center glowing sakura pistil (little golden core)
+    ctx.fillStyle='#ffd32a'; ctx.shadowColor='#ffd32a'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.arc(x+SZ/2, y+SZ/2, SZ*0.1, 0, Math.PI*2); ctx.fill();
+    // Velvet soft border
+    ctx.strokeStyle='rgba(255,255,255,0.65)'; ctx.lineWidth=1.5; rr(x+3,y+3,SZ-6,SZ-6,9); ctx.stroke();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,12);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='supernova'){
+    // 🪐 Cosmic Supernova: Deep space starfield void with vibrant glowing core star
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':p.f; ctx.shadowBlur=isH?28:16;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,'#1e0b36'); gr.addColorStop(0.5,'#0a0217'); gr.addColorStop(1,'#020005');
+    rr(x,y,SZ,SZ,10); ctx.fillStyle=gr; ctx.fill();
+    // Radial glowing nebula burst
+    var nbg=ctx.createRadialGradient(x+SZ/2, y+SZ/2, 1, x+SZ/2, y+SZ/2, SZ*0.44);
+    nbg.addColorStop(0, p.h); nbg.addColorStop(0.5, p.f+'aa'); nbg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle=nbg; rr(x,y,SZ,SZ,10); ctx.fill();
+    // Center 4-point cross starlight gleam
+    ctx.fillStyle='#ffffff'; ctx.shadowColor='#ffffff'; ctx.shadowBlur=12;
+    ctx.beginPath();
+    var scx=x+SZ/2, scy=y+SZ/2, sLen=SZ*0.28, sThick=SZ*0.06;
+    ctx.moveTo(scx, scy-sLen); ctx.lineTo(scx+sThick, scy); ctx.lineTo(scx+sLen, scy);
+    ctx.lineTo(scx, scy+sThick); ctx.lineTo(scx, scy+sLen); ctx.lineTo(scx-sThick, scy);
+    ctx.lineTo(scx-sLen, scy); ctx.lineTo(scx, scy-sThick); ctx.closePath(); ctx.fill();
+    // Stardust border
+    ctx.strokeStyle=p.f; ctx.lineWidth=1.5; rr(x+2,y+2,SZ-4,SZ-4,8); ctx.stroke();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,10);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='choco'){
+    // 🍫 Royal Deluxe Choco: Rich gourmet dark chocolate with 24K real gold leaf foil trim
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':'#ffd32a'; ctx.shadowBlur=isH?26:12;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,'#4a2011'); gr.addColorStop(0.5,'#2e1207'); gr.addColorStop(1,'#140702');
+    rr(x,y,SZ,SZ,8); ctx.fillStyle=gr; ctx.fill();
+    // Inner bevel chocolate pillow dome
+    var chg=ctx.createLinearGradient(x+4,y+4,x+SZ-4,y+SZ-4);
+    chg.addColorStop(0,'#6d321c'); chg.addColorStop(0.5,'#3a1609'); chg.addColorStop(1,'#1f0903');
+    rr(x+4,y+4,SZ-8,SZ-8,6); ctx.fillStyle=chg; ctx.fill();
+    // 24K edible gold foil flecks in corner
+    ctx.fillStyle='#ffd32a'; ctx.shadowColor='#ffd32a'; ctx.shadowBlur=6;
+    ctx.fillRect(x+SZ-14, y+6, 5, 5);
+    ctx.fillRect(x+SZ-18, y+13, 4, 4);
+    ctx.fillRect(x+SZ-10, y+14, 3, 3);
+    // Center luxury block color jewel dot
+    ctx.fillStyle=p.f; ctx.beginPath(); ctx.arc(x+SZ/2, y+SZ/2, SZ*0.12, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#ffd32a'; ctx.lineWidth=1.2; ctx.stroke();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,8);ctx.stroke();}
     ctx.restore();
   }
 }
@@ -2077,16 +2168,80 @@ function renderScoreBadge(finalScore){
   }
 }
 
+// ── 🎮 Arcade Mode Engine with Dynamic Wallpapers ──
+var currentMode = 'classic'; // 'classic', 'blitz', 'zen'
+var blitzTimer = 60;
+
+var MODE_THEMES = {
+  classic: null,
+  blitz: {
+    name: 'Blitz Synthwave', style: 'magma',
+    pageBg: '#16001a', panel: '#2a0030', bg: '#1f0024',
+    grid: '#ff3ea5', accent: '#ff7b00', wrapGlow: '#ff7b0088', star: '#ffd32a',
+    bgImage: 'url("assets/theme_synthwave.jpg")'
+  },
+  zen: {
+    name: 'Zen Nebula', style: 'prism',
+    pageBg: '#0a0014', panel: '#18002e', bg: '#120024',
+    grid: '#a855f7', accent: '#2ed2ff', wrapGlow: '#2ed2ff77', star: '#c084fc',
+    bgImage: 'url("assets/theme_nebula.jpg")'
+  }
+};
+
+function applyModeTheme(m){
+  if(m === 'blitz'){
+    applyTheme(MODE_THEMES.blitz);
+  } else if(m === 'zen'){
+    applyTheme(MODE_THEMES.zen);
+  } else {
+    if(UserState && UserState.equippedTheme && UserState.equippedTheme !== 'theme_default'){
+      applyCustomEquippedTheme();
+    } else {
+      applyTheme(THEMES[0]);
+    }
+  }
+}
+
+function setGameMode(m){
+  ensureAudio();
+  sndRow();
+  currentMode = m;
+  document.querySelectorAll('.mode-btn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-mode') === m);
+  });
+  applyModeTheme(m);
+  if(m === 'blitz') showToast('⏱️ 60s Blitz Mode Selected!');
+  else if(m === 'zen') showToast('🧘 Zen Relax Mode Selected!');
+  else showToast('⚡ Classic Mode Selected!');
+}
+
+function initModeButtons(){
+  document.querySelectorAll('.mode-btn').forEach(function(b){
+    b.onclick = function(e){
+      e.stopPropagation();
+      var mode = this.getAttribute('data-mode');
+      if(mode) setGameMode(mode);
+    };
+  });
+}
+
 // Game logic
 function startGame(){
   grid=mkGrid(); score=0; elapsed=0; lastSpawn=0;
   level=1; prevLevel=1; spawnInt=LVL[0].ms;
   activeColors=['RED','BLUE','YELLOW'];
-  applyTheme(THEMES[0]);
+  applyModeTheme(currentMode);
   rowsSinceWild=0; parts=[]; floats=[]; shM=0; flashAlpha=0; wildAnim=null;
   hoverGrp=new Set(); comboCount=0; lastComboTime=0; hasRevived=false; hasCelebratedRecord=false;
   if(currentMode === 'blitz'){
     blitzTimer = 60;
+    var tb = document.getElementById('tb');
+    if(tb) tb.style.width = '100%';
+    showToast('⏱️ 60s Blitz Rush Started!');
+  } else if(currentMode === 'zen'){
+    var tb = document.getElementById('tb');
+    if(tb) tb.style.width = '100%';
+    showToast('🧘 Zen Mode: Take your time!');
   }
   if(UserState && UserState.boosterCombo){
     showToast('🔥 Combo Surge Active: 1.5x on 4+ Clusters!');
@@ -2118,7 +2273,10 @@ function togglePause(){
 function goMenu(){
   state=ST.START; grid=mkGrid(); parts=[]; floats=[]; wildAnim=null;
   activeColors=['RED','BLUE','YELLOW'];
-  applyTheme(THEMES[0]);
+  applyModeTheme(currentMode);
+  document.querySelectorAll('.mode-btn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-mode') === currentMode);
+  });
   showOv('ov-start');
   var pbtn=document.getElementById('pbtn');
   if(pbtn){
@@ -2221,7 +2379,10 @@ function handleClick(px,py){
   checkRecordCelebration(score);
   if(grp.length>=6){
     addCoins(5, true, cx, cy - 25);
-    if(currentMode === 'blitz'){ blitzTimer = Math.min(90, blitzTimer + 2); showToast('⏱️ +2s Time Bonus!'); }
+    if(currentMode === 'blitz'){
+      blitzTimer = Math.min(90, blitzTimer + 2);
+      floats.push({x:cx, y:cy-38, vy:-1.6, life:1.2, text:'⏱️ +2s BONUS!', color:'#2ed2ff', sz:15});
+    }
     beep(950, 'sine', 0.09, 0.14, 1320);
   }
   grp.forEach(function(x){grid[x[0]][x[1]]=null;});
@@ -2580,7 +2741,11 @@ var SHOP_DATA = {
     {id:'block_gold', name:'Gold Luxury', price:2500, desc:'Solid 24K gold bars with royal crown shimmer', previewBg:'linear-gradient(135deg,#ffd32a,#ffeaa7)', icon:'👑'},
     {id:'block_obsidian', name:'Dark Matter', price:3500, desc:'Deep volcanic obsidian with glowing plasma core', previewBg:'linear-gradient(135deg,#2c3e50,#000000)', icon:'🔮'},
     {id:'block_prism', name:'Prism Rainbow', price:4500, desc:'Iridescent holographic rainbow spectrum blocks', previewBg:'linear-gradient(135deg,#ff3ea5,#2ed2ff)', icon:'🌈'},
-    {id:'block_matrix', name:'Wireframe Matrix', price:5500, desc:'Digital cyber wireframe matrix cubes', previewBg:'linear-gradient(135deg,#2ecc71,#00ffcc)', icon:'💠'}
+    {id:'block_matrix', name:'Wireframe Matrix', price:5500, desc:'Digital cyber wireframe matrix cubes', previewBg:'linear-gradient(135deg,#2ecc71,#00ffcc)', icon:'💠'},
+    {id:'block_ice', name:'Glacial Sub-Zero', price:6500, desc:'Translucent sub-zero ice crystal with frost fractures', previewBg:'linear-gradient(135deg,#e0f2fe,#0284c7)', icon:'🧊'},
+    {id:'block_sakura', name:'Sakura Blossom', price:7500, desc:'Ethereal soft pastel petals with glowing golden core', previewBg:'linear-gradient(135deg,#fff1f2,#db2777)', icon:'🌸'},
+    {id:'block_supernova', name:'Cosmic Supernova', price:8500, desc:'Deep space void with starlight cross & nebula burst', previewBg:'linear-gradient(135deg,#1e0b36,#b44fff)', icon:'🪐'},
+    {id:'block_choco', name:'Deluxe Choco', price:10000, desc:'Gourmet dark chocolate cubes with 24K gold leaf foil', previewBg:'linear-gradient(135deg,#4a2011,#ffd32a)', icon:'🍫'}
   ],
   themes: [
     {id:'theme_default', name:'Cosmic Shift', price:0, desc:'Original dynamic level progression', previewBg:'linear-gradient(135deg,#0a0a18,#121226)', icon:'🌌', data:null},
@@ -2597,7 +2762,11 @@ var SHOP_DATA = {
     {id:'theme_abyss', name:'Electric Abyss', price:3200, desc:'Midnight ocean depths with bioluminescent blue arcs', previewBg:'linear-gradient(135deg,#001020,#002540)', icon:'🌊',
       data:{name:'Electric Abyss', style:'cyber', pageBg:'#000c18', panel:'#001c33', bg:'#001224', grid:'#00b4d8', accent:'#00b4d8', wrapGlow:'#00b4d866', star:'#90e0ef'}},
     {id:'theme_warp', name:'Hyperdrive Star', price:4000, desc:'Warp speed star streaks through the multiverse', previewBg:'linear-gradient(135deg,#180026,#31004a)', icon:'🚀',
-      data:{name:'Hyperdrive Star', style:'prism', pageBg:'#12001e', panel:'#240038', bg:'#1c002a', grid:'#e056fd', accent:'#e056fd', wrapGlow:'#e056fd66', star:'#ffffff'}}
+      data:{name:'Hyperdrive Star', style:'prism', pageBg:'#12001e', panel:'#240038', bg:'#1c002a', grid:'#e056fd', accent:'#e056fd', wrapGlow:'#e056fd66', star:'#ffffff'}},
+    {id:'theme_amethyst', name:'Amethyst Cavern', price:5000, desc:'Deep royal purple crystal sanctum with mystical twilight', previewBg:'linear-gradient(135deg,#1f0036,#380061)', icon:'🔮',
+      data:{name:'Amethyst Cavern', style:'prism', pageBg:'#11001e', panel:'#22003b', bg:'#19002b', grid:'#b44fff', accent:'#b44fff', wrapGlow:'#b44fff66', star:'#e0aaff'}},
+    {id:'theme_eclipse', name:'Solar Eclipse', price:6000, desc:'Obsidian cosmic darkness with blinding golden corona rays', previewBg:'linear-gradient(135deg,#0a0a0d,#1a1805)', icon:'☀️',
+      data:{name:'Solar Eclipse', style:'cyber', pageBg:'#08080a', panel:'#141417', bg:'#0b0b0e', grid:'#ffd32a', accent:'#ffd32a', wrapGlow:'#ffd32a66', star:'#ffffff'}}
   ],
   sounds: [
     {id:'sound_arcade', name:'Classic Synth', price:0, desc:'Original smooth synthesized arcade pops', previewBg:'linear-gradient(135deg,#7b5cff,#2ed2ff)', icon:'🔊'},
@@ -2967,6 +3136,7 @@ if(tabBoosters) tabBoosters.onclick=function(){ switchShopTab('boosters'); };
 
 // Initialise Economy & Daily Bonus on load
 loadUserState();
+initModeButtons();
 setTimeout(checkDailyBonus, 600);
 
 requestAnimationFrame(loop);
@@ -3185,11 +3355,12 @@ function renderGlobalRanks(cont){
       var myPid = getPlayerId();
       snapshot.forEach(function(doc){
         var d = doc.data();
+        var sVal = d.score || 0;
         list.push({
           id: doc.id,
           name: d.name || 'Anonymous',
-          score: d.score || 0,
-          level: d.level || 1,
+          score: sVal,
+          level: getLvlNum(sVal),
           isSelf: (doc.id === myPid)
         });
       });
@@ -3243,7 +3414,8 @@ function drawScoreList(cont, list, isGlobal){
 
     var meta = document.createElement('div');
     meta.className = 'rank-meta';
-    meta.textContent = 'Level ' + (item.level || 1) + (isGlobal ? ' • 🌍 Global' : ' • 📱 Device');
+    var calcLvl = getLvlNum(item.score || 0);
+    meta.textContent = 'Level ' + calcLvl + (isGlobal ? ' • 🌍 Global' : ' • 📱 Device');
 
     info.appendChild(nameDiv);
     info.appendChild(meta);

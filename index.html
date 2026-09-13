@@ -62,6 +62,229 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 .brow{display:flex;gap:10px}
 .ptitle{font-size:36px;font-weight:900;color:#fff}
 
+
+/* 🪙 Coin Badge in Top Bar */
+#coin-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:#ffd32a15;
+  border:1.5px solid #ffd32a44;
+  color:#ffd32a;
+  font-weight:900;
+  font-size:13px;
+  padding:4px 11px;
+  border-radius:20px;
+  cursor:pointer;
+  box-shadow:0 0 12px #ffd32a22;
+  transition:transform .15s,box-shadow .15s;
+  user-select:none;
+}
+#coin-badge:hover{transform:scale(1.05);box-shadow:0 0 18px #ffd32a44}
+#coin-badge:active{transform:scale(.95)}
+
+/* Coin reward badge in Game Over */
+.coin-reward{
+  background:linear-gradient(135deg,#ffd32a22,#ff7b0015);
+  border:1px solid #ffd32a66;
+  color:#ffd32a;
+  font-weight:900;
+  font-size:14px;
+  padding:5px 14px;
+  border-radius:20px;
+  margin:2px 0 6px;
+  box-shadow:0 0 14px #ffd32a33;
+  display:inline-block;
+  animation:coinPop .4s ease;
+}
+@keyframes coinPop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+
+/* 🛍️ Shop Modal Overlay */
+#ov-shop{
+  padding:14px 12px;
+  justify-content:flex-start;
+  gap:10px;
+  overflow:hidden;
+}
+.shop-header{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-bottom:8px;
+  border-bottom:1px solid #ffffff18;
+}
+.shop-title{
+  font-size:20px;
+  font-weight:900;
+  background:linear-gradient(135deg,#fff,#ffd32a);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.shop-coin-pill{
+  font-size:13px;
+  font-weight:900;
+  color:#ffd32a;
+  background:#ffd32a18;
+  border:1px solid #ffd32a44;
+  padding:4px 10px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.shop-close{
+  width:30px;
+  height:30px;
+  font-size:14px;
+}
+.shop-tabs{
+  width:100%;
+  display:flex;
+  gap:8px;
+}
+.shop-tab{
+  flex:1;
+  padding:7px 0;
+  background:#ffffff0d;
+  border:1px solid #ffffff15;
+  border-radius:8px;
+  color:#ffffffaa;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  transition:all .2s;
+  letter-spacing:.5px;
+}
+.shop-tab.active{
+  background:linear-gradient(135deg,var(--g),#2ed2ff);
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 2px 12px #7b5cff44;
+}
+.shop-list{
+  width:100%;
+  flex:1;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding-right:2px;
+  max-height:430px;
+}
+.shop-list::-webkit-scrollbar{width:4px}
+.shop-list::-webkit-scrollbar-thumb{background:#ffffff22;border-radius:4px}
+.shop-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#ffffff08;
+  border:1px solid #ffffff14;
+  border-radius:12px;
+  padding:9px 11px;
+  transition:border-color .2s,background .2s;
+}
+.shop-item.is-active-item{
+  border-color:var(--g);
+  background:#7b5cff12;
+  box-shadow:0 0 15px #7b5cff22;
+}
+.shop-item-preview{
+  width:40px;
+  height:40px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  flex-shrink:0;
+  box-shadow:0 2px 8px #0006;
+}
+.shop-item-info{
+  flex:1;
+  text-align:left;
+}
+.shop-item-name{
+  font-size:13px;
+  font-weight:800;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.shop-item-desc{
+  font-size:11px;
+  color:#9a9abf;
+  line-height:1.25;
+  margin-top:2px;
+}
+.shop-btn{
+  padding:6px 13px;
+  border-radius:20px;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  border:none;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.shop-btn.btn-buy{
+  background:linear-gradient(135deg,#ffd32a,#ff7b00);
+  color:#0a0a18;
+  box-shadow:0 2px 10px #ffd32a44;
+}
+.shop-btn.btn-buy:hover{transform:scale(1.06);box-shadow:0 4px 14px #ffd32a77}
+.shop-btn.btn-buy:active{transform:scale(.96)}
+.shop-btn.btn-equip{
+  background:#ffffff18;
+  color:#fff;
+  border:1px solid #ffffff33;
+}
+.shop-btn.btn-equip:hover{background:#ffffff30;transform:scale(1.05)}
+.shop-btn.btn-equipped{
+  background:linear-gradient(135deg,#2ecc71,#1abc9c);
+  color:#fff;
+  cursor:default;
+  opacity:0.95;
+  box-shadow:0 2px 10px #2ecc7144;
+}
+.shop-btn.btn-locked{
+  background:#ffffff0a;
+  color:#ffffff55;
+  border:1px solid #ffffff15;
+  cursor:not-allowed;
+}
+
+/* 🎁 Toast Daily Reward */
+.toast-daily{
+  position:fixed;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(135deg,#1f1435,#120e24);
+  border:1.5px solid #ffd32a;
+  box-shadow:0 4px 30px #ffd32a66;
+  color:#ffd32a;
+  font-weight:900;
+  font-size:14px;
+  padding:9px 22px;
+  border-radius:30px;
+  z-index:999;
+  pointer-events:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  animation:toastSlide 3.2s ease forwards;
+}
+@keyframes toastSlide{
+  0%{opacity:0;transform:translate(-50%,-20px)}
+  15%{opacity:1;transform:translate(-50%,0)}
+  85%{opacity:1;transform:translate(-50%,0)}
+  100%{opacity:0;transform:translate(-50%,-15px)}
+}
+
 /* 📱 Mobil Uyumlu Düzen (Tüm Telefonlarda Maksimum Boyut & Ortalı Yerleşim) */
 @media (max-width: 720px), (max-height: 720px) {
   html,body{padding:0;margin:0;height:100%;height:100dvh;overflow:hidden;display:flex;justify-content:center;align-items:center}
@@ -153,6 +376,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   <div id="top-bar">
     <div id="brand-tag">GridPop</div>
     <div id="header-actions">
+      <div id="coin-badge" title="Coin Balance (Click to open Shop)">🪙 <span class="coin-val">0</span></div>
       <button class="icon-btn hidden" id="pbtn" aria-label="Pause" title="Pause">⏸</button>
       <button class="icon-btn" id="mute" aria-label="Mute" title="Mute/Unmute">🔊</button>
     </div>
@@ -185,7 +409,10 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
           <div class="dot" style="background:#fff;box-shadow:0 0 8px #ffffff99" title="⚡ Lightning"></div>
         </div>
         <button class="btn" id="btn-s">PLAY</button>
-        <button class="btn ghost" id="btn-h">How to Play</button>
+        <div class="brow" style="gap:8px">
+          <button class="btn ghost" id="btn-shop">🛍️ Shop</button>
+          <button class="btn ghost" id="btn-h">How to Play</button>
+        </div>
       </div>
       <div class="ov hidden" id="ov-how">
         <h2>How to Play</h2>
@@ -214,11 +441,26 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
           <div class="bb-val" id="bb-val">0</div>
         </div>
         <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px">🎬 1 Extra Life (Continue)</button>
+        <div id="coin-reward-badge" class="coin-reward" style="display:none"></div>
         <div class="brow">
           <button class="btn" id="btn-re">Play Again</button>
           <button class="btn ghost" id="btn-m">Main Menu</button>
         </div>
+        <button class="btn ghost" id="btn-shop-over" style="margin-top:6px;font-size:13px;padding:6px 18px">🛍️ Shop</button>
       </div>
+      <div class="ov hidden" id="ov-shop">
+        <div class="shop-header">
+          <div class="shop-title">🛍️ SHOP</div>
+          <div class="shop-coin-pill">🪙 <span class="coin-val">0</span></div>
+          <button class="icon-btn shop-close" id="btn-shop-close" title="Close">✕</button>
+        </div>
+        <div class="shop-tabs">
+          <button class="shop-tab active" id="tab-blocks">Blocks</button>
+          <button class="shop-tab" id="tab-themes">Themes</button>
+        </div>
+        <div class="shop-list" id="shop-items-container"></div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -824,6 +1066,9 @@ function drawBlock(r,c){
 
   var p=PAL[col];
   var style=curTheme.style||'jelly';
+  if(UserState.equippedBlock==='block_neon') style='cyber';
+  else if(UserState.equippedBlock==='block_retro') style='retro';
+  else if(UserState.equippedBlock==='block_gem') style='prism';
 
   if(style==='jelly'){
     // 🍬 Lv1-2: Klasik Parlak Jelibon (Sulu & Canlı)
@@ -902,6 +1147,32 @@ function drawBlock(r,c){
     // Alt sıcak gölge bandı
     ctx.save(); ctx.globalAlpha=.3; ctx.fillStyle=p.s;
     rr(x+4,y+SZ-9,SZ-8,6,3); ctx.fill(); ctx.restore();
+    ctx.restore();
+  }
+  else if(style==='retro'){
+    // 🕹️ 8-Bit Retro Arcade Pixel Block (Sharp, classic nostalgia)
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':p.g; ctx.shadowBlur=isH?20:8;
+    ctx.fillStyle=p.f;
+    ctx.fillRect(x,y,SZ,SZ);
+    // Bevel highlights (Top & Left)
+    ctx.fillStyle='rgba(255,255,255,0.65)';
+    ctx.fillRect(x,y,SZ,4);
+    ctx.fillRect(x,y,4,SZ);
+    // Bevel shadows (Bottom & Right)
+    ctx.fillStyle=p.s;
+    ctx.fillRect(x,y+SZ-5,SZ,5);
+    ctx.fillRect(x+SZ-5,y,5,SZ);
+    // Notched 4 corner pixels
+    ctx.fillStyle='#0a0a18';
+    ctx.fillRect(x,y,3,3);
+    ctx.fillRect(x+SZ-3,y,3,3);
+    ctx.fillRect(x,y+SZ-3,3,3);
+    ctx.fillRect(x+SZ-3,y+SZ-3,3,3);
+    if(isH){
+      ctx.strokeStyle='#ffffff'; ctx.lineWidth=3;
+      ctx.strokeRect(x+2,y+2,SZ-4,SZ-4);
+    }
     ctx.restore();
   }
   else if(style==='prism'){
@@ -1146,7 +1417,7 @@ function updPreview(){
 function updDanger(){document.getElementById('danger').style.opacity=grid[0].some(function(x){return x;})?'1':'0';}
 
 function showOv(id){
-  ['ov-start','ov-how','ov-pause','ov-over'].forEach(function(oid){
+  ['ov-start','ov-how','ov-pause','ov-over','ov-shop'].forEach(function(oid){
     var el=document.getElementById(oid);
     if(el) el.classList.toggle('hidden',oid!==id);
   });
@@ -1156,7 +1427,7 @@ function showOv(id){
   }
 }
 function hideAll(){
-  ['ov-start','ov-how','ov-pause','ov-over'].forEach(function(oid){
+  ['ov-start','ov-how','ov-pause','ov-over','ov-shop'].forEach(function(oid){
     var el=document.getElementById(oid);
     if(el) el.classList.add('hidden');
   });
@@ -1304,6 +1575,10 @@ function handleClick(px,py){
   shake(Math.min(grp.length*1.5+mult*2,18));
   ensureAudio(); sndPop(grp.length); vib(comboCount>=2?[25, 30, 40]:16);
   score+=pts;
+  if(grp.length>=6){
+    addCoins(5, true, cx, cy - 25);
+    beep(950, 'sine', 0.09, 0.14, 1320);
+  }
   grp.forEach(function(x){grid[x[0]][x[1]]=null;});
   gravity(grid);
   hoverGrp=new Set();
@@ -1420,7 +1695,19 @@ function reviveGame(){
 function gameOver(){
   state=ST.OVER; ensureAudio(); sndOver(); vib([50, 70, 50, 70, 120]);
   document.getElementById('fs').textContent=score.toLocaleString('en-US');
-  renderScoreBadge(score); updUI();
+  renderScoreBadge(score);
+  var earnedCoins=Math.floor(score/100);
+  var crb=document.getElementById('coin-reward-badge');
+  if(crb){
+    if(earnedCoins>0){
+      addCoins(earnedCoins,false);
+      crb.textContent='+'+earnedCoins.toLocaleString('en-US')+' 🪙 Earned!';
+      crb.style.display='inline-block';
+    } else {
+      crb.style.display='none';
+    }
+  }
+  updUI();
 
   // 1 Can Kurtarma butonunu kontrol et (her oyunda en fazla 1 kez kurtarılabilir)
   var revBtn = document.getElementById('btn-revive');
@@ -1552,7 +1839,260 @@ function loop(ts){
     updDanger();
   }
   render();
-  requestAnimationFrame(loop);
+  
+// ── 🛍️ COSMETIC SHOP & ECONOMY SYSTEM ──
+var SHOP_DATA = {
+  blocks: [
+    {id:'block_default', name:'Classic Jelly', price:0, desc:'Original juicy neon jelly with 3D gloss', previewBg:'linear-gradient(135deg,#ff4757,#ff8a96)', icon:'🍬'},
+    {id:'block_neon', name:'Neon Cyber', price:500, desc:'High-voltage electric cyber glow cubes', previewBg:'linear-gradient(135deg,#7b5cff,#2ed2ff)', icon:'⚡'},
+    {id:'block_retro', name:'8-Bit Arcade', price:1000, desc:'Classic pixel-art retro arcade blocks', previewBg:'linear-gradient(135deg,#ffd32a,#ff7b00)', icon:'🕹️'},
+    {id:'block_gem', name:'Crystal Gems', price:1500, desc:'Faceted prismatic crystals with diamond gleam', previewBg:'linear-gradient(135deg,#ff3ea5,#b44fff)', icon:'💎'}
+  ],
+  themes: [
+    {id:'theme_default', name:'Cosmic Shift', price:0, desc:'Dynamic level progression themes', previewBg:'linear-gradient(135deg,#0a0a18,#121226)', icon:'🌈', data:null},
+    {id:'theme_cyberpunk', name:'Cyberpunk Grid', price:800, desc:'Tron neon grid horizon & hyper-cyan glow', previewBg:'linear-gradient(135deg,#050a18,#0a142e)', icon:'🌃',
+      data:{name:'Cyberpunk Grid', style:'cyber', pageBg:'#050a18', panel:'#0a142e', bg:'#070d1f', grid:'#00f6ff', accent:'#00f6ff', wrapGlow:'#00f6ff66', star:'#00f6ff'}},
+    {id:'theme_space', name:'Deep Nebula', price:1200, desc:'Mystic deep-space purple nebula & gold dust', previewBg:'linear-gradient(135deg,#150020,#240036)', icon:'✨',
+      data:{name:'Deep Nebula', style:'prism', pageBg:'#150020', panel:'#240036', bg:'#1a0028', grid:'#ff47b6', accent:'#ff47b6', wrapGlow:'#ff47b666', star:'#ffd32a'}}
+  ]
+};
+
+var UserState = {
+  coins: 0,
+  unlockedBlocks: ['block_default'],
+  unlockedThemes: ['theme_default'],
+  equippedBlock: 'block_default',
+  equippedTheme: 'theme_default',
+  lastDailyDate: ''
+};
+
+function loadUserState(){
+  try{
+    var c=localStorage.getItem('gridpop_coins');
+    if(c!==null) UserState.coins=parseInt(c,10)||0;
+    else { UserState.coins=100; localStorage.setItem('gridpop_coins','100'); } // 🎁 100 Coin Starting Gift!
+
+    var ub=localStorage.getItem('gridpop_blocks');
+    if(ub) UserState.unlockedBlocks=JSON.parse(ub);
+
+    var ut=localStorage.getItem('gridpop_themes');
+    if(ut) UserState.unlockedThemes=JSON.parse(ut);
+
+    var eb=localStorage.getItem('gridpop_eq_block');
+    if(eb) UserState.equippedBlock=eb;
+
+    var et=localStorage.getItem('gridpop_eq_theme');
+    if(et) UserState.equippedTheme=et;
+
+    var ld=localStorage.getItem('gridpop_last_daily');
+    if(ld) UserState.lastDailyDate=ld;
+  }catch(e){console.warn(e);}
+  updateCoinDisplays();
+  applyCustomEquippedTheme();
+}
+
+function saveUserState(){
+  try{
+    localStorage.setItem('gridpop_coins', UserState.coins);
+    localStorage.setItem('gridpop_blocks', JSON.stringify(UserState.unlockedBlocks));
+    localStorage.setItem('gridpop_themes', JSON.stringify(UserState.unlockedThemes));
+    localStorage.setItem('gridpop_eq_block', UserState.equippedBlock);
+    localStorage.setItem('gridpop_eq_theme', UserState.equippedTheme);
+    localStorage.setItem('gridpop_last_daily', UserState.lastDailyDate);
+  }catch(e){}
+  updateCoinDisplays();
+}
+
+function updateCoinDisplays(){
+  var formatted=UserState.coins.toLocaleString('en-US');
+  document.querySelectorAll('.coin-val').forEach(function(el){
+    el.textContent=formatted;
+  });
+}
+
+function addCoins(amt, anim, x, y){
+  UserState.coins += amt;
+  saveUserState();
+  if(anim && x!==undefined && y!==undefined){
+    floats.push({x:x, y:y, vy:-1.4, life:1.3, text:'+'+amt+' 🪙', color:'#ffd32a', sz:17});
+  }
+}
+
+function spendCoins(amt){
+  if(UserState.coins>=amt){
+    UserState.coins -= amt;
+    saveUserState();
+    return true;
+  }
+  return false;
+}
+
+function showToast(msg){
+  var existing=document.querySelector('.toast-daily');
+  if(existing) existing.remove();
+  var t=document.createElement('div');
+  t.className='toast-daily';
+  t.innerHTML=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){if(t.parentNode)t.remove();}, 3400);
+}
+
+function checkDailyBonus(){
+  var today=new Date().toISOString().slice(0,10);
+  if(UserState.lastDailyDate !== today){
+    UserState.lastDailyDate=today;
+    addCoins(50, false);
+    saveUserState();
+    ensureAudio();
+    beep(523, 'triangle', 0.12, 0.2);
+    setTimeout(function(){beep(659, 'triangle', 0.12, 0.2);}, 120);
+    setTimeout(function(){beep(784, 'triangle', 0.2, 0.25);}, 240);
+    showToast('🎁 Daily Login Bonus: +50 🪙 Added!');
+  }
+}
+
+function applyCustomEquippedTheme(){
+  if(UserState.equippedTheme && UserState.equippedTheme!=='theme_default'){
+    var found=SHOP_DATA.themes.find(function(t){return t.id===UserState.equippedTheme;});
+    if(found && found.data){
+      applyTheme(found.data);
+    }
+  }
+}
+
+// ── SHOP MODAL LOGIC ──
+var curShopTab = 'blocks';
+var prevOverlayBeforeShop = 'ov-start';
+
+function openShop(){
+  ensureAudio();
+  ['ov-start','ov-how','ov-pause','ov-over'].forEach(function(oid){
+    var el=document.getElementById(oid);
+    if(el && !el.classList.contains('hidden')) prevOverlayBeforeShop=oid;
+  });
+  showOv('ov-shop');
+  renderShop();
+}
+
+function closeShop(){
+  ensureAudio();
+  showOv(prevOverlayBeforeShop || 'ov-start');
+  applyCustomEquippedTheme();
+}
+
+function renderShop(){
+  updateCoinDisplays();
+  var container=document.getElementById('shop-items-container');
+  if(!container) return;
+  container.innerHTML='';
+
+  var items = curShopTab==='blocks' ? SHOP_DATA.blocks : SHOP_DATA.themes;
+  var unlockedList = curShopTab==='blocks' ? UserState.unlockedBlocks : UserState.unlockedThemes;
+  var equippedId = curShopTab==='blocks' ? UserState.equippedBlock : UserState.equippedTheme;
+
+  items.forEach(function(item){
+    var isUnlocked = unlockedList.indexOf(item.id) !== -1 || item.price === 0;
+    var isEquipped = equippedId === item.id;
+    var canAfford = UserState.coins >= item.price;
+
+    var row=document.createElement('div');
+    row.className='shop-item' + (isEquipped ? ' is-active-item' : '');
+
+    var previewHtml = '<div class="shop-item-preview" style="background:' + item.previewBg + '">' + item.icon + '</div>';
+    var infoHtml = '<div class="shop-item-info"><div class="shop-item-name">' + item.name + (isEquipped ? ' <span style="color:#2ecc71;font-size:11px">● Active</span>' : '') + '</div><div class="shop-item-desc">' + item.desc + '</div></div>';
+
+    var btnHtml = '';
+    if(isEquipped){
+      btnHtml = '<button class="shop-btn btn-equipped" disabled>Equipped ✓</button>';
+    } else if(isUnlocked){
+      btnHtml = '<button class="shop-btn btn-equip" onclick="handleShopEquip(\'' + curShopTab + '\',\'' + item.id + '\')">Equip</button>';
+    } else {
+      if(canAfford){
+        btnHtml = '<button class="shop-btn btn-buy" onclick="handleShopBuy(\'' + curShopTab + '\',\'' + item.id + '\',' + item.price + ')">' + item.price + ' 🪙</button>';
+      } else {
+        btnHtml = '<button class="shop-btn btn-locked" onclick="handleShopNeedCoins(' + item.price + ')">' + item.price + ' 🪙</button>';
+      }
+    }
+
+    row.innerHTML = previewHtml + infoHtml + btnHtml;
+    container.appendChild(row);
+  });
+}
+
+function handleShopEquip(tab, id){
+  ensureAudio();
+  sndGreen();
+  if(tab==='blocks'){
+    UserState.equippedBlock=id;
+  } else {
+    UserState.equippedTheme=id;
+    applyCustomEquippedTheme();
+  }
+  saveUserState();
+  renderShop();
+}
+
+function handleShopBuy(tab, id, price){
+  ensureAudio();
+  if(spendCoins(price)){
+    beep(784, 'sine', 0.1, 0.2, 1046);
+    vib([30, 40, 50]);
+    if(tab==='blocks'){
+      if(UserState.unlockedBlocks.indexOf(id)===-1) UserState.unlockedBlocks.push(id);
+      UserState.equippedBlock=id;
+    } else {
+      if(UserState.unlockedThemes.indexOf(id)===-1) UserState.unlockedThemes.push(id);
+      UserState.equippedTheme=id;
+      applyCustomEquippedTheme();
+    }
+    saveUserState();
+    renderShop();
+    showToast('🎉 Purchased & Equipped!');
+  }
+}
+
+function handleShopNeedCoins(price){
+  ensureAudio();
+  sndOver();
+  var diff = price - UserState.coins;
+  showToast('⚠️ Need ' + diff + ' more 🪙 coins!');
+}
+
+// Attach Shop Button Events
+var btnShopStart=document.getElementById('btn-shop');
+if(btnShopStart) btnShopStart.onclick=openShop;
+
+var btnShopOver=document.getElementById('btn-shop-over');
+if(btnShopOver) btnShopOver.onclick=openShop;
+
+var btnShopClose=document.getElementById('btn-shop-close');
+if(btnShopClose) btnShopClose.onclick=closeShop;
+
+var coinBadge=document.getElementById('coin-badge');
+if(coinBadge) coinBadge.onclick=openShop;
+
+var tabBlocks=document.getElementById('tab-blocks');
+var tabThemes=document.getElementById('tab-themes');
+if(tabBlocks && tabThemes){
+  tabBlocks.onclick=function(){
+    curShopTab='blocks';
+    tabBlocks.classList.add('active');
+    tabThemes.classList.remove('active');
+    renderShop();
+  };
+  tabThemes.onclick=function(){
+    curShopTab='themes';
+    tabThemes.classList.add('active');
+    tabBlocks.classList.remove('active');
+    renderShop();
+  };
+}
+
+// Initialise Economy & Daily Bonus on load
+loadUserState();
+setTimeout(checkDailyBonus, 600);
+
+requestAnimationFrame(loop);
 }
 
 // Vibration helper for mobile devices
@@ -1613,6 +2153,259 @@ document.addEventListener('keydown',function(e){
 });
 
 updUI();
+
+// ── 🛍️ COSMETIC SHOP & ECONOMY SYSTEM ──
+var SHOP_DATA = {
+  blocks: [
+    {id:'block_default', name:'Classic Jelly', price:0, desc:'Original juicy neon jelly with 3D gloss', previewBg:'linear-gradient(135deg,#ff4757,#ff8a96)', icon:'🍬'},
+    {id:'block_neon', name:'Neon Cyber', price:500, desc:'High-voltage electric cyber glow cubes', previewBg:'linear-gradient(135deg,#7b5cff,#2ed2ff)', icon:'⚡'},
+    {id:'block_retro', name:'8-Bit Arcade', price:1000, desc:'Classic pixel-art retro arcade blocks', previewBg:'linear-gradient(135deg,#ffd32a,#ff7b00)', icon:'🕹️'},
+    {id:'block_gem', name:'Crystal Gems', price:1500, desc:'Faceted prismatic crystals with diamond gleam', previewBg:'linear-gradient(135deg,#ff3ea5,#b44fff)', icon:'💎'}
+  ],
+  themes: [
+    {id:'theme_default', name:'Cosmic Shift', price:0, desc:'Dynamic level progression themes', previewBg:'linear-gradient(135deg,#0a0a18,#121226)', icon:'🌈', data:null},
+    {id:'theme_cyberpunk', name:'Cyberpunk Grid', price:800, desc:'Tron neon grid horizon & hyper-cyan glow', previewBg:'linear-gradient(135deg,#050a18,#0a142e)', icon:'🌃',
+      data:{name:'Cyberpunk Grid', style:'cyber', pageBg:'#050a18', panel:'#0a142e', bg:'#070d1f', grid:'#00f6ff', accent:'#00f6ff', wrapGlow:'#00f6ff66', star:'#00f6ff'}},
+    {id:'theme_space', name:'Deep Nebula', price:1200, desc:'Mystic deep-space purple nebula & gold dust', previewBg:'linear-gradient(135deg,#150020,#240036)', icon:'✨',
+      data:{name:'Deep Nebula', style:'prism', pageBg:'#150020', panel:'#240036', bg:'#1a0028', grid:'#ff47b6', accent:'#ff47b6', wrapGlow:'#ff47b666', star:'#ffd32a'}}
+  ]
+};
+
+var UserState = {
+  coins: 0,
+  unlockedBlocks: ['block_default'],
+  unlockedThemes: ['theme_default'],
+  equippedBlock: 'block_default',
+  equippedTheme: 'theme_default',
+  lastDailyDate: ''
+};
+
+function loadUserState(){
+  try{
+    var c=localStorage.getItem('gridpop_coins');
+    if(c!==null) UserState.coins=parseInt(c,10)||0;
+    else { UserState.coins=100; localStorage.setItem('gridpop_coins','100'); } // 🎁 100 Coin Starting Gift!
+
+    var ub=localStorage.getItem('gridpop_blocks');
+    if(ub) UserState.unlockedBlocks=JSON.parse(ub);
+
+    var ut=localStorage.getItem('gridpop_themes');
+    if(ut) UserState.unlockedThemes=JSON.parse(ut);
+
+    var eb=localStorage.getItem('gridpop_eq_block');
+    if(eb) UserState.equippedBlock=eb;
+
+    var et=localStorage.getItem('gridpop_eq_theme');
+    if(et) UserState.equippedTheme=et;
+
+    var ld=localStorage.getItem('gridpop_last_daily');
+    if(ld) UserState.lastDailyDate=ld;
+  }catch(e){console.warn(e);}
+  updateCoinDisplays();
+  applyCustomEquippedTheme();
+}
+
+function saveUserState(){
+  try{
+    localStorage.setItem('gridpop_coins', UserState.coins);
+    localStorage.setItem('gridpop_blocks', JSON.stringify(UserState.unlockedBlocks));
+    localStorage.setItem('gridpop_themes', JSON.stringify(UserState.unlockedThemes));
+    localStorage.setItem('gridpop_eq_block', UserState.equippedBlock);
+    localStorage.setItem('gridpop_eq_theme', UserState.equippedTheme);
+    localStorage.setItem('gridpop_last_daily', UserState.lastDailyDate);
+  }catch(e){}
+  updateCoinDisplays();
+}
+
+function updateCoinDisplays(){
+  var formatted=UserState.coins.toLocaleString('en-US');
+  document.querySelectorAll('.coin-val').forEach(function(el){
+    el.textContent=formatted;
+  });
+}
+
+function addCoins(amt, anim, x, y){
+  UserState.coins += amt;
+  saveUserState();
+  if(anim && x!==undefined && y!==undefined){
+    floats.push({x:x, y:y, vy:-1.4, life:1.3, text:'+'+amt+' 🪙', color:'#ffd32a', sz:17});
+  }
+}
+
+function spendCoins(amt){
+  if(UserState.coins>=amt){
+    UserState.coins -= amt;
+    saveUserState();
+    return true;
+  }
+  return false;
+}
+
+function showToast(msg){
+  var existing=document.querySelector('.toast-daily');
+  if(existing) existing.remove();
+  var t=document.createElement('div');
+  t.className='toast-daily';
+  t.innerHTML=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){if(t.parentNode)t.remove();}, 3400);
+}
+
+function checkDailyBonus(){
+  var today=new Date().toISOString().slice(0,10);
+  if(UserState.lastDailyDate !== today){
+    UserState.lastDailyDate=today;
+    addCoins(50, false);
+    saveUserState();
+    ensureAudio();
+    beep(523, 'triangle', 0.12, 0.2);
+    setTimeout(function(){beep(659, 'triangle', 0.12, 0.2);}, 120);
+    setTimeout(function(){beep(784, 'triangle', 0.2, 0.25);}, 240);
+    showToast('🎁 Daily Login Bonus: +50 🪙 Added!');
+  }
+}
+
+function applyCustomEquippedTheme(){
+  if(UserState.equippedTheme && UserState.equippedTheme!=='theme_default'){
+    var found=SHOP_DATA.themes.find(function(t){return t.id===UserState.equippedTheme;});
+    if(found && found.data){
+      applyTheme(found.data);
+    }
+  }
+}
+
+// ── SHOP MODAL LOGIC ──
+var curShopTab = 'blocks';
+var prevOverlayBeforeShop = 'ov-start';
+
+function openShop(){
+  ensureAudio();
+  ['ov-start','ov-how','ov-pause','ov-over'].forEach(function(oid){
+    var el=document.getElementById(oid);
+    if(el && !el.classList.contains('hidden')) prevOverlayBeforeShop=oid;
+  });
+  showOv('ov-shop');
+  renderShop();
+}
+
+function closeShop(){
+  ensureAudio();
+  showOv(prevOverlayBeforeShop || 'ov-start');
+  applyCustomEquippedTheme();
+}
+
+function renderShop(){
+  updateCoinDisplays();
+  var container=document.getElementById('shop-items-container');
+  if(!container) return;
+  container.innerHTML='';
+
+  var items = curShopTab==='blocks' ? SHOP_DATA.blocks : SHOP_DATA.themes;
+  var unlockedList = curShopTab==='blocks' ? UserState.unlockedBlocks : UserState.unlockedThemes;
+  var equippedId = curShopTab==='blocks' ? UserState.equippedBlock : UserState.equippedTheme;
+
+  items.forEach(function(item){
+    var isUnlocked = unlockedList.indexOf(item.id) !== -1 || item.price === 0;
+    var isEquipped = equippedId === item.id;
+    var canAfford = UserState.coins >= item.price;
+
+    var row=document.createElement('div');
+    row.className='shop-item' + (isEquipped ? ' is-active-item' : '');
+
+    var previewHtml = '<div class="shop-item-preview" style="background:' + item.previewBg + '">' + item.icon + '</div>';
+    var infoHtml = '<div class="shop-item-info"><div class="shop-item-name">' + item.name + (isEquipped ? ' <span style="color:#2ecc71;font-size:11px">● Active</span>' : '') + '</div><div class="shop-item-desc">' + item.desc + '</div></div>';
+
+    var btnHtml = '';
+    if(isEquipped){
+      btnHtml = '<button class="shop-btn btn-equipped" disabled>Equipped ✓</button>';
+    } else if(isUnlocked){
+      btnHtml = '<button class="shop-btn btn-equip" onclick="handleShopEquip(\'' + curShopTab + '\',\'' + item.id + '\')">Equip</button>';
+    } else {
+      if(canAfford){
+        btnHtml = '<button class="shop-btn btn-buy" onclick="handleShopBuy(\'' + curShopTab + '\',\'' + item.id + '\',' + item.price + ')">' + item.price + ' 🪙</button>';
+      } else {
+        btnHtml = '<button class="shop-btn btn-locked" onclick="handleShopNeedCoins(' + item.price + ')">' + item.price + ' 🪙</button>';
+      }
+    }
+
+    row.innerHTML = previewHtml + infoHtml + btnHtml;
+    container.appendChild(row);
+  });
+}
+
+function handleShopEquip(tab, id){
+  ensureAudio();
+  sndGreen();
+  if(tab==='blocks'){
+    UserState.equippedBlock=id;
+  } else {
+    UserState.equippedTheme=id;
+    applyCustomEquippedTheme();
+  }
+  saveUserState();
+  renderShop();
+}
+
+function handleShopBuy(tab, id, price){
+  ensureAudio();
+  if(spendCoins(price)){
+    beep(784, 'sine', 0.1, 0.2, 1046);
+    vib([30, 40, 50]);
+    if(tab==='blocks'){
+      if(UserState.unlockedBlocks.indexOf(id)===-1) UserState.unlockedBlocks.push(id);
+      UserState.equippedBlock=id;
+    } else {
+      if(UserState.unlockedThemes.indexOf(id)===-1) UserState.unlockedThemes.push(id);
+      UserState.equippedTheme=id;
+      applyCustomEquippedTheme();
+    }
+    saveUserState();
+    renderShop();
+    showToast('🎉 Purchased & Equipped!');
+  }
+}
+
+function handleShopNeedCoins(price){
+  ensureAudio();
+  sndOver();
+  var diff = price - UserState.coins;
+  showToast('⚠️ Need ' + diff + ' more 🪙 coins!');
+}
+
+// Attach Shop Button Events
+var btnShopStart=document.getElementById('btn-shop');
+if(btnShopStart) btnShopStart.onclick=openShop;
+
+var btnShopOver=document.getElementById('btn-shop-over');
+if(btnShopOver) btnShopOver.onclick=openShop;
+
+var btnShopClose=document.getElementById('btn-shop-close');
+if(btnShopClose) btnShopClose.onclick=closeShop;
+
+var coinBadge=document.getElementById('coin-badge');
+if(coinBadge) coinBadge.onclick=openShop;
+
+var tabBlocks=document.getElementById('tab-blocks');
+var tabThemes=document.getElementById('tab-themes');
+if(tabBlocks && tabThemes){
+  tabBlocks.onclick=function(){
+    curShopTab='blocks';
+    tabBlocks.classList.add('active');
+    tabThemes.classList.remove('active');
+    renderShop();
+  };
+  tabThemes.onclick=function(){
+    curShopTab='themes';
+    tabThemes.classList.add('active');
+    tabBlocks.classList.remove('active');
+    renderShop();
+  };
+}
+
+// Initialise Economy & Daily Bonus on load
+loadUserState();
+setTimeout(checkDailyBonus, 600);
+
 requestAnimationFrame(loop);
 
 // İlk reklamları arka planda sessizce hazırla

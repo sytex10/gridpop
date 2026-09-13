@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-cache-v5-perfect-align';
+const CACHE_NAME = 'gridpop-cache-v6-shop';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-cache-v12-exclusive-challenges';
+const CACHE_NAME = 'gridpop-cache-v13-infinite-challenges';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

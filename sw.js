@@ -1,10 +1,13 @@
-const CACHE_NAME = 'gridpop-cache-v11-ultra-suite';
+const CACHE_NAME = 'gridpop-cache-v12-exclusive-challenges';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './assets/icon-192.png',
   './assets/icon-512.png',
+  './assets/challenge_classic.jpg',
+  './assets/challenge_blitz.jpg',
+  './assets/challenge_zen.jpg',
   './assets/theme_cyberpunk.jpg',
   './assets/theme_nebula.jpg',
   './assets/theme_synthwave.jpg',

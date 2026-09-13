@@ -19,7 +19,11 @@
 :root{--bg:#0a0a18;--panel:#121226;--g:#7b5cff;--dim:#6a6a9a}
 html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex;justify-content:center;align-items:center;font-family:'Outfit',sans-serif;color:#e8e8ff;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-touch-callout:none;transition:background .7s ease}
 #sf{position:fixed;inset:0;pointer-events:none;z-index:0}
-#app{position:relative;z-index:1;display:flex;gap:20px;align-items:flex-start}
+#app{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px}
+#top-bar{width:100%;max-width:655px;height:38px;display:flex;justify-content:space-between;align-items:center;padding:0 2px;box-sizing:border-box}
+#brand-tag{font-size:22px;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,#fff 20%,var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 14px var(--g));line-height:1;user-select:none;transition:filter .7s ease}
+#header-actions{display:flex;align-items:center;gap:8px}
+#game-stage{display:flex;gap:20px;align-items:flex-start;justify-content:center}
 #sidebar{width:150px;display:flex;flex-direction:column;gap:12px}
 .card{background:var(--panel);border:1px solid #2a2a4a;border-radius:14px;padding:12px;box-shadow:0 4px 24px #0006;transition:background .7s ease,border-color .7s ease}
 .card h3{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
@@ -31,8 +35,6 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 #wrap{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #2a2a5a,0 0 40px #7b5cff44,0 20px 60px #0009;transition:box-shadow .7s ease;touch-action:none}
 #gc{display:block;touch-action:none}
 #danger{position:absolute;inset:0;background:linear-gradient(to bottom,#ff000033 0%,transparent 45%);pointer-events:none;opacity:0;transition:opacity .3s}
-#board-container{display:flex;flex-direction:column;align-items:center}
-#board-header{width:100%;height:38px;display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:6px}
 .icon-btn{width:36px;height:36px;border:1px solid #ffffff18;border-radius:50%;background:#ffffff15;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;transition:background .2s,transform .15s,border-color .2s;line-height:1;color:#fff;backdrop-filter:blur(6px)}
 .icon-btn:hover{background:#ffffff28;border-color:#ffffff33;transform:scale(1.06)}
 .icon-btn:active{transform:scale(.95)}
@@ -69,14 +71,30 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
     max-width:440px;
     height:100%;
     height:100dvh;
-    justify-content:center; /* 🌟 Ekranın dikeyinde tam ortalar, alttaki ölü boşluk yok olur */
+    justify-content:center;
     align-items:center;
     padding:max(6px, env(safe-area-inset-top)) 10px max(8px, env(safe-area-inset-bottom));
-    gap:10px;
+    gap:8px;
     box-sizing:border-box;
+  }
+  #top-bar{
+    width:100%;
+    max-width:min(calc((100dvh - 130px) * (485 / 639)), 100vw - 20px, 440px);
+    height:34px;
+    padding:0 2px;
+  }
+  #brand-tag{
+    font-size:19px;
+  }
+  #game-stage{
+    flex-direction:column;
+    width:100%;
+    align-items:center;
+    gap:8px;
   }
   #sidebar{
     width:100%;
+    max-width:min(calc((100dvh - 130px) * (485 / 639)), 100vw - 20px, 440px);
     display:grid;
     grid-template-columns:1fr 1fr 1fr 1.35fr;
     gap:5px;
@@ -102,25 +120,11 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   .bar-bg{height:5px;width:100%;margin-bottom:3px}
   .preview{justify-content:center;gap:2px}
   .pc{width:10px;height:10px;border-radius:2px}
-
-  #board-container{
-    width:100%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-  }
-  #board-header{
-    width:100%;
-    max-width:min(calc((100dvh - 120px) * (485 / 639)), 100vw - 20px, 440px);
-    height:34px;
-    margin-bottom:4px;
-    gap:8px;
-  }
   .icon-btn{width:34px;height:34px;font-size:14px}
   /* Tahta - ekrana maksimum büyüklükte oturur */
   #wrap{
     width:100%;
-    max-width:min(calc((100dvh - 120px) * (485 / 639)), 100vw - 20px, 440px);
+    max-width:min(calc((100dvh - 130px) * (485 / 639)), 100vw - 20px, 440px);
     height:auto;
     aspect-ratio:485 / 639;
     border-radius:14px;
@@ -146,20 +150,23 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 <body>
 <canvas id="sf"></canvas>
 <div id="app">
-  <div id="sidebar">
-    <div class="card" id="card-sc"><h3>Score</h3><div class="val" id="sc">0</div></div>
-    <div class="card" id="card-lv"><h3>Level</h3><div class="val" id="lv">1</div></div>
-    <div class="card" id="card-bs"><h3>Best</h3><div class="val" id="bs">0</div></div>
-    <div class="card" id="card-nx">
-      <h3>Next</h3>
-      <div class="bar-bg"><div class="bar-fill" id="tb"></div></div>
-      <div class="preview" id="pr"></div>
-    </div>
-  </div>
-  <div id="board-container">
-    <div id="board-header">
+  <div id="top-bar">
+    <div id="brand-tag">GridPop</div>
+    <div id="header-actions">
       <button class="icon-btn hidden" id="pbtn" aria-label="Pause" title="Pause">⏸</button>
       <button class="icon-btn" id="mute" aria-label="Mute" title="Mute/Unmute">🔊</button>
+    </div>
+  </div>
+  <div id="game-stage">
+    <div id="sidebar">
+      <div class="card" id="card-sc"><h3>Score</h3><div class="val" id="sc">0</div></div>
+      <div class="card" id="card-lv"><h3>Level</h3><div class="val" id="lv">1</div></div>
+      <div class="card" id="card-bs"><h3>Best</h3><div class="val" id="bs">0</div></div>
+      <div class="card" id="card-nx">
+        <h3>Next</h3>
+        <div class="bar-bg"><div class="bar-fill" id="tb"></div></div>
+        <div class="preview" id="pr"></div>
+      </div>
     </div>
     <div id="wrap">
       <canvas id="gc"></canvas>

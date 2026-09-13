@@ -382,6 +382,68 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
+
+/* 🎮 Mode Selector on Start Screen */
+.mode-selector{
+  display:flex;
+  gap:6px;
+  background:#ffffff0d;
+  border:1px solid #ffffff18;
+  padding:4px;
+  border-radius:14px;
+  width:100%;
+  max-width:320px;
+  box-sizing:border-box;
+  margin-bottom:2px;
+}
+.mode-btn{
+  flex:1;
+  padding:7px 4px;
+  background:transparent;
+  border:none;
+  border-radius:10px;
+  color:#ffffff88;
+  font-family:inherit;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.mode-btn:hover{color:#fff;background:#ffffff15}
+.mode-btn.active{
+  background:linear-gradient(135deg,var(--g),#2ed2ff);
+  color:#fff;
+  box-shadow:0 2px 10px #7b5cff44;
+}
+
+/* 🏆 New Record Floating In-Game Toast */
+.record-toast{
+  position:absolute;
+  top:22%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(1);
+  background:linear-gradient(135deg,#ffd32a,#ff7b00);
+  border:2px solid #fff;
+  color:#0a0a18;
+  padding:12px 28px;
+  border-radius:30px;
+  font-weight:900;
+  font-size:18px;
+  box-shadow:0 0 40px #ffd32a88,0 8px 30px #0009;
+  z-index:9;
+  pointer-events:none;
+  text-align:center;
+  animation:recordPulse 2.8s ease forwards;
+}
+@keyframes recordPulse{
+  0%{transform:translate(-50%,-20px) scale(0.7);opacity:0}
+  15%{transform:translate(-50%,0) scale(1.15);opacity:1}
+  30%{transform:translate(-50%,0) scale(1);opacity:1}
+  80%{transform:translate(-50%,0) scale(1);opacity:1}
+  100%{transform:translate(-50%,-30px) scale(0.9);opacity:0}
+}
+
 .ranks-content{
   width:100%;
   flex:1;
@@ -490,6 +552,60 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   font-weight:700;
 }
 
+
+
+/* 🎬 Shop Daily Ad Banner */
+.shop-ad-banner{
+  width:100%;
+  background:linear-gradient(135deg,#ffd32a18,#ff7b0010);
+  border:1px solid #ffd32a44;
+  border-radius:12px;
+  padding:8px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  box-sizing:border-box;
+}
+.sab-text{
+  display:flex;
+  flex-direction:column;
+  text-align:left;
+  gap:2px;
+}
+.sab-title{
+  font-size:12px;
+  font-weight:900;
+  color:#ffd32a;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.sab-desc{
+  font-size:10px;
+  color:#9a9abf;
+}
+.sab-btn{
+  background:linear-gradient(135deg,#ffd32a,#ff7b00);
+  color:#0a0a18;
+  font-weight:900;
+  font-size:11px;
+  padding:6px 14px;
+  border-radius:20px;
+  white-space:nowrap;
+  box-shadow:0 0 12px #ffd32a44;
+  border:none;
+  cursor:pointer;
+  transition:transform .15s,opacity .2s;
+}
+.sab-btn:hover{transform:scale(1.05)}
+.sab-btn:active{transform:scale(.95)}
+.sab-btn:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+  transform:none!important;
+  box-shadow:none;
+}
 
 /* 🎁 Toast Daily Reward */
 .toast-daily{
@@ -651,6 +767,11 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
           <div class="dot" style="background:#ff3ea5;box-shadow:0 0 8px #ff3ea599" title="Pink (Lv9)"></div>
           <div class="dot" style="background:#fff;box-shadow:0 0 8px #ffffff99" title="⚡ Lightning"></div>
         </div>
+        <div class="mode-selector">
+          <button class="mode-btn active" id="mbtn-classic" data-mode="classic">⚡ Classic</button>
+          <button class="mode-btn" id="mbtn-blitz" data-mode="blitz">⏱️ 60s Blitz</button>
+          <button class="mode-btn" id="mbtn-zen" data-mode="zen">🧘 Zen Mode</button>
+        </div>
         <button class="btn" id="btn-s">PLAY</button>
         <div class="brow" style="gap:8px">
           <button class="btn ghost" id="btn-shop">🛍️ Shop</button>
@@ -705,6 +826,15 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
         <div class="shop-tabs">
           <button class="shop-tab active" id="tab-blocks">Blocks</button>
           <button class="shop-tab" id="tab-themes">Themes</button>
+          <button class="shop-tab" id="tab-sounds">Sounds</button>
+          <button class="shop-tab" id="tab-boosters">Boosters</button>
+        </div>
+        <div class="shop-ad-banner">
+          <div class="sab-text">
+            <span class="sab-title">🎬 Daily Ad Bonus</span>
+            <span class="sab-desc">Watch 1 video to get +100 Coins (24h cooldown)</span>
+          </div>
+          <button class="sab-btn" id="btn-watch-ad-coin">Watch Ad (+100 🪙)</button>
         </div>
         <div class="shop-list" id="shop-items-container"></div>
       </div>
@@ -765,6 +895,15 @@ function applyTheme(th){
   document.documentElement.style.setProperty('--g', th.accent);
   var wrap=document.getElementById('wrap');
   if(wrap) wrap.style.boxShadow='0 0 0 2px '+th.grid+'55, 0 0 45px '+th.wrapGlow+', 0 20px 60px #0009';
+
+  if(th.bgImage){
+    document.body.style.backgroundImage = 'radial-gradient(ellipse at center, rgba(10,10,24,0.45) 0%, rgba(10,10,24,0.85) 100%), ' + th.bgImage;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
+  } else {
+    document.body.style.backgroundImage = 'none';
+  }
 }
 
 // Level defs: score threshold, spawn interval (ms), active colors, theme index
@@ -780,8 +919,25 @@ var LVL=[
   {t:13000, ms:2400, c:['RED','BLUE','YELLOW','GREEN','PURPLE','ORANGE'],         th:3},
   {t:17000, ms:2100, c:['RED','BLUE','GREEN','PURPLE','ORANGE','PINK'],           th:4}
 ];
-function getLvl(s){var d=LVL[0];for(var i=0;i<LVL.length;i++){if(s>=LVL[i].t)d=LVL[i];}return d;}
-function getLvlNum(s){var n=1;for(var i=0;i<LVL.length;i++){if(s>=LVL[i].t)n=i+1;}return n;}
+function getLvl(s){
+  if(s < 22000){
+    var d = LVL[0];
+    for(var i=0; i<LVL.length; i++){ if(s >= LVL[i].t) d = LVL[i]; }
+    return d;
+  }
+  // Level 10+ speed is capped at intense 1900ms, colors stay full
+  return { t: 22000, ms: 1900, c: ['RED','BLUE','GREEN','PURPLE','ORANGE','PINK'], th: 4 };
+}
+
+function getLvlNum(s){
+  if(s < 22000){
+    var n = 1;
+    for(var i=0; i<LVL.length; i++){ if(s >= LVL[i].t) n = i + 1; }
+    return n;
+  }
+  // ♾️ Sonsuz Level: 22.000 puandan sonra her 4.500 puanda bir yeni level atlar!
+  return 10 + Math.floor((s - 22000) / 4500);
+}
 
 var ST={PLAY:1,ANIM:2,OVER:3,PAUSE:4,START:0};
 var ANIM_DUR=180;
@@ -836,7 +992,36 @@ function beep(freq,type,dur,vol,sweep){
   g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
   o.connect(g); g.connect(aCtx.destination); o.start(t); o.stop(t+dur+.05);
 }
-function sndPop(n){beep(380+n*25,'sawtooth',.22,.38,70);}
+function sndPop(n){
+  var pack = (UserState && UserState.equippedSound) ? UserState.equippedSound : 'sound_arcade';
+  var curLv = getLvlNum(score);
+  // Level artıkça ses tonu müzikal olarak yükselir ve zenginleşir!
+  var levelPitchBonus = Math.min(curLv * 25, 300);
+
+  if(pack === 'sound_retro8bit'){
+    // 👾 8-Bit Retro Chiptune: Klasik kare dalga ve hızlı frekans arpejleri
+    beep(240 + n * 35 + levelPitchBonus, 'square', 0.16, 0.25);
+    setTimeout(function(){ beep(360 + n * 40 + levelPitchBonus, 'square', 0.12, 0.2); }, 30);
+  } else if(pack === 'sound_plasma'){
+    // ⚡ Sci-Fi Plasma Laser: Hızlı lazer frekans süpürmesi & alt bas
+    beep(800 + n * 60 + levelPitchBonus, 'sawtooth', 0.18, 0.3, 120);
+    beep(120, 'sine', 0.12, 0.2);
+  } else if(pack === 'sound_kawaii'){
+    // 🔔 Kawaii Magic Bells: Saf kristal çan & tatlı akor
+    beep(784 + levelPitchBonus, 'sine', 0.15, 0.35);
+    setTimeout(function(){ beep(1046 + levelPitchBonus, 'sine', 0.12, 0.3); }, 40);
+  } else if(pack === 'sound_cyberbass'){
+    // 🎸 Heavy Cyber Bass: Ağır bas darbesi & distorsiyon tınısı
+    beep(130 + n * 15, 'sawtooth', 0.28, 0.45, 65);
+    beep(85, 'triangle', 0.22, 0.4);
+  } else {
+    // 🔊 Classic Synth (Default): Seviyeye göre harmonik katman
+    beep(380 + n * 25 + levelPitchBonus, 'sawtooth', 0.22, 0.38, 70);
+    if(curLv >= 5){
+      beep(520 + levelPitchBonus, 'sine', 0.1, 0.2);
+    }
+  }
+}
 function sndRow(){beep(180,'sine',.09,.16);}
 function sndOver(){[440,349,293,196].forEach(function(f,i){setTimeout(function(){beep(f,'triangle',.38,.34);},i*170);});}
 function sndPause(){beep(300,'sine',.12,.18);}
@@ -997,23 +1182,57 @@ function pick(a){return a[Math.floor(Math.random()*a.length)];}
 function mkGrid(){return Array.from({length:ROWS},function(){return Array(COLS).fill(null);});}
 function mkRow(){
   var row=[];
+  var wildFreq = (UserState && UserState.boosterLightning) ? 3 : WILD_EVERY;
+
   for(var c=0; c<COLS; c++){
-    // %44 ihtimalle yanındaki bloğun rengini alır; doğal, doyurucu ve patlatması tatmin edici kombolar oluşturur!
-    if(c>0 && Math.random()<0.44){
+    // 🛡️ Kenar Blok Sıkışması Koruması (Anti-Orphan Column):
+    // Kenarlarda dikey tek başına blok kalmasını önlemek için üstündeki ve yanındaki blokla eşleşme olasılığı artırılır
+    var aboveCol = (grid && grid[ROWS-1]) ? grid[ROWS-1][c] : null;
+
+    if(c === 0){
+      if(aboveCol && aboveCol !== 'WILD' && Math.random() < 0.55){
+        row.push(aboveCol);
+      } else {
+        row.push(pick(activeColors));
+      }
+    } else if(c === 1 && Math.random() < 0.65){
+      row.push(row[0]); // Sol kenarla en az 2'li blok oluşturur!
+    } else if(c === COLS - 1){
+      if(aboveCol && aboveCol !== 'WILD' && Math.random() < 0.55){
+        row.push(aboveCol);
+      } else if(Math.random() < 0.70){
+        row.push(row[c-1]); // Sağ kenarla en az 2'li blok oluşturur!
+      } else {
+        row.push(pick(activeColors));
+      }
+    } else if(Math.random() < 0.48){
       row.push(row[c-1]);
     } else {
       row.push(pick(activeColors));
     }
   }
+
   rowsSinceWild++;
-  if(rowsSinceWild>=WILD_EVERY){
-    rowsSinceWild=0;
-    row[Math.floor(Math.random()*COLS)]='WILD';
+  if(rowsSinceWild >= wildFreq){
+    rowsSinceWild = 0;
+    row[Math.floor(Math.random() * COLS)] = 'WILD';
   }
   return row;
 }
 
 // BFS
+function isOrphanCell(r, c){
+  var col = grid[r][c]; if(!col) return false;
+  var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  for(var i=0; i<dirs.length; i++){
+    var nr = r + dirs[i][0], nc = c + dirs[i][1];
+    if(nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS){
+      if(grid[nr][nc] === col || grid[nr][nc] === 'WILD') return false;
+    }
+  }
+  return true;
+}
+
 function bfs(g,sr,sc){
   var col=g[sr][sc]; if(!col)return[];
   var vis=new Set(),q=[[sr,sc]],res=[];
@@ -1306,16 +1525,21 @@ function drawWildStone(cx, cy, sz, scale, rot, alpha){
   rr(x,y,sz,sz,rd); ctx.fillStyle=ig; ctx.fill();
   ctx.restore();
 
-  // Çift katmanlı parlayan şimşek ikonu
+  // Crisp vector lightning bolt with high-voltage core & plasma corona
   ctx.save();
-  ctx.shadowColor='#ffffaa'; ctx.shadowBlur=24*pulse;
-  ctx.font='bold 40px serif';
-  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowColor='#ffffaa'; ctx.shadowBlur=26*pulse;
   ctx.fillStyle='#ffffff';
-  ctx.fillText('\u26a1',0,2);
-  ctx.shadowColor='#ffdd00'; ctx.shadowBlur=12*pulse;
-  ctx.globalAlpha=.55;
-  ctx.fillText('\u26a1',0,2);
+  ctx.beginPath();
+  var bw = sz * 0.44, bh = sz * 0.58;
+  ctx.moveTo(bw*0.08, -bh*0.5);
+  ctx.lineTo(-bw*0.42, bh*0.04);
+  ctx.lineTo(-bw*0.02, bh*0.04);
+  ctx.lineTo(-bw*0.18, bh*0.5);
+  ctx.lineTo(bw*0.46, -bh*0.04);
+  ctx.lineTo(bw*0.06, -bh*0.04);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle='#ffd32a'; ctx.lineWidth=2; ctx.stroke();
   ctx.restore();
 
   ctx.restore();
@@ -1336,6 +1560,10 @@ function drawBlock(r,c){
   if(UserState.equippedBlock==='block_neon') style='cyber';
   else if(UserState.equippedBlock==='block_retro') style='retro';
   else if(UserState.equippedBlock==='block_gem') style='prism';
+  else if(UserState.equippedBlock==='block_gold') style='gold';
+  else if(UserState.equippedBlock==='block_obsidian') style='obsidian';
+  else if(UserState.equippedBlock==='block_prism') style='rainbow';
+  else if(UserState.equippedBlock==='block_matrix') style='matrix';
 
   if(style==='jelly'){
     // 🍬 Lv1-2: Klasik Parlak Jelibon (Sulu & Canlı)
@@ -1458,6 +1686,87 @@ function drawBlock(r,c){
     ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
     rr(x+4,y+4,SZ-8,SZ-8,7); ctx.stroke();
     if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,10);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='gold'){
+    // 👑 24K Royal Gold Luxury Ingot: Mirror metallic gold sheen & diamond glimmer
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':'#ffd32a'; ctx.shadowBlur=isH?28:16;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,'#fff6a8'); gr.addColorStop(0.3,'#ffd32a'); gr.addColorStop(0.7,'#e6a100'); gr.addColorStop(1,'#996500');
+    rr(x,y,SZ,SZ,10); ctx.fillStyle=gr; ctx.fill();
+    // Diagonal mirror reflection streak
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x+SZ*0.25, y+2); ctx.lineTo(x+SZ*0.5, y+2); ctx.lineTo(x+2, y+SZ*0.5); ctx.lineTo(x+2, y+SZ*0.25);
+    ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fill();
+    ctx.restore();
+    // Inner royal border
+    ctx.strokeStyle='rgba(255,255,255,0.7)'; ctx.lineWidth=1.8;
+    rr(x+3,y+3,SZ-6,SZ-6,7); ctx.stroke();
+    // Center gem emblem colored by block
+    ctx.fillStyle=p.f;
+    ctx.beginPath();
+    ctx.arc(x+SZ/2, y+SZ/2, SZ*0.14, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle='#ffffff'; ctx.lineWidth=1.2; ctx.stroke();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,10);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='obsidian'){
+    // 🔮 Dark Matter Obsidian: Deep glossy volcanic black with pulsing plasma neon core
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':p.f; ctx.shadowBlur=isH?28:16;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,'#1e1e2f'); gr.addColorStop(0.5,'#0d0d16'); gr.addColorStop(1,'#05050a');
+    rr(x,y,SZ,SZ,10); ctx.fillStyle=gr; ctx.fill();
+    // Glowing plasma core matching block color
+    var rg=ctx.createRadialGradient(x+SZ/2, y+SZ/2, 2, x+SZ/2, y+SZ/2, SZ*0.38);
+    rg.addColorStop(0, p.h); rg.addColorStop(0.6, p.f); rg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle=rg;
+    ctx.beginPath(); ctx.arc(x+SZ/2, y+SZ/2, SZ*0.36, 0, Math.PI*2); ctx.fill();
+    // Sleek glass bevel edge
+    ctx.strokeStyle=p.f; ctx.lineWidth=1.6;
+    rr(x+3,y+3,SZ-6,SZ-6,7); ctx.stroke();
+    // Top glass highlight arc
+    ctx.save(); ctx.globalAlpha=0.5; ctx.fillStyle='#ffffff';
+    ctx.beginPath(); ctx.ellipse(x+SZ*0.35, y+SZ*0.22, SZ*0.18, SZ*0.08, -0.25, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,10);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='rainbow'){
+    // 🌈 Prism Rainbow: Holographic spectrum gradient with iridescent shimmer
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':'#2ed2ff'; ctx.shadowBlur=isH?26:14;
+    var gr=ctx.createLinearGradient(x,y,x+SZ,y+SZ);
+    gr.addColorStop(0,'#ff3ea5'); gr.addColorStop(0.28,'#ffd32a'); gr.addColorStop(0.58,'#2ecc71'); gr.addColorStop(0.82,'#2ed2ff'); gr.addColorStop(1,'#b44fff');
+    rr(x,y,SZ,SZ,10); ctx.fillStyle=gr; ctx.fill();
+    // Diamond prism facet slice
+    ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.beginPath();
+    ctx.moveTo(x+4,y+4); ctx.lineTo(x+SZ-4,y+4); ctx.lineTo(x+4,y+SZ-4); ctx.fill();
+    // Crystal rim
+    ctx.strokeStyle='rgba(255,255,255,0.8)'; ctx.lineWidth=1.5;
+    rr(x+2,y+2,SZ-4,SZ-4,8); ctx.stroke();
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,10);ctx.stroke();}
+    ctx.restore();
+  }
+  else if(style==='matrix'){
+    // 💠 Wireframe Matrix: Cyber phosphorescent grid & micro-data node
+    ctx.save();
+    ctx.shadowColor=isH?'#ffffff':p.f; ctx.shadowBlur=isH?24:12;
+    ctx.fillStyle='#060e12'; rr(x,y,SZ,SZ,6); ctx.fill();
+    // Outer cyber wireframe
+    ctx.strokeStyle=p.f; ctx.lineWidth=2;
+    rr(x+2,y+2,SZ-4,SZ-4,5); ctx.stroke();
+    // Inner matrix grid box
+    ctx.strokeStyle=p.f+'77'; ctx.lineWidth=1;
+    ctx.strokeRect(x+SZ*0.25, y+SZ*0.25, SZ*0.5, SZ*0.5);
+    // Glowing central core microchip
+    ctx.fillStyle=p.h;
+    ctx.fillRect(x+SZ*0.38, y+SZ*0.38, SZ*0.24, SZ*0.24);
+    if(isH){ctx.strokeStyle='#ffffff';ctx.lineWidth=3;rr(x,y,SZ,SZ,6);ctx.stroke();}
     ctx.restore();
   }
 }
@@ -1702,6 +2011,52 @@ function hideAll(){
   if(pbtn && state===ST.PLAY) pbtn.classList.remove('hidden');
 }
 
+
+var hasCelebratedRecord = false;
+function checkRecordCelebration(currentScore){
+  var prevBest = getBest();
+  if(prevBest > 0 && currentScore > prevBest && !hasCelebratedRecord){
+    hasCelebratedRecord = true;
+    showRecordToast(currentScore);
+    sndNewBestRecord();
+  }
+}
+
+function showRecordToast(recScore){
+  var old = document.querySelector('.record-toast');
+  if(old) old.remove();
+
+  var wrap = document.getElementById('wrap');
+  if(!wrap) return;
+  var el = document.createElement('div');
+  el.className = 'record-toast';
+  el.innerHTML = '🏆 NEW RECORD!<br><span style="font-size:22px;color:#fff">' + recScore.toLocaleString('en-US') + '</span>';
+  wrap.appendChild(el);
+
+  // Spark burst around center
+  for(var i=0; i<28; i++){
+    var angle = Math.random() * Math.PI * 2;
+    var spd = Math.random() * 5 + 2;
+    parts.push({
+      x: W / 2, y: H * 0.35,
+      vx: Math.cos(angle) * spd,
+      vy: Math.sin(angle) * spd,
+      color: '#ffd32a',
+      r: Math.random() * 3 + 2,
+      life: 1, dc: 0.02
+    });
+  }
+
+  setTimeout(function(){ if(el.parentNode) el.remove(); }, 2800);
+}
+
+function sndNewBestRecord(){
+  ensureAudio();
+  [523, 659, 784, 1046, 1318].forEach(function(f, idx){
+    setTimeout(function(){ beep(f, 'sine', 0.22, 0.45, f*1.2); }, idx * 90);
+  });
+}
+
 function renderScoreBadge(finalScore){
   var prevBest=getBest();
   var isRecord=finalScore>0 && finalScore>=prevBest;
@@ -1729,7 +2084,16 @@ function startGame(){
   activeColors=['RED','BLUE','YELLOW'];
   applyTheme(THEMES[0]);
   rowsSinceWild=0; parts=[]; floats=[]; shM=0; flashAlpha=0; wildAnim=null;
-  hoverGrp=new Set(); comboCount=0; lastComboTime=0; hasRevived=false;
+  hoverGrp=new Set(); comboCount=0; lastComboTime=0; hasRevived=false; hasCelebratedRecord=false;
+  if(currentMode === 'blitz'){
+    blitzTimer = 60;
+  }
+  if(UserState && UserState.boosterHeadstart){
+    score = 1000;
+    UserState.boosterHeadstart = false;
+    localStorage.setItem('gridpop_booster_headstart', '0');
+    showToast('🚀 +1000 Pts Headstart Activated!');
+  }
   state=ST.PLAY; lastT=performance.now();
   for(var r=ROWS-2;r<ROWS;r++) grid[r]=mkRow();
   updPreview(); updUI(); hideAll();
@@ -1819,7 +2183,14 @@ function handleClick(px,py){
   }
 
   var grp=bfs(grid,r,c);
-  if(grp.length<2)return;
+  // 🛡️ Tekil Kenar Blok Kurtarma: Eğer blok tek kalmışsa ve üst danger bölgesindeyse (r <= 3), tek tıkla minik kıvılcımla patlatılmasına izin verilir!
+  if(grp.length < 2){
+    if((r <= 3 || isOrphanCell(r, c)) && grid[r][c] && grid[r][c] !== 'WILD'){
+      grp = [[r, c]];
+    } else {
+      return;
+    }
+  }
 
   // Combo
   var now=performance.now();
@@ -1843,8 +2214,10 @@ function handleClick(px,py){
   ensureAudio(); sndPop(grp.length); vib(comboCount>=2?[25, 30, 40]:16);
   score+=pts;
   addCareerBlocks(grp.length);
+  checkRecordCelebration(score);
   if(grp.length>=6){
     addCoins(5, true, cx, cy - 25);
+    if(currentMode === 'blitz'){ blitzTimer = Math.min(90, blitzTimer + 2); showToast('⏱️ +2s Time Bonus!'); }
     beep(950, 'sine', 0.09, 0.14, 1320);
   }
   grp.forEach(function(x){grid[x[0]][x[1]]=null;});
@@ -1962,6 +2335,11 @@ function reviveGame(){
 
 function gameOver(){
   state=ST.OVER; ensureAudio(); sndOver(); vib([50, 70, 50, 70, 120]);
+  if(UserState){
+    UserState.boosterHeadstart = false;
+    UserState.boosterLightning = false;
+    UserState.boosterDoubleCoins = false;
+  }
   document.getElementById('fs').textContent=score.toLocaleString('en-US');
   renderScoreBadge(score);
   var curLv=getLvlNum(score);
@@ -2093,12 +2471,26 @@ function loop(ts){
       animT-=dt;if(animT<=0)state=ST.PLAY;
     }
 
-    var tss=elapsed-lastSpawn, frac=1-tss/spawnInt;
-    updBar(frac);
-    if(!wildAnim && tss>=spawnInt){
-      lastSpawn=elapsed;
-      if(!pushRow())gameOver();
-      else{ensureAudio();sndRow();updPreview();}
+    if(currentMode === 'blitz'){
+      blitzTimer -= dt * 0.001;
+      if(blitzTimer <= 0){
+        blitzTimer = 0;
+        gameOver();
+      }
+      updBar(Math.max(0, blitzTimer / 60));
+      var tb = document.getElementById('tb');
+      if(tb) tb.style.width = Math.min(100, (blitzTimer / 60) * 100) + '%';
+    } else if(currentMode === 'zen'){
+      lastSpawn = elapsed;
+      updBar(1);
+    } else {
+      var tss=elapsed-lastSpawn, frac=1-tss/spawnInt;
+      updBar(frac);
+      if(!wildAnim && tss>=spawnInt){
+        lastSpawn=elapsed;
+        if(!pushRow())gameOver();
+        else{ensureAudio();sndRow();updPreview();}
+      }
     }
     updShake();
     for(var i=parts.length-1;i>=0;i--){
@@ -2112,260 +2504,7 @@ function loop(ts){
     updDanger();
   }
   render();
-  
-// ── 🛍️ COSMETIC SHOP & ECONOMY SYSTEM ──
-var SHOP_DATA = {
-  blocks: [
-    {id:'block_default', name:'Classic Jelly', price:0, desc:'Original juicy neon jelly with 3D gloss', previewBg:'linear-gradient(135deg,#ff4757,#ff8a96)', icon:'🍬'},
-    {id:'block_neon', name:'Neon Cyber', price:500, desc:'High-voltage electric cyber glow cubes', previewBg:'linear-gradient(135deg,#7b5cff,#2ed2ff)', icon:'⚡'},
-    {id:'block_retro', name:'8-Bit Arcade', price:1000, desc:'Classic pixel-art retro arcade blocks', previewBg:'linear-gradient(135deg,#ffd32a,#ff7b00)', icon:'🕹️'},
-    {id:'block_gem', name:'Crystal Gems', price:1500, desc:'Faceted prismatic crystals with diamond gleam', previewBg:'linear-gradient(135deg,#ff3ea5,#b44fff)', icon:'💎'}
-  ],
-  themes: [
-    {id:'theme_default', name:'Cosmic Shift', price:0, desc:'Dynamic level progression themes', previewBg:'linear-gradient(135deg,#0a0a18,#121226)', icon:'🌈', data:null},
-    {id:'theme_cyberpunk', name:'Cyberpunk Grid', price:800, desc:'Tron neon grid horizon & hyper-cyan glow', previewBg:'linear-gradient(135deg,#050a18,#0a142e)', icon:'🌃',
-      data:{name:'Cyberpunk Grid', style:'cyber', pageBg:'#050a18', panel:'#0a142e', bg:'#070d1f', grid:'#00f6ff', accent:'#00f6ff', wrapGlow:'#00f6ff66', star:'#00f6ff'}},
-    {id:'theme_space', name:'Deep Nebula', price:1200, desc:'Mystic deep-space purple nebula & gold dust', previewBg:'linear-gradient(135deg,#150020,#240036)', icon:'✨',
-      data:{name:'Deep Nebula', style:'prism', pageBg:'#150020', panel:'#240036', bg:'#1a0028', grid:'#ff47b6', accent:'#ff47b6', wrapGlow:'#ff47b666', star:'#ffd32a'}}
-  ]
-};
-
-var UserState = {
-  coins: 0,
-  unlockedBlocks: ['block_default'],
-  unlockedThemes: ['theme_default'],
-  equippedBlock: 'block_default',
-  equippedTheme: 'theme_default',
-  lastDailyDate: ''
-};
-
-function loadUserState(){
-  try{
-    var c=localStorage.getItem('gridpop_coins');
-    if(c!==null) UserState.coins=parseInt(c,10)||0;
-    else { UserState.coins=100; localStorage.setItem('gridpop_coins','100'); } // 🎁 100 Coin Starting Gift!
-
-    var ub=localStorage.getItem('gridpop_blocks');
-    if(ub) UserState.unlockedBlocks=JSON.parse(ub);
-
-    var ut=localStorage.getItem('gridpop_themes');
-    if(ut) UserState.unlockedThemes=JSON.parse(ut);
-
-    var eb=localStorage.getItem('gridpop_eq_block');
-    if(eb) UserState.equippedBlock=eb;
-
-    var et=localStorage.getItem('gridpop_eq_theme');
-    if(et) UserState.equippedTheme=et;
-
-    var ld=localStorage.getItem('gridpop_last_daily');
-    if(ld) UserState.lastDailyDate=ld;
-  }catch(e){console.warn(e);}
-  updateCoinDisplays();
-  applyCustomEquippedTheme();
-}
-
-function saveUserState(){
-  try{
-    localStorage.setItem('gridpop_coins', UserState.coins);
-    localStorage.setItem('gridpop_blocks', JSON.stringify(UserState.unlockedBlocks));
-    localStorage.setItem('gridpop_themes', JSON.stringify(UserState.unlockedThemes));
-    localStorage.setItem('gridpop_eq_block', UserState.equippedBlock);
-    localStorage.setItem('gridpop_eq_theme', UserState.equippedTheme);
-    localStorage.setItem('gridpop_last_daily', UserState.lastDailyDate);
-  }catch(e){}
-  updateCoinDisplays();
-}
-
-function updateCoinDisplays(){
-  var formatted=UserState.coins.toLocaleString('en-US');
-  document.querySelectorAll('.coin-val').forEach(function(el){
-    el.textContent=formatted;
-  });
-}
-
-function addCoins(amt, anim, x, y){
-  UserState.coins += amt;
-  saveUserState();
-  if(anim && x!==undefined && y!==undefined){
-    floats.push({x:x, y:y, vy:-1.4, life:1.3, text:'+'+amt+' 🪙', color:'#ffd32a', sz:17});
-  }
-}
-
-function spendCoins(amt){
-  if(UserState.coins>=amt){
-    UserState.coins -= amt;
-    saveUserState();
-    return true;
-  }
-  return false;
-}
-
-function showToast(msg){
-  var existing=document.querySelector('.toast-daily');
-  if(existing) existing.remove();
-  var t=document.createElement('div');
-  t.className='toast-daily';
-  t.innerHTML=msg;
-  document.body.appendChild(t);
-  setTimeout(function(){if(t.parentNode)t.remove();}, 3400);
-}
-
-function checkDailyBonus(){
-  var today=new Date().toISOString().slice(0,10);
-  if(UserState.lastDailyDate !== today){
-    UserState.lastDailyDate=today;
-    addCoins(50, false);
-    saveUserState();
-    ensureAudio();
-    beep(523, 'triangle', 0.12, 0.2);
-    setTimeout(function(){beep(659, 'triangle', 0.12, 0.2);}, 120);
-    setTimeout(function(){beep(784, 'triangle', 0.2, 0.25);}, 240);
-    showToast('🎁 Daily Login Bonus: +50 🪙 Added!');
-  }
-}
-
-function applyCustomEquippedTheme(){
-  if(UserState.equippedTheme && UserState.equippedTheme!=='theme_default'){
-    var found=SHOP_DATA.themes.find(function(t){return t.id===UserState.equippedTheme;});
-    if(found && found.data){
-      applyTheme(found.data);
-    }
-  }
-}
-
-// ── SHOP MODAL LOGIC ──
-var curShopTab = 'blocks';
-var prevOverlayBeforeShop = 'ov-start';
-
-function openShop(){
-  ensureAudio();
-  ['ov-start','ov-how','ov-pause','ov-over'].forEach(function(oid){
-    var el=document.getElementById(oid);
-    if(el && !el.classList.contains('hidden')) prevOverlayBeforeShop=oid;
-  });
-  showOv('ov-shop');
-  renderShop();
-}
-
-function closeShop(){
-  ensureAudio();
-  showOv(prevOverlayBeforeShop || 'ov-start');
-  applyCustomEquippedTheme();
-}
-
-function renderShop(){
-  updateCoinDisplays();
-  var container=document.getElementById('shop-items-container');
-  if(!container) return;
-  container.innerHTML='';
-
-  var items = curShopTab==='blocks' ? SHOP_DATA.blocks : SHOP_DATA.themes;
-  var unlockedList = curShopTab==='blocks' ? UserState.unlockedBlocks : UserState.unlockedThemes;
-  var equippedId = curShopTab==='blocks' ? UserState.equippedBlock : UserState.equippedTheme;
-
-  items.forEach(function(item){
-    var isUnlocked = unlockedList.indexOf(item.id) !== -1 || item.price === 0;
-    var isEquipped = equippedId === item.id;
-    var canAfford = UserState.coins >= item.price;
-
-    var row=document.createElement('div');
-    row.className='shop-item' + (isEquipped ? ' is-active-item' : '');
-
-    var previewHtml = '<div class="shop-item-preview" style="background:' + item.previewBg + '">' + item.icon + '</div>';
-    var infoHtml = '<div class="shop-item-info"><div class="shop-item-name">' + item.name + (isEquipped ? ' <span style="color:#2ecc71;font-size:11px">● Active</span>' : '') + '</div><div class="shop-item-desc">' + item.desc + '</div></div>';
-
-    var btnHtml = '';
-    if(isEquipped){
-      btnHtml = '<button class="shop-btn btn-equipped" disabled>Equipped ✓</button>';
-    } else if(isUnlocked){
-      btnHtml = '<button class="shop-btn btn-equip" onclick="handleShopEquip(\'' + curShopTab + '\',\'' + item.id + '\')">Equip</button>';
-    } else {
-      if(canAfford){
-        btnHtml = '<button class="shop-btn btn-buy" onclick="handleShopBuy(\'' + curShopTab + '\',\'' + item.id + '\',' + item.price + ')">' + item.price + ' 🪙</button>';
-      } else {
-        btnHtml = '<button class="shop-btn btn-locked" onclick="handleShopNeedCoins(' + item.price + ')">' + item.price + ' 🪙</button>';
-      }
-    }
-
-    row.innerHTML = previewHtml + infoHtml + btnHtml;
-    container.appendChild(row);
-  });
-}
-
-function handleShopEquip(tab, id){
-  ensureAudio();
-  sndGreen();
-  if(tab==='blocks'){
-    UserState.equippedBlock=id;
-  } else {
-    UserState.equippedTheme=id;
-    applyCustomEquippedTheme();
-  }
-  saveUserState();
-  renderShop();
-}
-
-function handleShopBuy(tab, id, price){
-  ensureAudio();
-  if(spendCoins(price)){
-    beep(784, 'sine', 0.1, 0.2, 1046);
-    vib([30, 40, 50]);
-    if(tab==='blocks'){
-      if(UserState.unlockedBlocks.indexOf(id)===-1) UserState.unlockedBlocks.push(id);
-      UserState.equippedBlock=id;
-    } else {
-      if(UserState.unlockedThemes.indexOf(id)===-1) UserState.unlockedThemes.push(id);
-      UserState.equippedTheme=id;
-      applyCustomEquippedTheme();
-    }
-    saveUserState();
-    renderShop();
-    showToast('🎉 Purchased & Equipped!');
-  }
-}
-
-function handleShopNeedCoins(price){
-  ensureAudio();
-  sndOver();
-  var diff = price - UserState.coins;
-  showToast('⚠️ Need ' + diff + ' more 🪙 coins!');
-}
-
-// Attach Shop Button Events
-var btnShopStart=document.getElementById('btn-shop');
-if(btnShopStart) btnShopStart.onclick=openShop;
-
-var btnShopOver=document.getElementById('btn-shop-over');
-if(btnShopOver) btnShopOver.onclick=openShop;
-
-var btnShopClose=document.getElementById('btn-shop-close');
-if(btnShopClose) btnShopClose.onclick=closeShop;
-
-var coinBadge=document.getElementById('coin-badge');
-if(coinBadge) coinBadge.onclick=openShop;
-
-var tabBlocks=document.getElementById('tab-blocks');
-var tabThemes=document.getElementById('tab-themes');
-if(tabBlocks && tabThemes){
-  tabBlocks.onclick=function(){
-    curShopTab='blocks';
-    tabBlocks.classList.add('active');
-    tabThemes.classList.remove('active');
-    renderShop();
-  };
-  tabThemes.onclick=function(){
-    curShopTab='themes';
-    tabThemes.classList.add('active');
-    tabBlocks.classList.remove('active');
-    renderShop();
-  };
-}
-
-// Initialise Economy & Daily Bonus on load
-loadUserState();
-setTimeout(checkDailyBonus, 600);
-
-requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
 }
 
 // Vibration helper for mobile devices
@@ -2431,16 +2570,42 @@ updUI();
 var SHOP_DATA = {
   blocks: [
     {id:'block_default', name:'Classic Jelly', price:0, desc:'Original juicy neon jelly with 3D gloss', previewBg:'linear-gradient(135deg,#ff4757,#ff8a96)', icon:'🍬'},
-    {id:'block_neon', name:'Neon Cyber', price:500, desc:'High-voltage electric cyber glow cubes', previewBg:'linear-gradient(135deg,#7b5cff,#2ed2ff)', icon:'⚡'},
+    {id:'block_neon', name:'Cyber Glow', price:500, desc:'High-voltage electric cyber glow cubes', previewBg:'linear-gradient(135deg,#7b5cff,#2ed2ff)', icon:'⚡'},
     {id:'block_retro', name:'8-Bit Arcade', price:1000, desc:'Classic pixel-art retro arcade blocks', previewBg:'linear-gradient(135deg,#ffd32a,#ff7b00)', icon:'🕹️'},
-    {id:'block_gem', name:'Crystal Gems', price:1500, desc:'Faceted prismatic crystals with diamond gleam', previewBg:'linear-gradient(135deg,#ff3ea5,#b44fff)', icon:'💎'}
+    {id:'block_gem', name:'Crystal Gems', price:1500, desc:'Faceted prismatic crystals with diamond gleam', previewBg:'linear-gradient(135deg,#ff3ea5,#b44fff)', icon:'💎'},
+    {id:'block_gold', name:'Gold Luxury', price:2500, desc:'Solid 24K gold bars with royal crown shimmer', previewBg:'linear-gradient(135deg,#ffd32a,#ffeaa7)', icon:'👑'},
+    {id:'block_obsidian', name:'Dark Matter', price:3500, desc:'Deep volcanic obsidian with glowing plasma core', previewBg:'linear-gradient(135deg,#2c3e50,#000000)', icon:'🔮'},
+    {id:'block_prism', name:'Prism Rainbow', price:4500, desc:'Iridescent holographic rainbow spectrum blocks', previewBg:'linear-gradient(135deg,#ff3ea5,#2ed2ff)', icon:'🌈'},
+    {id:'block_matrix', name:'Wireframe Matrix', price:5500, desc:'Digital cyber wireframe matrix cubes', previewBg:'linear-gradient(135deg,#2ecc71,#00ffcc)', icon:'💠'}
   ],
   themes: [
-    {id:'theme_default', name:'Cosmic Shift', price:0, desc:'Dynamic level progression themes', previewBg:'linear-gradient(135deg,#0a0a18,#121226)', icon:'🌈', data:null},
-    {id:'theme_cyberpunk', name:'Cyberpunk Grid', price:800, desc:'Tron neon grid horizon & hyper-cyan glow', previewBg:'linear-gradient(135deg,#050a18,#0a142e)', icon:'🌃',
-      data:{name:'Cyberpunk Grid', style:'cyber', pageBg:'#050a18', panel:'#0a142e', bg:'#070d1f', grid:'#00f6ff', accent:'#00f6ff', wrapGlow:'#00f6ff66', star:'#00f6ff'}},
-    {id:'theme_space', name:'Deep Nebula', price:1200, desc:'Mystic deep-space purple nebula & gold dust', previewBg:'linear-gradient(135deg,#150020,#240036)', icon:'✨',
-      data:{name:'Deep Nebula', style:'prism', pageBg:'#150020', panel:'#240036', bg:'#1a0028', grid:'#ff47b6', accent:'#ff47b6', wrapGlow:'#ff47b666', star:'#ffd32a'}}
+    {id:'theme_default', name:'Cosmic Shift', price:0, desc:'Original dynamic level progression', previewBg:'linear-gradient(135deg,#0a0a18,#121226)', icon:'🌌', data:null},
+    {id:'theme_cyberpunk', name:'Cyberpunk 2099', price:800, desc:'Neon metropolis skyline & glowing grid road', previewBg:'linear-gradient(135deg,#050a18,#0a142e)', icon:'🏙️',
+      data:{name:'Cyberpunk 2099', style:'cyber', pageBg:'#050a18', panel:'#0a142e', bg:'#070d1f', grid:'#00f6ff', accent:'#00f6ff', wrapGlow:'#00f6ff66', star:'#00f6ff', bgImage:'url("assets/theme_cyberpunk.jpg")'}},
+    {id:'theme_nebula', name:'Deep Nebula', price:1200, desc:'Mystic violet galaxy dust & starlight matrix', previewBg:'linear-gradient(135deg,#150020,#240036)', icon:'🌠',
+      data:{name:'Deep Nebula', style:'prism', pageBg:'#150020', panel:'#240036', bg:'#1a0028', grid:'#ff47b6', accent:'#ff47b6', wrapGlow:'#ff47b666', star:'#ffd32a', bgImage:'url("assets/theme_nebula.jpg")'}},
+    {id:'theme_synthwave', name:'Synthwave 80s', price:1600, desc:'Retro horizon wireframe mountains & digital sun', previewBg:'linear-gradient(135deg,#1f002b,#36004a)', icon:'🌇',
+      data:{name:'Synthwave 80s', style:'magma', pageBg:'#12001a', panel:'#260033', bg:'#1c0026', grid:'#ff3ea5', accent:'#ff3ea5', wrapGlow:'#ff3ea566', star:'#ff9dd2', bgImage:'url("assets/theme_synthwave.jpg")'}},
+    {id:'theme_emerald', name:'Emerald Matrix', price:2000, desc:'Bioluminescent green cyber rain & nano vines', previewBg:'linear-gradient(135deg,#05140b,#092315)', icon:'🌲',
+      data:{name:'Emerald Matrix', style:'rune', pageBg:'#05140b', panel:'#092315', bg:'#071a10', grid:'#2ecc71', accent:'#2ecc71', wrapGlow:'#2ecc7166', star:'#7fffb2'}},
+    {id:'theme_magma', name:'Magma Inferno', price:2500, desc:'Molten volcanic core with incandescent cracks', previewBg:'linear-gradient(135deg,#1a0800,#291003)', icon:'🌋',
+      data:{name:'Magma Inferno', style:'magma', pageBg:'#1a0800', panel:'#291003', bg:'#220c02', grid:'#ff7b00', accent:'#ff7b00', wrapGlow:'#ff7b0066', star:'#ffb566'}},
+    {id:'theme_abyss', name:'Electric Abyss', price:3200, desc:'Midnight ocean depths with bioluminescent blue arcs', previewBg:'linear-gradient(135deg,#001020,#002540)', icon:'🌊',
+      data:{name:'Electric Abyss', style:'cyber', pageBg:'#000c18', panel:'#001c33', bg:'#001224', grid:'#00b4d8', accent:'#00b4d8', wrapGlow:'#00b4d866', star:'#90e0ef'}},
+    {id:'theme_warp', name:'Hyperdrive Star', price:4000, desc:'Warp speed star streaks through the multiverse', previewBg:'linear-gradient(135deg,#180026,#31004a)', icon:'🚀',
+      data:{name:'Hyperdrive Star', style:'prism', pageBg:'#12001e', panel:'#240038', bg:'#1c002a', grid:'#e056fd', accent:'#e056fd', wrapGlow:'#e056fd66', star:'#ffffff'}}
+  ],
+  sounds: [
+    {id:'sound_arcade', name:'Classic Synth', price:0, desc:'Original smooth synthesized arcade pops', previewBg:'linear-gradient(135deg,#7b5cff,#2ed2ff)', icon:'🔊'},
+    {id:'sound_retro8bit', name:'8-Bit Chiptune', price:800, desc:'Authentic NES / GameBoy square wave audio', previewBg:'linear-gradient(135deg,#ffd32a,#ff7b00)', icon:'👾'},
+    {id:'sound_plasma', name:'Sci-Fi Plasma', price:1400, desc:'High-voltage laser sweeps & sub-bass thump', previewBg:'linear-gradient(135deg,#00f6ff,#0066ff)', icon:'⚡'},
+    {id:'sound_kawaii', name:'Kawaii Bells', price:2000, desc:'Celestial crystal bells & glockenspiel sparkle', previewBg:'linear-gradient(135deg,#ff3ea5,#ffd32a)', icon:'🔔'},
+    {id:'sound_cyberbass', name:'Cyber Bass', price:2800, desc:'Heavy acoustic bass drops & punchy guitar crunch', previewBg:'linear-gradient(135deg,#ff4757,#2c3e50)', icon:'🎸'}
+  ],
+  boosters: [
+    {id:'booster_headstart', name:'Headstart (+1000)', price:300, desc:'Start your next round with 1,000 bonus points!', previewBg:'linear-gradient(135deg,#ffd32a,#ff7b00)', icon:'🚀'},
+    {id:'booster_lightning', name:'Lightning Frenzy', price:500, desc:'⚡ Lightning stones spawn every 3 rows (next game)!', previewBg:'linear-gradient(135deg,#00f6ff,#7b5cff)', icon:'⚡'},
+    {id:'booster_double', name:'2x Double Coins', price:600, desc:'Double all coins earned from score & clusters (next game)!', previewBg:'linear-gradient(135deg,#2ecc71,#f1c40f)', icon:'🪙'}
   ]
 };
 
@@ -2448,8 +2613,13 @@ var UserState = {
   coins: 0,
   unlockedBlocks: ['block_default'],
   unlockedThemes: ['theme_default'],
+  unlockedSounds: ['sound_arcade'],
   equippedBlock: 'block_default',
   equippedTheme: 'theme_default',
+  equippedSound: 'sound_arcade',
+  boosterHeadstart: false,
+  boosterLightning: false,
+  boosterDoubleCoins: false,
   lastDailyDate: ''
 };
 
@@ -2471,6 +2641,12 @@ function loadUserState(){
     var et=localStorage.getItem('gridpop_eq_theme');
     if(et) UserState.equippedTheme=et;
 
+    var es=localStorage.getItem('gridpop_eq_sound');
+    if(es) UserState.equippedSound=es;
+
+    var us=localStorage.getItem('gridpop_sounds');
+    if(us) UserState.unlockedSounds=JSON.parse(us);
+
     var ld=localStorage.getItem('gridpop_last_daily');
     if(ld) UserState.lastDailyDate=ld;
   }catch(e){console.warn(e);}
@@ -2485,6 +2661,8 @@ function saveUserState(){
     localStorage.setItem('gridpop_themes', JSON.stringify(UserState.unlockedThemes));
     localStorage.setItem('gridpop_eq_block', UserState.equippedBlock);
     localStorage.setItem('gridpop_eq_theme', UserState.equippedTheme);
+    localStorage.setItem('gridpop_eq_sound', UserState.equippedSound);
+    localStorage.setItem('gridpop_sounds', JSON.stringify(UserState.unlockedSounds));
     localStorage.setItem('gridpop_last_daily', UserState.lastDailyDate);
   }catch(e){}
   updateCoinDisplays();
@@ -2498,6 +2676,7 @@ function updateCoinDisplays(){
 }
 
 function addCoins(amt, anim, x, y){
+  if(UserState && UserState.boosterDoubleCoins){ amt *= 2; }
   UserState.coins += amt;
   saveUserState();
   if(anim && x!==undefined && y!==undefined){
@@ -2551,7 +2730,62 @@ function applyCustomEquippedTheme(){
 var curShopTab = 'blocks';
 var prevOverlayBeforeShop = 'ov-start';
 
+
+// 🎬 Daily Ad Coin Reward (+100 Coins)
+function checkAdCoinAvailable(){
+  var today = new Date().toISOString().slice(0, 10);
+  var lastAdDate = localStorage.getItem('gp_last_ad_coin_date');
+  return lastAdDate !== today;
+}
+
+function updateWatchAdButtonUI(){
+  var btn = document.getElementById('btn-watch-ad-coin');
+  if(!btn) return;
+  if(checkAdCoinAvailable()){
+    btn.disabled = false;
+    btn.textContent = 'Watch Ad (+100 🪙)';
+    btn.title = 'Watch a short video to earn 100 coins';
+  } else {
+    btn.disabled = true;
+    btn.textContent = '✓ Claimed Today (100 🪙)';
+    btn.title = 'Available again tomorrow!';
+  }
+}
+
+function watchAdForCoins(){
+  ensureAudio();
+  if(!checkAdCoinAvailable()){
+    showToast('⏳ You already claimed today\'s 100 coin bonus! Come back tomorrow.');
+    return;
+  }
+
+  if(window.AdMobBridge && window.AdMobBridge.showRewarded){
+    window.AdMobBridge.showRewarded(function(success){
+      if(success){
+        grantDailyAdCoins();
+      } else {
+        showToast('⚠️ Ad unavailable right now. Please try again in a moment!');
+      }
+    });
+  } else {
+    grantDailyAdCoins();
+  }
+}
+
+function grantDailyAdCoins(){
+  var today = new Date().toISOString().slice(0, 10);
+  localStorage.setItem('gp_last_ad_coin_date', today);
+  addCoins(100, false);
+  updateWatchAdButtonUI();
+  beep(880, 'sine', 0.12, 0.2, 1760);
+  showToast('🎉 +100 Daily Ad Coins Received!');
+}
+
+var btnWatchAdCoin = document.getElementById('btn-watch-ad-coin');
+if(btnWatchAdCoin) btnWatchAdCoin.onclick = watchAdForCoins;
+
 function openShop(){
+  updateWatchAdButtonUI();
   ensureAudio();
   ['ov-start','ov-how','ov-pause','ov-over'].forEach(function(oid){
     var el=document.getElementById(oid);
@@ -2573,15 +2807,42 @@ function renderShop(){
   if(!container) return;
   container.innerHTML='';
 
-  var items = curShopTab==='blocks' ? SHOP_DATA.blocks : SHOP_DATA.themes;
-  var unlockedList = curShopTab==='blocks' ? UserState.unlockedBlocks : UserState.unlockedThemes;
-  var equippedId = curShopTab==='blocks' ? UserState.equippedBlock : UserState.equippedTheme;
+  var items = [];
+  var unlockedList = [];
+  var equippedId = '';
+
+  if(curShopTab==='blocks'){
+    items = SHOP_DATA.blocks;
+    unlockedList = UserState.unlockedBlocks;
+    equippedId = UserState.equippedBlock;
+  } else if(curShopTab==='themes'){
+    items = SHOP_DATA.themes;
+    unlockedList = UserState.unlockedThemes;
+    equippedId = UserState.equippedTheme;
+  } else if(curShopTab==='sounds'){
+    items = SHOP_DATA.sounds;
+    unlockedList = UserState.unlockedSounds || ['sound_arcade'];
+    equippedId = UserState.equippedSound || 'sound_arcade';
+  } else if(curShopTab==='boosters'){
+    items = SHOP_DATA.boosters;
+  }
 
   items.forEach(function(item){
-    var isUnlocked = unlockedList.indexOf(item.id) !== -1 || item.price === 0;
-    var isEquipped = equippedId === item.id;
-    var canAfford = UserState.coins >= item.price;
+    var isBooster = (curShopTab==='boosters');
+    var isUnlocked = false;
+    var isEquipped = false;
 
+    if(isBooster){
+      if(item.id==='booster_headstart') isEquipped = !!UserState.boosterHeadstart;
+      if(item.id==='booster_lightning') isEquipped = !!UserState.boosterLightning;
+      if(item.id==='booster_double') isEquipped = !!UserState.boosterDoubleCoins;
+      isUnlocked = isEquipped;
+    } else {
+      isUnlocked = unlockedList.indexOf(item.id) !== -1 || item.price === 0;
+      isEquipped = equippedId === item.id;
+    }
+
+    var canAfford = UserState.coins >= item.price;
     var row=document.createElement('div');
     row.className='shop-item' + (isEquipped ? ' is-active-item' : '');
 
@@ -2589,7 +2850,15 @@ function renderShop(){
     var infoHtml = '<div class="shop-item-info"><div class="shop-item-name">' + item.name + (isEquipped ? ' <span style="color:#2ecc71;font-size:11px">● Active</span>' : '') + '</div><div class="shop-item-desc">' + item.desc + '</div></div>';
 
     var btnHtml = '';
-    if(isEquipped){
+    if(isBooster){
+      if(isEquipped){
+        btnHtml = '<button class="shop-btn btn-equipped" disabled>Active ✓</button>';
+      } else if(canAfford){
+        btnHtml = '<button class="shop-btn btn-buy" onclick="handleShopBuy(\'boosters\',\'' + item.id + '\',' + item.price + ')">' + item.price + ' 🪙</button>';
+      } else {
+        btnHtml = '<button class="shop-btn btn-locked" onclick="handleShopNeedCoins(' + item.price + ')">' + item.price + ' 🪙</button>';
+      }
+    } else if(isEquipped){
       btnHtml = '<button class="shop-btn btn-equipped" disabled>Equipped ✓</button>';
     } else if(isUnlocked){
       btnHtml = '<button class="shop-btn btn-equip" onclick="handleShopEquip(\'' + curShopTab + '\',\'' + item.id + '\')">Equip</button>';
@@ -2611,9 +2880,12 @@ function handleShopEquip(tab, id){
   sndGreen();
   if(tab==='blocks'){
     UserState.equippedBlock=id;
-  } else {
+  } else if(tab==='themes'){
     UserState.equippedTheme=id;
     applyCustomEquippedTheme();
+  } else if(tab==='sounds'){
+    UserState.equippedSound=id;
+    sndPop(4); // Test audio preview!
   }
   saveUserState();
   renderShop();
@@ -2624,17 +2896,29 @@ function handleShopBuy(tab, id, price){
   if(spendCoins(price)){
     beep(784, 'sine', 0.1, 0.2, 1046);
     vib([30, 40, 50]);
-    if(tab==='blocks'){
+    if(tab==='boosters'){
+      if(id==='booster_headstart') UserState.boosterHeadstart = true;
+      if(id==='booster_lightning') UserState.boosterLightning = true;
+      if(id==='booster_double') UserState.boosterDoubleCoins = true;
+      showToast('🚀 Booster Active for next round!');
+    } else if(tab==='blocks'){
       if(UserState.unlockedBlocks.indexOf(id)===-1) UserState.unlockedBlocks.push(id);
       UserState.equippedBlock=id;
-    } else {
+      showToast('🎉 Block Unlocked & Equipped!');
+    } else if(tab==='themes'){
       if(UserState.unlockedThemes.indexOf(id)===-1) UserState.unlockedThemes.push(id);
       UserState.equippedTheme=id;
       applyCustomEquippedTheme();
+      showToast('🎉 Theme Unlocked & Equipped!');
+    } else if(tab==='sounds'){
+      UserState.unlockedSounds = UserState.unlockedSounds || ['sound_arcade'];
+      if(UserState.unlockedSounds.indexOf(id)===-1) UserState.unlockedSounds.push(id);
+      UserState.equippedSound=id;
+      sndPop(4);
+      showToast('🎉 Sound Pack Unlocked & Equipped!');
     }
     saveUserState();
     renderShop();
-    showToast('🎉 Purchased & Equipped!');
   }
 }
 
@@ -2643,6 +2927,16 @@ function handleShopNeedCoins(price){
   sndOver();
   var diff = price - UserState.coins;
   showToast('⚠️ Need ' + diff + ' more 🪙 coins!');
+}
+
+function switchShopTab(t){
+  ensureAudio();
+  curShopTab = t;
+  ['tab-blocks','tab-themes','tab-sounds','tab-boosters'].forEach(function(tid){
+    var el = document.getElementById(tid);
+    if(el) el.classList.toggle('active', tid === ('tab-' + t));
+  });
+  renderShop();
 }
 
 // Attach Shop Button Events
@@ -2660,20 +2954,12 @@ if(coinBadge) coinBadge.onclick=openShop;
 
 var tabBlocks=document.getElementById('tab-blocks');
 var tabThemes=document.getElementById('tab-themes');
-if(tabBlocks && tabThemes){
-  tabBlocks.onclick=function(){
-    curShopTab='blocks';
-    tabBlocks.classList.add('active');
-    tabThemes.classList.remove('active');
-    renderShop();
-  };
-  tabThemes.onclick=function(){
-    curShopTab='themes';
-    tabThemes.classList.add('active');
-    tabBlocks.classList.remove('active');
-    renderShop();
-  };
-}
+var tabSounds=document.getElementById('tab-sounds');
+var tabBoosters=document.getElementById('tab-boosters');
+if(tabBlocks) tabBlocks.onclick=function(){ switchShopTab('blocks'); };
+if(tabThemes) tabThemes.onclick=function(){ switchShopTab('themes'); };
+if(tabSounds) tabSounds.onclick=function(){ switchShopTab('sounds'); };
+if(tabBoosters) tabBoosters.onclick=function(){ switchShopTab('boosters'); };
 
 // Initialise Economy & Daily Bonus on load
 loadUserState();
@@ -3056,12 +3342,36 @@ function saveTagFromInput(){
   var norm = val.normalized;
   var orig = val.original;
   var pid = getPlayerId();
+  var currentStoredNorm = (localStorage.getItem('gp_player_name_norm') || '').toLowerCase();
+
+  // If player enters the exact same tag they already have, no cooldown needed
+  if(currentStoredNorm && currentStoredNorm === norm){
+    showToast('✓ This is already your active player tag!');
+    return;
+  }
+
+  var now = Date.now();
+  var SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+  var ONE_DAY = 24 * 60 * 60 * 1000;
+  var lastChange = parseInt(localStorage.getItem('gp_last_tag_change_time') || '0', 10);
+
+  // ⏳ 7-day cooldown check for username changes
+  if(lastChange > 0 && (now - lastChange < SEVEN_DAYS)){
+    var remMs = SEVEN_DAYS - (now - lastChange);
+    var remDays = Math.ceil(remMs / (24 * 3600 * 1000));
+    var remHours = Math.ceil(remMs / (3600 * 1000));
+    var timeStr = remDays > 1 ? (remDays + ' days') : (remHours + ' hours');
+    showToast('⏳ Tag change on cooldown! Available in ' + timeStr + '.');
+    return;
+  }
+
   var btnSave = document.getElementById('btn-save-tag');
   if(btnSave) { btnSave.disabled = true; btnSave.textContent = '...'; }
 
   if(!firestore){
-    // Offline fallback
     localStorage.setItem('gp_player_name', orig);
+    localStorage.setItem('gp_player_name_norm', norm);
+    localStorage.setItem('gp_last_tag_change_time', now.toString());
     input.value = orig;
     showToast('✓ Tag saved locally: ' + orig);
     if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
@@ -3069,37 +3379,48 @@ function saveTagFromInput(){
     return;
   }
 
-  // Check unique username in Firestore (case-insensitive via document ID)
+  // Check unique username in Firestore
   firestore.collection('usernames').doc(norm).get().then(function(doc){
     if(doc.exists){
       var data = doc.data();
+      // If claimed by another player:
       if(data.playerId && data.playerId !== pid){
-        // Username is already claimed by someone else!
         showToast('❌ "' + orig + '" is already taken! Try another.');
+        if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
+        return;
+      }
+      // If held in 24-hour release hold:
+      if(data.releaseAt && now < data.releaseAt && data.previousPlayerId !== pid){
+        var waitHours = Math.ceil((data.releaseAt - now) / (3600 * 1000));
+        showToast('⏳ "' + orig + '" is on 24h release cooldown (' + waitHours + 'h left)!');
         if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
         return;
       }
     }
 
-    // Free or belongs to current player -> Claim it!
-    var oldNorm = (localStorage.getItem('gp_player_name_norm') || '').toLowerCase();
-    
-    // Write claim to usernames collection
+    // Tag is available! Claim it now
     firestore.collection('usernames').doc(norm).set({
       playerId: pid,
       displayName: orig,
       normalized: norm,
-      claimedAt: firebase.firestore.FieldValue.serverTimestamp()
+      claimedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      releaseAt: null
     }, { merge: true }).then(function(){
-      // Clean up previous claimed username doc if name changed
-      if(oldNorm && oldNorm !== norm){
-        firestore.collection('usernames').doc(oldNorm).delete().catch(function(){});
+      // 🔒 24-Hour Release Hold on old username (1 gün sonra boşa düşsün)
+      if(currentStoredNorm && currentStoredNorm !== norm){
+        firestore.collection('usernames').doc(currentStoredNorm).set({
+          playerId: null,
+          previousPlayerId: pid,
+          releaseAt: now + ONE_DAY,
+          releasedAtDate: new Date(now + ONE_DAY).toISOString()
+        }, { merge: true }).catch(function(){});
       }
 
       localStorage.setItem('gp_player_name', orig);
       localStorage.setItem('gp_player_name_norm', norm);
+      localStorage.setItem('gp_last_tag_change_time', now.toString());
       input.value = orig;
-      showToast('✓ Tag claimed: ' + orig);
+      showToast('✓ Tag claimed: ' + orig + ' (Next in 7 days)');
 
       if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
       cachedGlobalScores = null;
@@ -3107,7 +3428,7 @@ function saveTagFromInput(){
       renderRanksView();
     }).catch(function(err){
       console.warn('Tag claim error:', err);
-      showToast('⚠️ Could not verify tag. Try again.');
+      showToast('⚠️ Could not claim tag. Try again.');
       if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
     });
   }).catch(function(err){

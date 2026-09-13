@@ -1,10 +1,13 @@
-const CACHE_NAME = 'gridpop-cache-v9-perfect-align';
+const CACHE_NAME = 'gridpop-cache-v11-ultra-suite';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './assets/icon-192.png',
   './assets/icon-512.png',
+  './assets/theme_cyberpunk.jpg',
+  './assets/theme_nebula.jpg',
+  './assets/theme_synthwave.jpg',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap'
 ];
 

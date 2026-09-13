@@ -61,6 +61,8 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 .best-badge.is-record{background:linear-gradient(135deg,#ffd32a22,#ff475718);border-color:#ffd32a88;box-shadow:0 0 25px #ffd32a44}
 .best-badge.is-record .bb-title{color:#ffd32a}
 .brow{display:flex;gap:10px}
+.btn-stack{display:flex;flex-direction:column;gap:8px;width:100%;max-width:250px;align-items:center}
+.btn-stack .btn{width:100%;text-align:center;justify-content:center;box-sizing:border-box}
 .ptitle{font-size:36px;font-weight:900;color:#fff}
 
 
@@ -772,11 +774,11 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
           <button class="mode-btn" id="mbtn-blitz" data-mode="blitz">⏱️ 60s Blitz</button>
           <button class="mode-btn" id="mbtn-zen" data-mode="zen">🧘 Zen Mode</button>
         </div>
-        <button class="btn" id="btn-s">PLAY</button>
-        <div class="brow" style="gap:8px">
+        <div class="btn-stack" style="margin-top:2px">
+          <button class="btn" id="btn-s">PLAY</button>
           <button class="btn ghost" id="btn-shop">🛍️ Shop</button>
-          <button class="btn ghost" id="btn-ranks">🏆 Ranks</button>
-          <button class="btn ghost" id="btn-h">How to Play</button>
+          <button class="btn ghost" id="btn-ranks">🏆 Global Ranks</button>
+          <button class="btn ghost" id="btn-h">❔ How to Play</button>
         </div>
       </div>
       <div class="ov hidden" id="ov-how">
@@ -805,16 +807,14 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
           <div class="bb-title" id="bb-title">BEST SCORE</div>
           <div class="bb-val" id="bb-val">0</div>
         </div>
-        <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px">🎬 1 Extra Life (Continue)</button>
+        <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px;width:100%;max-width:250px">🎬 1 Extra Life (Continue)</button>
         <div id="coin-reward-badge" class="coin-reward" style="display:none"></div>
-        <button class="btn" id="btn-challenge" style="background:linear-gradient(135deg,#ff3ea5,#b44fff);box-shadow:0 4px 20px #ff3ea555;font-size:14px;padding:8px 22px;margin:2px 0 4px;font-weight:800">⚔️ Challenge Friends</button>
-        <div class="brow">
+        <button class="btn" id="btn-challenge" style="background:linear-gradient(135deg,#ff3ea5,#b44fff);box-shadow:0 4px 20px #ff3ea555;font-size:14px;padding:8px 22px;margin:2px 0 4px;font-weight:800;width:100%;max-width:250px">⚔️ Challenge Friends</button>
+        <div class="btn-stack" style="margin-top:4px">
           <button class="btn" id="btn-re">Play Again</button>
+          <button class="btn ghost" id="btn-shop-over">🛍️ Shop</button>
+          <button class="btn ghost" id="btn-ranks-over">🏆 Global Ranks</button>
           <button class="btn ghost" id="btn-m">Main Menu</button>
-        </div>
-        <div class="brow" style="margin-top:6px;gap:8px">
-          <button class="btn ghost" id="btn-shop-over" style="font-size:13px;padding:6px 16px">🛍️ Shop</button>
-          <button class="btn ghost" id="btn-ranks-over" style="font-size:13px;padding:6px 16px">🏆 Ranks</button>
         </div>
       </div>
       <div class="ov hidden" id="ov-shop">
@@ -2088,11 +2088,8 @@ function startGame(){
   if(currentMode === 'blitz'){
     blitzTimer = 60;
   }
-  if(UserState && UserState.boosterHeadstart){
-    score = 1000;
-    UserState.boosterHeadstart = false;
-    localStorage.setItem('gridpop_booster_headstart', '0');
-    showToast('🚀 +1000 Pts Headstart Activated!');
+  if(UserState && UserState.boosterCombo){
+    showToast('🔥 Combo Surge Active: 1.5x on 4+ Clusters!');
   }
   state=ST.PLAY; lastT=performance.now();
   for(var r=ROWS-2;r<ROWS;r++) grid[r]=mkRow();
@@ -2199,12 +2196,19 @@ function handleClick(px,py){
 
   var mult=Math.min(comboCount,4);
   var pts=grp.length*grp.length*10*mult;
+  var isComboSurge = (UserState && UserState.boosterCombo && grp.length >= 4);
+  if(isComboSurge){
+    pts = Math.round(pts * 1.5);
+  }
   var cx=grp.reduce(function(s,x){return s+PAD+x[1]*(SZ+GAP)+SZ/2;},0)/grp.length;
   var cy=grp.reduce(function(s,x){return s+PAD+x[0]*(SZ+GAP)+SZ/2;},0)/grp.length;
 
   var big=grp.length>=5||comboCount>=3;
   var fcol=comboCount>=3?'#ffd32a':(big?'#ffffff':(PAL[grid[grp[0][0]][grp[0][1]]]||PAL.RED).h);
   addFloat(cx,cy,'+'+pts.toLocaleString('en-US'),fcol,big);
+  if(isComboSurge){
+    floats.push({x:cx, y:cy-22, vy:-1.5, life:1.1, text:'🔥 1.5x SURGE!', color:'#ff7b00', sz:15});
+  }
   if(comboCount>=2){
     var lbls=['','','COMBO!','HOT! \uD83D\uDD25','INSANE!! \uD83D\uDD25\uD83D\uDD25'];
     floats.push({x:cx,y:cy+34,vy:-1.1,life:1,text:lbls[Math.min(comboCount,4)],color:'#ffd32a',sz:15});
@@ -2336,7 +2340,7 @@ function reviveGame(){
 function gameOver(){
   state=ST.OVER; ensureAudio(); sndOver(); vib([50, 70, 50, 70, 120]);
   if(UserState){
-    UserState.boosterHeadstart = false;
+    UserState.boosterCombo = false;
     UserState.boosterLightning = false;
     UserState.boosterDoubleCoins = false;
   }
@@ -2603,7 +2607,7 @@ var SHOP_DATA = {
     {id:'sound_cyberbass', name:'Cyber Bass', price:2800, desc:'Heavy acoustic bass drops & punchy guitar crunch', previewBg:'linear-gradient(135deg,#ff4757,#2c3e50)', icon:'🎸'}
   ],
   boosters: [
-    {id:'booster_headstart', name:'Headstart (+1000)', price:300, desc:'Start your next round with 1,000 bonus points!', previewBg:'linear-gradient(135deg,#ffd32a,#ff7b00)', icon:'🚀'},
+    {id:'booster_combo', name:'Combo Surge (1.5x)', price:400, desc:'1.5x Bonus Points on all 4+ block clusters next game!', previewBg:'linear-gradient(135deg,#ff4757,#ff7b00)', icon:'🔥'},
     {id:'booster_lightning', name:'Lightning Frenzy', price:500, desc:'⚡ Lightning stones spawn every 3 rows (next game)!', previewBg:'linear-gradient(135deg,#00f6ff,#7b5cff)', icon:'⚡'},
     {id:'booster_double', name:'2x Double Coins', price:600, desc:'Double all coins earned from score & clusters (next game)!', previewBg:'linear-gradient(135deg,#2ecc71,#f1c40f)', icon:'🪙'}
   ]
@@ -2617,7 +2621,7 @@ var UserState = {
   equippedBlock: 'block_default',
   equippedTheme: 'theme_default',
   equippedSound: 'sound_arcade',
-  boosterHeadstart: false,
+  boosterCombo: false,
   boosterLightning: false,
   boosterDoubleCoins: false,
   lastDailyDate: ''
@@ -2833,7 +2837,7 @@ function renderShop(){
     var isEquipped = false;
 
     if(isBooster){
-      if(item.id==='booster_headstart') isEquipped = !!UserState.boosterHeadstart;
+      if(item.id==='booster_combo') isEquipped = !!UserState.boosterCombo;
       if(item.id==='booster_lightning') isEquipped = !!UserState.boosterLightning;
       if(item.id==='booster_double') isEquipped = !!UserState.boosterDoubleCoins;
       isUnlocked = isEquipped;
@@ -2897,7 +2901,7 @@ function handleShopBuy(tab, id, price){
     beep(784, 'sine', 0.1, 0.2, 1046);
     vib([30, 40, 50]);
     if(tab==='boosters'){
-      if(id==='booster_headstart') UserState.boosterHeadstart = true;
+      if(id==='booster_combo') UserState.boosterCombo = true;
       if(id==='booster_lightning') UserState.boosterLightning = true;
       if(id==='booster_double') UserState.boosterDoubleCoins = true;
       showToast('🚀 Booster Active for next round!');

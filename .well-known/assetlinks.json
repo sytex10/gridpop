@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.sytex10.gridpop",
+    "sha256_cert_fingerprints": ["43:29:33:CE:CD:01:79:87:B5:62:76:8A:68:A4:FE:F2:4C:2B:C6:1D:9A:13:65:09:4D:CB:52:47:1C:98:84:41"]
+  }
+}]

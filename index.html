@@ -36,7 +36,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--g),#2ed2ff);border-radius:4px;width:100%}
 .preview{display:flex;gap:3px;flex-wrap:nowrap;justify-content:center}
 .pc{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-#wrap{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #2a2a5a,0 0 40px #7b5cff44,0 20px 60px #0009;transition:box-shadow .7s ease;touch-action:none}
+#wrap{position:relative;width:420px;height:544px;aspect-ratio:627/812;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #2a2a5a,0 0 40px #7b5cff44,0 20px 60px #0009;transition:box-shadow .7s ease;touch-action:none}
 #gc{display:block;touch-action:none}
 #danger{position:absolute;inset:0;background:linear-gradient(to bottom,#ff000033 0%,transparent 45%);pointer-events:none;opacity:0;transition:opacity .3s}
 .icon-btn{width:36px;height:36px;border:1px solid #ffffff18;border-radius:50%;background:#ffffff15;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;transition:background .2s,transform .15s,border-color .2s;line-height:1;color:#fff;backdrop-filter:blur(6px)}
@@ -858,13 +858,13 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
   /* 🎯 Oyun Tahtası (#wrap) - Her Ekrana Otomatik Uyum Sağlayan Dinamik Kare */
   #wrap {
-    --avail-h: calc(100dvh - clamp(98px, 15vh, 124px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-    --avail-w: calc(100vw - clamp(16px, 4.5vw, 24px) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-    width: min(var(--avail-h), var(--avail-w), 430px) !important;
-    height: min(var(--avail-h), var(--avail-w), 430px) !important;
-    max-width: min(var(--avail-h), var(--avail-w), 430px) !important;
-    max-height: min(var(--avail-h), var(--avail-w), 430px) !important;
-    aspect-ratio: 1 / 1 !important;
+    --avail-h: calc(100dvh - clamp(88px, 13vh, 116px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    --avail-w: calc(100vw - clamp(14px, 4vw, 22px) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    width: min(var(--avail-w), calc(var(--avail-h) * 0.772), 430px) !important;
+    height: min(calc(var(--avail-w) / 0.772), var(--avail-h), 557px) !important;
+    max-width: 430px !important;
+    max-height: 557px !important;
+    aspect-ratio: 627 / 812 !important;
     border-radius: clamp(12px, 3.5vw, 18px) !important;
     display: block !important;
     flex-shrink: 0 !important;
@@ -1058,9 +1058,9 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
       <div class="card" id="card-lv"><h3>Level</h3><div class="val" id="lv">1</div></div>
       <div class="card" id="card-bs"><h3>Best</h3><div class="val" id="bs">0</div></div>
       <div class="card" id="card-nx">
-        <h3>Next</h3>
+        <h3>Combo</h3>
         <div class="bar-bg"><div class="bar-fill" id="tb"></div></div>
-        <div class="preview" id="pr"></div>
+        <div class="val" id="cb-val" style="font-size:22px;color:#ffd32a;margin-top:2px;">0x</div>
       </div>
     </div>
     <div id="wrap">
@@ -1068,7 +1068,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
       <div id="danger"></div>
       <div class="ov" id="ov-start">
         <h1>GridPop</h1>
-        <p class="tag" style="margin-top:-4px">Pop color blocks & conquer the storm!</p>
+        <p class="tag" style="margin-top:-4px">Drag & Drop Blocks to Blast Rows & Columns!</p>
         
         <div class="dots">
           <div class="dot" style="background:#ff4757;box-shadow:0 0 8px #ff475799" title="Red"></div>
@@ -1188,7 +1188,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v26_universal_adaptive_layout';
+  var BUILD_ID = 'gp_build_v27_block_blast_master';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -1201,9 +1201,12 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
 'use strict';
 // ── Constants ──
-var COLS=8,ROWS=8,SZ=72,GAP=5,PAD=14;
-var W=COLS*SZ+(COLS-1)*GAP+PAD*2;
-var H=ROWS*SZ+(ROWS-1)*GAP+PAD*2;
+var COLS=8,ROWS=8,SZ=70,GAP=5,PAD=16;
+var GRID_W = COLS*SZ + (COLS-1)*GAP + PAD*2; // 627
+var GRID_H = ROWS*SZ + (ROWS-1)*GAP + PAD*2; // 627
+var DOCK_H = 185;
+var W = GRID_W; // 627
+var H = GRID_H + DOCK_H; // 812 total canvas height
 
 var PAL={
   RED:    {f:'#ff4757',h:'#ff8a96',s:'#c0001d',g:'#ff475766'},
@@ -1550,6 +1553,167 @@ var misclickCell = null;
 var ACTIVE_SESSION_KEY = 'gp_active_session_v24';
 
 var wildAnim=null; // ⚡ Merkeze uçan & şimşek çakan joker animasyon durumu
+
+
+// ── 🧩 Block Blast Shapes Library & Engine ──
+var SHAPES = {
+  EASY: [
+    { name: 'dot', matrix: [[1]] },
+    { name: 'line2_h', matrix: [[1, 1]] },
+    { name: 'line2_v', matrix: [[1], [1]] },
+    { name: 'line3_h', matrix: [[1, 1, 1]] },
+    { name: 'line3_v', matrix: [[1], [1], [1]] },
+    { name: 'corner_tl', matrix: [[1, 1], [1, 0]] },
+    { name: 'corner_tr', matrix: [[1, 1], [0, 1]] },
+    { name: 'corner_bl', matrix: [[1, 0], [1, 1]] },
+    { name: 'corner_br', matrix: [[0, 1], [1, 1]] }
+  ],
+  MEDIUM: [
+    { name: 'square2', matrix: [[1, 1], [1, 1]] },
+    { name: 'line4_h', matrix: [[1, 1, 1, 1]] },
+    { name: 'line4_v', matrix: [[1], [1], [1], [1]] },
+    { name: 'T_up', matrix: [[1, 1, 1], [0, 1, 0]] },
+    { name: 'T_down', matrix: [[0, 1, 0], [1, 1, 1]] },
+    { name: 'L_tl', matrix: [[1, 0], [1, 0], [1, 1]] },
+    { name: 'L_tr', matrix: [[0, 1], [0, 1], [1, 1]] },
+    { name: 'L_bl', matrix: [[1, 1], [1, 0], [1, 0]] },
+    { name: 'L_br', matrix: [[1, 1], [0, 1], [0, 1]] },
+    { name: 'Z_h', matrix: [[1, 1, 0], [0, 1, 1]] },
+    { name: 'S_h', matrix: [[0, 1, 1], [1, 1, 0]] }
+  ],
+  HARD: [
+    { name: 'square3', matrix: [[1, 1, 1], [1, 1, 1], [1, 1, 1]] },
+    { name: 'line5_h', matrix: [[1, 1, 1, 1, 1]] },
+    { name: 'line5_v', matrix: [[1], [1], [1], [1], [1]] },
+    { name: 'big_L_tl', matrix: [[1, 0, 0], [1, 0, 0], [1, 1, 1]] },
+    { name: 'big_L_br', matrix: [[1, 1, 1], [0, 0, 1], [0, 0, 1]] }
+  ]
+};
+
+var dockPieces = [null, null, null];
+var draggedPiece = null; // { piece, index, startX, startY, curX, curY }
+var TOUCH_OFFSET_Y = 85; // 📱 Touch Offset: Floats 85px above finger so board is never blocked!
+var blastStreak = 0;
+var lastBlastTime = 0;
+
+function getActiveBlockStyle() {
+  var style = (curTheme && curTheme.style) ? curTheme.style : 'jelly';
+  if (window.UserState) {
+    if(UserState.equippedBlock==='block_neon') style='cyber';
+    else if(UserState.equippedBlock==='block_retro') style='retro';
+    else if(UserState.equippedBlock==='block_gem') style='prism';
+    else if(UserState.equippedBlock==='block_gold') style='gold';
+    else if(UserState.equippedBlock==='block_obsidian') style='obsidian';
+    else if(UserState.equippedBlock==='block_prism') style='rainbow';
+    else if(UserState.equippedBlock==='block_matrix') style='matrix';
+    else if(UserState.equippedBlock==='block_magma') style='magma';
+    else if(UserState.equippedBlock==='block_glitch') style='glitch';
+  }
+  return style;
+}
+
+function countFilledCells(g) {
+  var count = 0;
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      if (g[r][c] !== null) count++;
+    }
+  }
+  return count;
+}
+
+function canPlaceShape(g, shape, startR, startC) {
+  var shH = shape.length, shW = shape[0].length;
+  if (startR < 0 || startR + shH > ROWS || startC < 0 || startC + shW > COLS) return false;
+  for (var r = 0; r < shH; r++) {
+    for (var c = 0; c < shW; c++) {
+      if (shape[r][c] === 1) {
+        if (g[startR + r][startC + c] !== null) return false;
+      }
+    }
+  }
+  return true;
+}
+
+function canPieceFitAnywhere(g, shape) {
+  var shH = shape.length, shW = shape[0].length;
+  for (var r = 0; r <= ROWS - shH; r++) {
+    for (var c = 0; c <= COLS - shW; c++) {
+      if (canPlaceShape(g, shape, r, c)) return true;
+    }
+  }
+  return false;
+}
+
+// 🧠 RNG / Parça Dengesi (Fairness Spawn Algorithm)
+function generateFairPieces(g) {
+  var filledCount = countFilledCells(g);
+  var fillRatio = filledCount / 64;
+  var newPieces = [];
+  var hasHard = false;
+
+  var colorKeys = ['RED', 'BLUE', 'YELLOW', 'GREEN', 'PURPLE', 'ORANGE', 'PINK'];
+
+  for (var i = 0; i < 3; i++) {
+    var pool = [];
+    if (fillRatio > 0.60) {
+      // Board is crowded: ONLY give EASY and select MEDIUM pieces. NO 3x3 squares or 5-lines!
+      pool = SHAPES.EASY.concat(SHAPES.EASY).concat(SHAPES.MEDIUM);
+    } else if (fillRatio > 0.40) {
+      pool = SHAPES.EASY.concat(SHAPES.MEDIUM);
+      if (!hasHard) pool = pool.concat(SHAPES.HARD);
+    } else {
+      pool = SHAPES.EASY.concat(SHAPES.MEDIUM).concat(SHAPES.MEDIUM);
+      if (!hasHard) pool = pool.concat(SHAPES.HARD);
+    }
+
+    var shapeObj = pool[Math.floor(Math.random() * pool.length)];
+    if (SHAPES.HARD.some(function(h){ return h.name === shapeObj.name; })) {
+      hasHard = true; // Never give multiple hard shapes in one hand!
+    }
+
+    var color = colorKeys[Math.floor(Math.random() * colorKeys.length)];
+    newPieces.push({
+      shape: shapeObj.matrix,
+      name: shapeObj.name,
+      color: color,
+      scale: 1,
+      alpha: 1
+    });
+  }
+
+  // 🛡️ İyi Niyet Kuralı: En az 1 parçanın kesinlikle sığabileceği garanti edilir!
+  var canFitAny = newPieces.some(function(p){ return canPieceFitAnywhere(g, p.shape); });
+  if (!canFitAny) {
+    var fittingShapes = SHAPES.EASY.concat(SHAPES.MEDIUM).filter(function(s){
+      return canPieceFitAnywhere(g, s.matrix);
+    });
+    if (fittingShapes.length > 0) {
+      var rescue = fittingShapes[Math.floor(Math.random() * fittingShapes.length)];
+      newPieces[0].shape = rescue.matrix;
+      newPieces[0].name = rescue.name;
+    } else {
+      newPieces[0].shape = [[1]];
+      newPieces[0].name = 'dot';
+    }
+  }
+
+  // 🛡️ Ekstra Güvenlik: Tahta %75 doluysa en az iki parçanın sığabilmesi desteklenir
+  if (fillRatio > 0.75) {
+    for (var k = 0; k < 2; k++) {
+      if (!canPieceFitAnywhere(g, newPieces[k].shape)) {
+        var fitting = SHAPES.EASY.filter(function(s){ return canPieceFitAnywhere(g, s.matrix); });
+        if (fitting.length > 0) {
+          var res = fitting[Math.floor(Math.random() * fitting.length)];
+          newPieces[k].shape = res.matrix;
+          newPieces[k].name = res.name;
+        }
+      }
+    }
+  }
+
+  return newPieces;
+}
 
 // Grid helpers
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
@@ -2375,6 +2539,126 @@ function render(){
   if(grid)for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)grid[r][c]?drawBlock(r,c):drawEmpty(r,c);
 
   // ⚡ Şimşek Taşı ve Yıldırım Efektleri (Ortaya uçuş, gökten inen yıldırımlar, çatallı arklar ve şok dalgaları)
+  
+  // ── 🧩 Draw Dock Slots & Pieces ──
+  var dockY = GRID_H + 10;
+  ctx.save();
+  // Sleek neon dock separator line
+  var gradSep = ctx.createLinearGradient(PAD, dockY - 5, W - PAD, dockY - 5);
+  gradSep.addColorStop(0, 'rgba(123, 92, 255, 0.1)');
+  gradSep.addColorStop(0.5, 'rgba(0, 246, 255, 0.6)');
+  gradSep.addColorStop(1, 'rgba(123, 92, 255, 0.1)');
+  ctx.strokeStyle = gradSep;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(PAD, dockY - 5);
+  ctx.lineTo(W - PAD, dockY - 5);
+  ctx.stroke();
+
+  var slotCenters = [
+    { x: W * 0.19, y: dockY + DOCK_H * 0.44 },
+    { x: W * 0.50, y: dockY + DOCK_H * 0.44 },
+    { x: W * 0.81, y: dockY + DOCK_H * 0.44 }
+  ];
+
+  for (var di = 0; di < 3; di++) {
+    var slot = slotCenters[di];
+    var piece = dockPieces[di];
+
+    // Dock slot plate
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(slot.x - 75, slot.y - 65, 150, 130, 16);
+    } else {
+      ctx.rect(slot.x - 75, slot.y - 65, 150, 130);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    if (piece && (!draggedPiece || draggedPiece.index !== di)) {
+      var sh = piece.shape;
+      var shRows = sh.length, shCols = sh[0].length;
+      var miniSZ = 26;
+      var miniGap = 3;
+      var pW = shCols * miniSZ + (shCols - 1) * miniGap;
+      var pH = shRows * miniSZ + (shRows - 1) * miniGap;
+      var startX = slot.x - pW / 2;
+      var startY = slot.y - pH / 2;
+
+      for (var pr = 0; pr < shRows; pr++) {
+        for (var pc = 0; pc < shCols; pc++) {
+          if (sh[pr][pc] === 1) {
+            var bx = startX + pc * (miniSZ + miniGap);
+            var by = startY + pr * (miniSZ + miniGap);
+            var pal = PAL[piece.color] || PAL.BLUE;
+            drawSingleBlockShader(ctx, bx, by, miniSZ, pal, getActiveBlockStyle(), false);
+          }
+        }
+      }
+    }
+  }
+  ctx.restore();
+
+  // ── 👻 Draw Ghost Placement Preview on Grid ──
+  if (draggedPiece) {
+    var p = draggedPiece.piece;
+    var sh = p.shape;
+    var shRows = sh.length, shCols = sh[0].length;
+
+    var hoverC = Math.round((draggedPiece.curX - PAD - (shCols * (SZ + GAP)) / 2) / (SZ + GAP));
+    var hoverR = Math.round((draggedPiece.curY - PAD - (shRows * (SZ + GAP)) / 2) / (SZ + GAP));
+
+    var isValid = canPlaceShape(grid, sh, hoverR, hoverC);
+
+    if (hoverR >= 0 && hoverR + shRows <= ROWS && hoverC >= 0 && hoverC + shCols <= COLS) {
+      ctx.save();
+      for (var hr = 0; hr < shRows; hr++) {
+        for (var hc = 0; hc < shCols; hc++) {
+          if (sh[hr][hc] === 1) {
+            var gx = PAD + (hoverC + hc) * (SZ + GAP);
+            var gy = PAD + (hoverR + hr) * (SZ + GAP);
+            ctx.strokeStyle = isValid ? '#00f6ff' : '#ff4757';
+            ctx.fillStyle = isValid ? 'rgba(0, 246, 255, 0.35)' : 'rgba(255, 71, 87, 0.25)';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = isValid ? '#00f6ff' : '#ff4757';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            if (ctx.roundRect) {
+              ctx.roundRect(gx, gy, SZ, SZ, 10);
+            } else {
+              ctx.rect(gx, gy, SZ, SZ);
+            }
+            ctx.fill();
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.restore();
+    }
+
+    // ── 🖐️ Draw Lifted Floating Piece (85px Touch Offset above finger!) ──
+    ctx.save();
+    var dragW = shCols * (SZ + GAP) - GAP;
+    var dragH = shRows * (SZ + GAP) - GAP;
+    var dStartX = draggedPiece.curX - dragW / 2;
+    var dStartY = draggedPiece.curY - dragH / 2;
+
+    for (var dr = 0; dr < shRows; dr++) {
+      for (var dc = 0; dc < shCols; dc++) {
+        if (sh[dr][dc] === 1) {
+          var dbx = dStartX + dc * (SZ + GAP);
+          var dby = dStartY + dr * (SZ + GAP);
+          var dpal = PAL[p.color] || PAL.BLUE;
+          drawSingleBlockShader(ctx, dbx, dby, SZ, dpal, getActiveBlockStyle(), false);
+        }
+      }
+    }
+    ctx.restore();
+  }
+
   if(wildAnim){
     // Aşama 1: Hedef blokların etrafında elektriklenme aurası & kilitlenme ve gerilim titremesi
     if(wildAnim.t < wildAnim.dur1){
@@ -2889,8 +3173,10 @@ function startGame(){
     showToast('🔥 Combo Surge Active: 1.5x on 4+ Clusters!');
   }
   state=ST.PLAY; lastT=performance.now();
-  var startRows = (currentMode === 'blitz' || currentMode === 'zen') ? 3 : 2;
-  for(var r=ROWS-startRows; r<ROWS; r++) grid[r]=mkRow();
+  blastStreak = 0; lastBlastTime = 0; draggedPiece = null;
+  dockPieces = generateFairPieces(grid);
+  var cbElem = document.getElementById('cb-val');
+  if (cbElem) cbElem.textContent = '0x';
   updPreview(); updUI(); hideAll();
   var pbtn=document.getElementById('pbtn');
   if(pbtn){
@@ -3202,7 +3488,123 @@ function reviveGame(){
   updUI();
 }
 
+
+// 💥 Block Blast Line Clearing & Combo Engine
+function checkAndBlastLines() {
+  var fullRows = [];
+  var fullCols = [];
+
+  for (var r = 0; r < ROWS; r++) {
+    var rowFull = true;
+    for (var c = 0; c < COLS; c++) {
+      if (grid[r][c] === null) { rowFull = false; break; }
+    }
+    if (rowFull) fullRows.push(r);
+  }
+
+  for (var c = 0; c < COLS; c++) {
+    var colFull = true;
+    for (var r = 0; r < ROWS; r++) {
+      if (grid[r][c] === null) { colFull = false; break; }
+    }
+    if (colFull) fullCols.push(c);
+  }
+
+  var totalLines = fullRows.length + fullCols.length;
+  if (totalLines === 0) {
+    return 0;
+  }
+
+  var now = performance.now();
+  if (now - lastBlastTime < 4500) {
+    blastStreak++;
+  } else {
+    blastStreak = 1;
+  }
+  lastBlastTime = now;
+
+  var cbElem = document.getElementById('cb-val');
+  if (cbElem) cbElem.textContent = blastStreak + 'x';
+
+  // Identify all unique cleared cells
+  var clearedCells = {};
+  fullRows.forEach(function(r) {
+    for (var c = 0; c < COLS; c++) {
+      clearedCells[r * 100 + c] = [r, c];
+    }
+  });
+  fullCols.forEach(function(c) {
+    for (var r = 0; r < ROWS; r++) {
+      clearedCells[r * 100 + c] = [r, c];
+    }
+  });
+
+  var cellList = [];
+  for (var k in clearedCells) {
+    cellList.push(clearedCells[k]);
+  }
+
+  // Audio & Visual scoring
+  ensureAudio();
+  var lineScore = totalLines * 120 * blastStreak;
+  if (totalLines >= 2) lineScore += (totalLines - 1) * 200 * blastStreak;
+  score += lineScore;
+  addCoins(totalLines * 3, false);
+  addCareerBlocks(cellList.length);
+  checkRecordCelebration(score);
+
+  // Explosive particles
+  cellList.forEach(function(pos) {
+    var r = pos[0], c = pos[1];
+    var col = grid[r][c] || 'BLUE';
+    var cx = PAD + c * (SZ + GAP) + SZ / 2;
+    var cy = PAD + r * (SZ + GAP) + SZ / 2;
+    grid[r][c] = null;
+
+    for (var p = 0; p < 7; p++) {
+      var angle = Math.random() * Math.PI * 2;
+      var spd = Math.random() * 5 + 2;
+      parts.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd,
+        color: (PAL[col] ? PAL[col].f : '#00f6ff'),
+        life: 1.0,
+        r: Math.random() * 4 + 2
+      });
+    }
+  });
+
+  // Sound: Satisfying ascending pitch based on streak
+  var pitch = 260 + Math.min(blastStreak, 8) * 85;
+  beep(pitch, 'triangle', 0.12, 0.18, pitch * 1.5);
+  setTimeout(function(){ beep(pitch * 1.25, 'sine', 0.15, 0.22, pitch * 2); }, 80);
+
+  shake(Math.min(10 + totalLines * 4 + blastStreak * 2, 25));
+  vib(totalLines >= 2 ? [30, 40, 50] : [25, 30]);
+
+  // Floating combo text
+  var fX = W / 2, fY = GRID_H / 2;
+  var blastTitle = totalLines >= 3 ? '💥 TRIPLE BLAST!' : (totalLines === 2 ? '⚡ DOUBLE BLAST!' : '✨ LINE CLEAR!');
+  if (blastStreak > 1) blastTitle = '🔥 COMBO ' + blastStreak + 'x!
+' + blastTitle;
+
+  floats.push({
+    x: fX, y: fY,
+    vy: -1.6, life: 1.4,
+    text: blastTitle,
+    color: blastStreak >= 3 ? '#ffd32a' : '#00f6ff',
+    sz: blastStreak >= 3 ? 24 : 20,
+    isWarning: false
+  });
+
+  addFloat(fX, fY + 36, '+' + lineScore.toLocaleString('en-US'), '#ffd32a', true);
+  updUI();
+  return totalLines;
+}
+
 function gameOver(){
+
   clearGameSession();
   state=ST.OVER; ensureAudio(); sndOver(); vib([50, 70, 50, 70, 120]);
   if(UserState){
@@ -3350,37 +3752,11 @@ function loop(ts){
       updBar(Math.max(0, blitzTimer / 60));
       var tb = document.getElementById('tb');
       if(tb) tb.style.width = Math.min(100, (blitzTimer / 60) * 100) + '%';
-
-      // ⏱️ Blitz Modu: Her 2.4 saniyede bir yeni sıra yükselir!
-      var blitzSpawnInt = 2400;
-      var tss = elapsed - lastSpawn;
-      if(!wildAnim && tss >= blitzSpawnInt){
-        lastSpawn = elapsed;
-        if(!pushRow()) gameOver();
-        else { ensureAudio(); sndRow(); updPreview(); }
-      }
-    } else if(currentMode === 'zen'){
-      // 🧘 Zen Modu: Zaman baskısı yok, bar daima dolu
-      lastSpawn = elapsed;
-      updBar(1);
-
-      // Zen Modu: Tahtada blok sayısı 14'ün altına düşerse otomatik sıra iter
-      if(!wildAnim && countBlocks() < 14){
-        if(!grid[0].some(function(cell){ return cell !== null; })){
-          pushRow();
-          ensureAudio();
-          sndRow();
-          updPreview();
-        }
-      }
     } else {
-      var tss=elapsed-lastSpawn, frac=1-tss/spawnInt;
-      updBar(frac);
-      if(!wildAnim && tss>=spawnInt){
-        lastSpawn=elapsed;
-        if(!pushRow())gameOver();
-        else{ensureAudio();sndRow();updPreview();}
-      }
+      // 🧩 Block Blast Classic & Zen: Peaceful placement, no bottom row pushing
+      updBar(1);
+      var tb = document.getElementById('tb');
+      if(tb) tb.style.width = '100%';
     }
     updShake();
     if(cooldownWarningPulse > 0) cooldownWarningPulse = Math.max(0, cooldownWarningPulse - dt * 0.003);
@@ -3408,7 +3784,129 @@ gc.addEventListener('mousemove',function(e){
   gc.style.cursor=hoverGrp.size>0?'pointer':'default';
 });
 gc.addEventListener('mouseleave',function(){hoverGrp=new Set();gc.style.cursor='default';});
-gc.addEventListener('click',function(e){
+
+// ── 🖐️ Pointer Drag & Drop Event Listeners with Touch Offset ──
+function getCanvasCoords(e) {
+  var rc = gc.getBoundingClientRect();
+  var clientX = e.clientX, clientY = e.clientY;
+  if (e.touches && e.touches.length > 0) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  }
+  return {
+    x: (clientX - rc.left) * (W / rc.width),
+    y: (clientY - rc.top) * (H / rc.height)
+  };
+}
+
+function handlePointerDown(e) {
+  if (state !== ST.PLAY) return;
+  var pos = getCanvasCoords(e);
+  var dockY = GRID_H + 10;
+  var slotCenters = [
+    { x: W * 0.19, y: dockY + DOCK_H * 0.44 },
+    { x: W * 0.50, y: dockY + DOCK_H * 0.44 },
+    { x: W * 0.81, y: dockY + DOCK_H * 0.44 }
+  ];
+
+  for (var di = 0; di < 3; di++) {
+    var slot = slotCenters[di];
+    var piece = dockPieces[di];
+    if (piece) {
+      if (Math.abs(pos.x - slot.x) < 70 && Math.abs(pos.y - slot.y) < 65) {
+        draggedPiece = {
+          piece: piece,
+          index: di,
+          startX: slot.x,
+          startY: slot.y,
+          curX: pos.x,
+          curY: pos.y - TOUCH_OFFSET_Y // 📱 85px Touch Offset!
+        };
+        ensureAudio();
+        beep(220, 'sine', 0.05, 0.06, 320);
+        vib(20);
+        break;
+      }
+    }
+  }
+}
+
+function handlePointerMove(e) {
+  if (!draggedPiece || state !== ST.PLAY) return;
+  if (e.cancelable) e.preventDefault();
+  var pos = getCanvasCoords(e);
+  draggedPiece.curX = pos.x;
+  draggedPiece.curY = pos.y - TOUCH_OFFSET_Y; // Float 85px above finger
+}
+
+function handlePointerUp(e) {
+  if (!draggedPiece || state !== ST.PLAY) return;
+  var p = draggedPiece.piece;
+  var sh = p.shape;
+  var shRows = sh.length, shCols = sh[0].length;
+
+  var targetC = Math.round((draggedPiece.curX - PAD - (shCols * (SZ + GAP)) / 2) / (SZ + GAP));
+  var targetR = Math.round((draggedPiece.curY - PAD - (shRows * (SZ + GAP)) / 2) / (SZ + GAP));
+
+  if (canPlaceShape(grid, sh, targetR, targetC)) {
+    // 🎯 Valid Placement: Stamp shape onto grid
+    var placedCellsCount = 0;
+    for (var r = 0; r < shRows; r++) {
+      for (var c = 0; c < shCols; c++) {
+        if (sh[r][c] === 1) {
+          grid[targetR + r][targetC + c] = p.color;
+          placedCellsCount++;
+        }
+      }
+    }
+
+    score += placedCellsCount * 10;
+    addCareerBlocks(placedCellsCount);
+    checkRecordCelebration(score);
+
+    ensureAudio();
+    beep(180, 'triangle', 0.08, 0.09, 240);
+    vib(25);
+
+    // Consume dock slot
+    dockPieces[draggedPiece.index] = null;
+    draggedPiece = null;
+
+    // Check & Blast full lines
+    checkAndBlastLines();
+    updUI();
+
+    // If all 3 pieces used, spawn new batch!
+    var allEmpty = dockPieces.every(function(dp){ return dp === null; });
+    if (allEmpty) {
+      dockPieces = generateFairPieces(grid);
+    }
+
+    // Check Game Over: Can ANY remaining piece fit anywhere?
+    var remainingPieces = dockPieces.filter(function(dp){ return dp !== null; });
+    var hasValidMoves = remainingPieces.some(function(dp){
+      return canPieceFitAnywhere(grid, dp.shape);
+    });
+
+    if (!hasValidMoves && remainingPieces.length > 0) {
+      setTimeout(function(){
+        gameOver();
+      }, 400);
+    }
+  } else {
+    // Invalid: snap back to dock
+    ensureAudio();
+    beep(140, 'sawtooth', 0.04, 0.04, 90);
+    draggedPiece = null;
+  }
+}
+
+gc.addEventListener('pointerdown', handlePointerDown);
+window.addEventListener('pointermove', handlePointerMove, { passive: false });
+window.addEventListener('pointerup', handlePointerUp);
+window.addEventListener('pointercancel', function(){ draggedPiece = null; });
+
+// gc.addEventListener('click',function(e){
   var rc=gc.getBoundingClientRect();
   handleClick((e.clientX-rc.left)*(W/rc.width),(e.clientY-rc.top)*(H/rc.height));
 });
@@ -4089,7 +4587,7 @@ window.AdMobBridge.preloadRewarded();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=26', { updateViaCache: 'none' }).catch(function(e){
+    navigator.serviceWorker.register('./sw.js?v=27', { updateViaCache: 'none' }).catch(function(e){
       console.log('SW reg:', e);
     });
   });

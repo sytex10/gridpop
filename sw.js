@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v22-network-first-fresh';
+const CACHE_NAME = 'gridpop-v23-no-scroll-fixed';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

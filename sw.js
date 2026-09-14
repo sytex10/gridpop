@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v32-syntaxfix';
+const CACHE_NAME = 'gridpop-v33-uniqueness';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

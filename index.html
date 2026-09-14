@@ -36,7 +36,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--g),#2ed2ff);border-radius:4px;width:100%}
 .preview{display:flex;gap:3px;flex-wrap:nowrap;justify-content:center}
 .pc{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-#wrap{position:relative;width:420px;height:544px;aspect-ratio:627/812;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #2a2a5a,0 0 40px #7b5cff44,0 20px 60px #0009;transition:box-shadow .7s ease;touch-action:none}
+#wrap{position:relative;width:420px;height:443px;aspect-ratio:627/661;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #2a2a5a,0 0 40px #7b5cff44,0 20px 60px #0009;transition:box-shadow .7s ease;touch-action:manipulation;cursor:pointer}
 #gc{width:100%!important;height:100%!important;object-fit:contain!important;display:block!important;touch-action:none!important}
 #danger{position:absolute;inset:0;background:linear-gradient(to bottom,#ff000033 0%,transparent 45%);pointer-events:none;opacity:0;transition:opacity .3s}
 .icon-btn{width:36px;height:36px;border:1px solid #ffffff18;border-radius:50%;background:#ffffff15;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;transition:background .2s,transform .15s,border-color .2s;line-height:1;color:#fff;backdrop-filter:blur(6px)}
@@ -860,11 +860,11 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
   #wrap {
     --avail-h: calc(100dvh - clamp(88px, 13vh, 116px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     --avail-w: calc(100vw - clamp(14px, 4vw, 22px) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-    width: min(var(--avail-w), calc(var(--avail-h) * 0.772), 430px) !important;
-    height: min(calc(var(--avail-w) / 0.772), var(--avail-h), 557px) !important;
-    max-width: 430px !important;
-    max-height: 557px !important;
-    aspect-ratio: 627 / 812 !important;
+    width: min(var(--avail-w), calc(var(--avail-h) * 0.948), 440px) !important;
+    height: min(calc(var(--avail-w) / 0.948), var(--avail-h), 464px) !important;
+    max-width: 440px !important;
+    max-height: 464px !important;
+    aspect-ratio: 627 / 661 !important;
     border-radius: clamp(12px, 3.5vw, 18px) !important;
     display: block !important;
     flex-shrink: 0 !important;
@@ -872,7 +872,8 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
     box-sizing: border-box !important;
     margin: 0 auto !important;
     overflow: hidden !important;
-    touch-action: none !important;
+    touch-action: manipulation !important;
+    cursor: pointer !important;
   }
 
   #gc {
@@ -1194,7 +1195,7 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v34_drawfix';
+  var BUILD_ID = 'gp_build_v35_cascade';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -1209,9 +1210,9 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
 var COLS=8,ROWS=8,SZ=70,GAP=5,PAD=16;
 var GRID_W = COLS*SZ + (COLS-1)*GAP + PAD*2; // 627
 var GRID_H = ROWS*SZ + (ROWS-1)*GAP + PAD*2; // 627
-var DOCK_H = 185;
+var TOP_BAR_H = 34; // Sleek Overdrive Meter on top
 var W = GRID_W; // 627
-var H = GRID_H + DOCK_H; // 812 total canvas height
+var H = GRID_H + TOP_BAR_H; // 661 total canvas height (perfect proportional square-like layout)
 
 var PAL={
   RED:    {f:'#ff4757',h:'#ff8a96',s:'#c0001d',g:'#ff475766'},
@@ -1772,7 +1773,16 @@ function generateFairPieces(g) {
 
 // Grid helpers
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
-function mkGrid(){return Array.from({length:ROWS},function(){return Array(COLS).fill(null);});}
+function mkGrid(){
+  var g = Array.from({length:ROWS}, function(){ return Array(COLS).fill(null); });
+  var cols = (activeColors && activeColors.length > 0) ? activeColors : ['RED', 'BLUE', 'YELLOW', 'GREEN'];
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      g[r][c] = cols[Math.floor(Math.random() * cols.length)];
+    }
+  }
+  return g;
+}
 function mkRow(){
   var row=[];
   var wildFreq = (UserState && UserState.boosterLightning) ? 3 : WILD_EVERY;
@@ -2613,11 +2623,316 @@ function drawSpecialEmblem(ctx, cx, cy, sz, specialType, hp, maxHp) {
   ctx.restore();
 }
 
+
+// ── 🌊 TOY BLAST / CASCADE ENGINE: Falling Physics & Cluster Matching ──
+var fallingBlocks = []; // { col, fromR, toR, data, y, targetY, vy }
+var isCascading = false;
+var lastTapTime = 0;
+
+function pickRandomColor() {
+  var cols = (activeColors && activeColors.length > 0) ? activeColors : ['RED', 'BLUE', 'YELLOW', 'GREEN'];
+  return cols[Math.floor(Math.random() * cols.length)];
+}
+
+// Flood Fill BFS to find connected cluster of matching color
+function findCluster(startR, startC) {
+  var startCell = grid[startR][startC];
+  if (!startCell) return [];
+  
+  var cellObj = getCell(startR, startC);
+  if (cellObj && cellObj.special) {
+    return [{ r: startR, c: startC, isSpecialDirect: cellObj.special }];
+  }
+
+  var targetColor = getCellColor(startCell);
+  if (targetColor === 'CRYSTAL') return [];
+
+  var cluster = [];
+  var visited = Array.from({ length: ROWS }, function(){ return Array(COLS).fill(false); });
+  var queue = [{ r: startR, c: startC }];
+  visited[startR][startC] = true;
+
+  while (queue.length > 0) {
+    var curr = queue.shift();
+    cluster.push(curr);
+
+    var dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    for (var i = 0; i < dirs.length; i++) {
+      var nr = curr.r + dirs[i][0];
+      var nc = curr.c + dirs[i][1];
+      if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !visited[nr][nc]) {
+        var neighbor = grid[nr][nc];
+        if (neighbor) {
+          var nColor = getCellColor(neighbor);
+          if (nColor === targetColor && nColor !== 'CRYSTAL') {
+            visited[nr][nc] = true;
+            queue.push({ r: nr, c: nc });
+          }
+        }
+      }
+    }
+  }
+  return cluster;
+}
+
+// ⬇️ Column-by-Column Cascade & Refill with 60fps Smooth Easing
+function dropAndRefillGrid() {
+  for (var c = 0; c < COLS; c++) {
+    var emptyCount = 0;
+    // Scan from bottom to top
+    for (var r = ROWS - 1; r >= 0; r--) {
+      if (grid[r][c] === null) {
+        emptyCount++;
+      } else if (emptyCount > 0) {
+        var targetR = r + emptyCount;
+        var startY = PAD + TOP_BAR_H + r * (SZ + GAP);
+        var endY = PAD + TOP_BAR_H + targetR * (SZ + GAP);
+        fallingBlocks.push({
+          col: c,
+          fromR: r,
+          toR: targetR,
+          data: grid[r][c],
+          y: startY,
+          targetY: endY,
+          vy: 0
+        });
+        grid[targetR][c] = grid[r][c];
+        grid[r][c] = null;
+      }
+    }
+
+    // Drop new random blocks from above for the missing spots
+    for (var k = 0; k < emptyCount; k++) {
+      var targetRow = k;
+      var newCol = pickRandomColor();
+      var startYAbove = PAD + TOP_BAR_H - (emptyCount - k) * (SZ + GAP);
+      var endYTarget = PAD + TOP_BAR_H + targetRow * (SZ + GAP);
+      fallingBlocks.push({
+        col: c,
+        fromR: -(emptyCount - k),
+        toR: targetRow,
+        data: newCol,
+        y: startYAbove,
+        targetY: endYTarget,
+        vy: 0
+      });
+      grid[targetRow][c] = newCol;
+    }
+  }
+}
+
+// 💥 Pop Cluster, Trigger Power-Ups & Execute Cascade
+function popCluster(tapR, tapC) {
+  if (state !== ST.PLAY) return;
+
+  var cluster = findCluster(tapR, tapC);
+  if (!cluster || cluster.length === 0) return;
+
+  // Single block misclick feedback
+  if (cluster.length === 1 && !cluster[0].isSpecialDirect) {
+    misclickCell = { r: tapR, c: tapC, t: performance.now() };
+    ensureAudio();
+    beep(140, 'sawtooth', 0.04, 0.04, 90);
+    vib(12);
+    return;
+  }
+
+  ensureAudio();
+  var now = performance.now();
+  if (now - lastBlastTime < 3800) {
+    blastStreak++;
+  } else {
+    blastStreak = 1;
+  }
+  lastBlastTime = now;
+
+  var cbElem = document.getElementById('cb-val');
+  if (cbElem) cbElem.textContent = blastStreak + 'x';
+
+  var mult = feverActive ? 2 : 1;
+
+  // 💣 ⚡ 🌈 Direct Special Tile Tap
+  if (cluster.length === 1 && cluster[0].isSpecialDirect) {
+    var spType = cluster[0].isSpecialDirect;
+    var scx = PAD + tapC * (SZ + GAP) + SZ / 2;
+    var scy = PAD + TOP_BAR_H + tapR * (SZ + GAP) + SZ / 2;
+    grid[tapR][tapC] = null;
+
+    if (spType === 'bomb') {
+      var bBonus = 200 * mult;
+      score += bBonus;
+      shake(22);
+      beep(95, 'sawtooth', 0.28, 0.22, 60);
+      for (var br = Math.max(0, tapR - 1); br <= Math.min(ROWS - 1, tapR + 1); br++) {
+        for (var bc = Math.max(0, tapC - 1); bc <= Math.min(COLS - 1, tapC + 1); bc++) {
+          if (grid[br][bc] !== null) {
+            grid[br][bc] = null;
+            var bcx = PAD + bc * (SZ + GAP) + SZ / 2;
+            var bcy = PAD + TOP_BAR_H + br * (SZ + GAP) + SZ / 2;
+            for (var bp = 0; bp < 8; bp++) {
+              var bang = Math.random() * Math.PI * 2, bsp = Math.random() * 6 + 3;
+              parts.push({ x: bcx, y: bcy, vx: Math.cos(bang)*bsp, vy: Math.sin(bang)*bsp, color: bp%2===0?'#ff4757':'#ffa502', life: 1.1, r: 4 });
+            }
+          }
+        }
+      }
+      floats.push({ x: scx, y: scy, vy: -1.8, life: 1.4, text: '💣 TNT 3x3 DETONATION! +' + bBonus, color: '#ff4757', sz: 21, isWarning: false });
+    }
+    else if (spType === 'lightning') {
+      var ltBonus = 250 * mult;
+      score += ltBonus;
+      shake(24);
+      beep(550, 'sawtooth', 0.22, 0.18, 850);
+      for (var lc = 0; lc < COLS; lc++) grid[tapR][lc] = null;
+      for (var lr = 0; lr < ROWS; lr++) grid[lr][tapC] = null;
+      floats.push({ x: scx, y: scy, vy: -1.8, life: 1.4, text: '⚡ LIGHTNING CROSS! +' + ltBonus, color: '#00f6ff', sz: 21, isWarning: false });
+    }
+    else if (spType === 'rainbow') {
+      var rbBonus = 300 * mult;
+      score += rbBonus;
+      shake(20);
+      beep(720, 'sine', 0.25, 0.2, 980);
+      var colorCounts = {};
+      for (var gr = 0; gr < ROWS; gr++) {
+        for (var gc = 0; gc < COLS; gc++) {
+          if (grid[gr][gc]) {
+            var cName = getCellColor(grid[gr][gc]);
+            if (cName !== 'WILD' && cName !== 'CRYSTAL') colorCounts[cName] = (colorCounts[cName] || 0) + 1;
+          }
+        }
+      }
+      var maxCol = null, maxCnt = 0;
+      for (var ck in colorCounts) { if (colorCounts[ck] > maxCnt) { maxCnt = colorCounts[ck]; maxCol = ck; } }
+      if (maxCol) {
+        for (var gr = 0; gr < ROWS; gr++) {
+          for (var gc = 0; gc < COLS; gc++) {
+            if (grid[gr][gc] && getCellColor(grid[gr][gc]) === maxCol) grid[gr][gc] = null;
+          }
+        }
+        floats.push({ x: scx, y: scy, vy: -1.8, life: 1.4, text: '🌈 ' + maxCol + ' WIPEOUT! +' + rbBonus, color: '#ff3ea5', sz: 21, isWarning: false });
+      }
+    }
+    dropAndRefillGrid();
+    updUI();
+    return;
+  }
+
+  // Normal Cluster Pop (>= 2 blocks)
+  var targetCol = getCellColor(grid[tapR][tapC]);
+  var baseScore = (cluster.length * 20 * blastStreak) * mult;
+  if (cluster.length >= 5) baseScore += (cluster.length - 4) * 35 * mult;
+  score += baseScore;
+  addCareerBlocks(cluster.length);
+  checkRecordCelebration(score);
+
+  // Check adjacent obstacles (Crystals / Gold)
+  cluster.forEach(function(pos) {
+    var adjDirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    adjDirs.forEach(function(d) {
+      var ar = pos.r + d[0], ac = pos.c + d[1];
+      var adjCell = getCell(ar, ac);
+      if (adjCell && adjCell.special === 'crystal') {
+        adjCell.hp--;
+        var acx = PAD + ac * (SZ + GAP) + SZ / 2;
+        var acy = PAD + TOP_BAR_H + ar * (SZ + GAP) + SZ / 2;
+        if (adjCell.hp <= 0) {
+          grid[ar][ac] = null;
+          score += 500 * mult;
+          beep(780, 'sine', 0.25, 0.2, 1100);
+          floats.push({ x: acx, y: acy, vy: -1.8, life: 1.4, text: '💎 CRYSTAL SHATTERED! +500', color: '#2ed2ff', sz: 19, isWarning: false });
+        }
+      }
+      else if (adjCell && adjCell.special === 'gold') {
+        grid[ar][ac] = null;
+        addCoins(10, true);
+        beep(620, 'triangle', 0.15, 0.18, 880);
+      }
+    });
+  });
+
+  // Determine Power-Up Synthesis
+  var powerUpType = null;
+  if (cluster.length >= 9) powerUpType = 'rainbow';
+  else if (cluster.length >= 7) powerUpType = 'lightning';
+  else if (cluster.length >= 5) powerUpType = 'bomb';
+
+  // Clear cells and spawn particles
+  var avgX = 0, avgY = 0;
+  cluster.forEach(function(pos) {
+    var r = pos.r, c = pos.c;
+    var cx = PAD + c * (SZ + GAP) + SZ / 2;
+    var cy = PAD + TOP_BAR_H + r * (SZ + GAP) + SZ / 2;
+    avgX += cx; avgY += cy;
+
+    if (r === tapR && c === tapC && powerUpType) {
+      // Synthesize power-up right at the tapped cell!
+      if (powerUpType === 'rainbow') grid[r][c] = { color: 'WILD', special: 'rainbow', hp: 1 };
+      else grid[r][c] = { color: targetCol, special: powerUpType, hp: 1 };
+    } else {
+      grid[r][c] = null;
+    }
+
+    for (var p = 0; p < 6; p++) {
+      var angle = Math.random() * Math.PI * 2, spd = Math.random() * 5 + 2;
+      parts.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd,
+        color: (PAL[targetCol] ? PAL[targetCol].f : '#00f6ff'),
+        life: 0.9,
+        r: Math.random() * 4 + 2
+      });
+    }
+  });
+
+  avgX /= cluster.length;
+  avgY /= cluster.length;
+
+  if (powerUpType === 'rainbow') {
+    floats.push({ x: avgX, y: avgY - 20, vy: -1.8, life: 1.4, text: '🌈 PRISMATIC SYNTHESIS!', color: '#ff3ea5', sz: 20, isWarning: false });
+  } else if (powerUpType === 'lightning') {
+    floats.push({ x: avgX, y: avgY - 20, vy: -1.8, life: 1.4, text: '⚡ LIGHTNING SYNTHESIS!', color: '#00f6ff', sz: 20, isWarning: false });
+  } else if (powerUpType === 'bomb') {
+    floats.push({ x: avgX, y: avgY - 20, vy: -1.8, life: 1.4, text: '💣 TNT SYNTHESIS!', color: '#ff4757', sz: 20, isWarning: false });
+  }
+
+  // Sound: Satisfying ascending pitch
+  var pitch = 280 + Math.min(blastStreak, 8) * 60 + cluster.length * 20;
+  beep(pitch, 'triangle', 0.1, 0.16);
+  vib(Math.min(15 + cluster.length * 4, 45));
+  shake(Math.min(6 + cluster.length * 2, 22));
+
+  addFloat(avgX, avgY, '+' + baseScore.toLocaleString('en-US'), '#ffd32a', true);
+
+  // Overdrive / Fever update
+  feverMeter = Math.min(100, feverMeter + cluster.length * 4 + (blastStreak > 1 ? 6 : 0));
+  if (feverMeter >= 100 && !feverActive) {
+    feverActive = true;
+    feverMovesLeft = 3;
+    document.body.classList.add('fever-active');
+    shake(22);
+    beep(540, 'triangle', 0.28, 0.25, 840);
+    floats.push({ x: W/2, y: H * 0.35, vy: -1.8, life: 1.8, text: '🔥 OVERDRIVE ACTIVATED! (3 TURNS - 2X SCORE)', color: '#ffd32a', sz: 20, isWarning: false });
+  } else if (feverActive) {
+    feverMovesLeft--;
+    if (feverMovesLeft <= 0) {
+      feverActive = false;
+      feverMeter = 0;
+      document.body.classList.remove('fever-active');
+      floats.push({ x: W/2, y: H * 0.35, vy: -1.4, life: 1.2, text: '⚡ OVERDRIVE COMPLETE', color: '#ff7b00', sz: 18, isWarning: false });
+    }
+  }
+
+  // Execute Cascade Drop & Refill
+  dropAndRefillGrid();
+  updUI();
+}
+
 function drawBlock(r,c){
   var rawCell=grid[r][c]; if(!rawCell)return;
   var col=getCellColor(rawCell);
   var cellObj=getCell(r,c);
-  var x=PAD+c*(SZ+GAP), y=PAD+r*(SZ+GAP);
+  var x=PAD+c*(SZ+GAP), y=PAD+TOP_BAR_H+r*(SZ+GAP);
   var isH=hoverGrp.has(r*100+c);
 
   // ⚠️ Yanlış (Tekil) Bloğa Basıldığında Titreme, Neon Çerçeve ve ✕ Animasyonu
@@ -2699,7 +3014,7 @@ function drawBlock(r,c){
 }
 
 function drawEmpty(r,c){
-  var x=PAD+c*(SZ+GAP),y=PAD+r*(SZ+GAP);
+  var x=PAD+c*(SZ+GAP),y=PAD+TOP_BAR_H+r*(SZ+GAP);
   ctx.save(); ctx.globalAlpha=.13; ctx.strokeStyle=curTheme.grid; ctx.lineWidth=1.5;
   var style=curTheme.style||'jelly';
   var crd=(style==='cyber'?6:(style==='magma'?8:(style==='rune'?14:12)));
@@ -2709,22 +3024,17 @@ function drawEmpty(r,c){
 function render(){
   ctx.save(); ctx.translate(shX,shY);
   ctx.fillStyle=curTheme.bg; ctx.fillRect(0,0,W,H);
-  if(grid)for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)grid[r][c]?drawBlock(r,c):drawEmpty(r,c);
 
-  // ⚡ Şimşek Taşı ve Yıldırım Efektleri (Ortaya uçuş, gökten inen yıldırımlar, çatallı arklar ve şok dalgaları)
-  
-  // ── 🔥 Draw Overdrive Gauge (Fever Meter) ──
-  var gaugeY = dockY - 13;
+  // ── 🔥 Draw Top Overdrive Gauge (Fever Meter) ──
+  var gaugeY = PAD - 2;
   var gaugeW = W - PAD * 2;
-  var gaugeH = 7;
+  var gaugeH = 8;
   ctx.save();
-  // Bar bg
   ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
   if (ctx.roundRect) ctx.roundRect(PAD, gaugeY, gaugeW, gaugeH, 4);
   else ctx.rect(PAD, gaugeY, gaugeW, gaugeH);
   ctx.fill();
 
-  // Bar fill
   var fillPct = feverActive ? (feverMovesLeft / 3) : (feverMeter / 100);
   if (fillPct > 0) {
     var fGrad = ctx.createLinearGradient(PAD, gaugeY, PAD + gaugeW * fillPct, gaugeY);
@@ -2745,7 +3055,6 @@ function render(){
     ctx.fill();
   }
 
-  // Label text
   ctx.font = 'bold 11px Outfit, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'bottom';
@@ -2753,139 +3062,69 @@ function render(){
     ctx.fillStyle = '#ffd32a';
     ctx.shadowColor = '#ff7b00';
     ctx.shadowBlur = 8;
-    ctx.fillText('🔥 OVERDRIVE ACTIVE: ' + feverMovesLeft + ' MOVES LEFT (2X SCORE)', W / 2, gaugeY - 2);
+    ctx.fillText('🔥 OVERDRIVE ACTIVE: ' + feverMovesLeft + ' MOVES LEFT (2X MULTIPLIER)', W / 2, gaugeY - 2);
   } else {
-    ctx.fillStyle = feverMeter >= 75 ? '#00f6ff' : 'rgba(255, 255, 255, 0.55)';
+    ctx.fillStyle = feverMeter >= 75 ? '#00f6ff' : 'rgba(255, 255, 255, 0.6)';
     ctx.shadowBlur = 0;
     ctx.fillText('⚡ OVERDRIVE CHARGE: ' + Math.round(feverMeter) + '%', W / 2, gaugeY - 2);
   }
   ctx.restore();
 
-  // ── 🧩 Draw Dock Slots & Pieces ──
-  var dockY = GRID_H + 10;
-  ctx.save();
-  // Sleek neon dock separator line
-  var gradSep = ctx.createLinearGradient(PAD, dockY - 5, W - PAD, dockY - 5);
-  gradSep.addColorStop(0, 'rgba(123, 92, 255, 0.1)');
-  gradSep.addColorStop(0.5, 'rgba(0, 246, 255, 0.6)');
-  gradSep.addColorStop(1, 'rgba(123, 92, 255, 0.1)');
-  ctx.strokeStyle = gradSep;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(PAD, dockY - 5);
-  ctx.lineTo(W - PAD, dockY - 5);
-  ctx.stroke();
-
-  var slotCenters = [
-    { x: W * 0.19, y: dockY + DOCK_H * 0.44 },
-    { x: W * 0.50, y: dockY + DOCK_H * 0.44 },
-    { x: W * 0.81, y: dockY + DOCK_H * 0.44 }
-  ];
-
-  for (var di = 0; di < 3; di++) {
-    var slot = slotCenters[di];
-    var piece = dockPieces[di];
-
-    // Dock slot plate
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    if (ctx.roundRect) {
-      ctx.roundRect(slot.x - 75, slot.y - 65, 150, 130, 16);
-    } else {
-      ctx.rect(slot.x - 75, slot.y - 65, 150, 130);
+  // ── Draw Empty Grid Slots ──
+  for(var r=0; r<ROWS; r++) {
+    for(var c=0; c<COLS; c++) {
+      drawEmpty(r, c);
     }
-    ctx.fill();
-    ctx.stroke();
+  }
 
-    if (piece && (!draggedPiece || draggedPiece.index !== di)) {
-      var sh = piece.shape;
-      var shRows = sh.length, shCols = sh[0].length;
-      var miniSZ = 26;
-      var miniGap = 3;
-      var pW = shCols * miniSZ + (shCols - 1) * miniGap;
-      var pH = shRows * miniSZ + (shRows - 1) * miniGap;
-      var startX = slot.x - pW / 2;
-      var startY = slot.y - pH / 2;
+  // ── Track falling block destination cells so we don't draw resting duplicates ──
+  var activeFallingCells = {};
+  for(var fi = 0; fi < fallingBlocks.length; fi++) {
+    var fb = fallingBlocks[fi];
+    activeFallingCells[fb.toR * 100 + fb.col] = true;
+  }
 
-      for (var pr = 0; pr < shRows; pr++) {
-        for (var pc = 0; pc < shCols; pc++) {
-          if (sh[pr][pc] === 1) {
-            var bx = startX + pc * (miniSZ + miniGap);
-            var by = startY + pr * (miniSZ + miniGap);
-            var pal = PAL[piece.color] || PAL.BLUE;
-            drawSingleBlockShader(ctx, bx, by, miniSZ, pal, getActiveBlockStyle(), false);
-            if (piece.special && piece.special.r === pr && piece.special.c === pc) {
-              drawSpecialEmblem(ctx, bx + miniSZ/2, by + miniSZ/2, miniSZ, piece.special.type, 1, 1);
-            }
-          }
+  // ── Draw Resting Blocks ──
+  if(grid) {
+    for(var r=0; r<ROWS; r++) {
+      for(var c=0; c<COLS; c++) {
+        if(grid[r][c] && !activeFallingCells[r * 100 + c]) {
+          drawBlock(r, c);
         }
       }
     }
   }
-  ctx.restore();
 
-  // ── 👻 Draw Ghost Placement Preview on Grid ──
-  if (draggedPiece) {
-    var p = draggedPiece.piece;
-    var sh = p.shape;
-    var shRows = sh.length, shCols = sh[0].length;
+  // ── Update & Draw Falling Cascade Blocks (60fps Smooth Easing & Bounce) ──
+  for(var fi = fallingBlocks.length - 1; fi >= 0; fi--) {
+    var fb = fallingBlocks[fi];
+    fb.vy += 2.2; // Gravity acceleration
+    fb.y += fb.vy;
 
-    var hoverC = Math.round((draggedPiece.curX - PAD - (shCols * (SZ + GAP)) / 2) / (SZ + GAP));
-    var hoverR = Math.round((draggedPiece.curY - PAD - (shRows * (SZ + GAP)) / 2) / (SZ + GAP));
-
-    var isValid = canPlaceShape(grid, sh, hoverR, hoverC);
-
-    if (hoverR >= 0 && hoverR + shRows <= ROWS && hoverC >= 0 && hoverC + shCols <= COLS) {
-      ctx.save();
-      for (var hr = 0; hr < shRows; hr++) {
-        for (var hc = 0; hc < shCols; hc++) {
-          if (sh[hr][hc] === 1) {
-            var gx = PAD + (hoverC + hc) * (SZ + GAP);
-            var gy = PAD + (hoverR + hr) * (SZ + GAP);
-            ctx.strokeStyle = isValid ? '#00f6ff' : '#ff4757';
-            ctx.fillStyle = isValid ? 'rgba(0, 246, 255, 0.35)' : 'rgba(255, 71, 87, 0.25)';
-            ctx.lineWidth = 3;
-            ctx.shadowColor = isValid ? '#00f6ff' : '#ff4757';
-            ctx.shadowBlur = 12;
-            ctx.beginPath();
-            if (ctx.roundRect) {
-              ctx.roundRect(gx, gy, SZ, SZ, 10);
-            } else {
-              ctx.rect(gx, gy, SZ, SZ);
-            }
-            ctx.fill();
-            ctx.stroke();
-          }
-        }
-      }
-      ctx.restore();
-    }
-
-    // ── 🖐️ Draw Lifted Floating Piece (85px Touch Offset above finger!) ──
-    ctx.save();
-    var dragW = shCols * (SZ + GAP) - GAP;
-    var dragH = shRows * (SZ + GAP) - GAP;
-    var dStartX = draggedPiece.curX - dragW / 2;
-    var dStartY = draggedPiece.curY - dragH / 2;
-
-    for (var dr = 0; dr < shRows; dr++) {
-      for (var dc = 0; dc < shCols; dc++) {
-        if (sh[dr][dc] === 1) {
-          var dbx = dStartX + dc * (SZ + GAP);
-          var dby = dStartY + dr * (SZ + GAP);
-          var dpal = PAL[p.color] || PAL.BLUE;
-          drawSingleBlockShader(ctx, dbx, dby, SZ, dpal, getActiveBlockStyle(), false);
-          if (p.special && p.special.r === dr && p.special.c === dc) {
-            drawSpecialEmblem(ctx, dbx + SZ/2, dby + SZ/2, SZ, p.special.type, 1, 1);
-          }
-        }
+    if(fb.y >= fb.targetY) {
+      fb.y = fb.targetY;
+      if(Math.abs(fb.vy) > 3.8) {
+        fb.vy = -fb.vy * 0.22; // Tactile landing bounce!
+      } else {
+        fallingBlocks.splice(fi, 1);
       }
     }
-    ctx.restore();
+
+    // Draw falling block with active shader
+    var bx = PAD + fb.col * (SZ + GAP);
+    var by = fb.y;
+    var rawCell = fb.data;
+    var colName = getCellColor(rawCell);
+    var p = PAL[colName] || PAL.BLUE;
+    var style = getActiveBlockStyle();
+    drawSingleBlockShader(ctx, bx, by, SZ, p, style, false);
+
+    if(typeof rawCell === 'object' && rawCell !== null && rawCell.special) {
+      drawSpecialEmblem(ctx, bx + SZ/2, by + SZ/2, SZ, rawCell.special, rawCell.hp, rawCell.maxHp);
+    }
   }
 
+  
   if(wildAnim){
     // Aşama 1: Hedef blokların etrafında elektriklenme aurası & kilitlenme ve gerilim titremesi
     if(wildAnim.t < wildAnim.dur1){
@@ -4369,10 +4608,20 @@ function handlePointerUp(e) {
   }
 }
 
-gc.addEventListener('pointerdown', handlePointerDown);
-window.addEventListener('pointermove', handlePointerMove, { passive: false });
-window.addEventListener('pointerup', handlePointerUp);
-window.addEventListener('pointercancel', function(){ draggedPiece = null; });
+function handleCanvasTap(e) {
+  if (state !== ST.PLAY) return;
+  var pos = getCanvasCoords(e);
+  var c = Math.floor((pos.x - PAD) / (SZ + GAP));
+  var r = Math.floor((pos.y - PAD - TOP_BAR_H) / (SZ + GAP));
+  if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
+    popCluster(r, c);
+  }
+}
+
+gc.addEventListener('pointerdown', function(e) {
+  if (e.cancelable) e.preventDefault();
+  handleCanvasTap(e);
+});
 
 // Classic tap-to-pop click & touch listeners replaced by unified Block Blast Pointer Events
 

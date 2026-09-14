@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-cache-v18-perfect-mobile-fit';
+const CACHE_NAME = 'gridpop-cache-v19-balanced-mobile-proportions';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

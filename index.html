@@ -1180,7 +1180,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v28_single_mode_master';
+  var BUILD_ID = 'gp_build_v29_buttons_fixed';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -3892,33 +3892,7 @@ window.addEventListener('pointermove', handlePointerMove, { passive: false });
 window.addEventListener('pointerup', handlePointerUp);
 window.addEventListener('pointercancel', function(){ draggedPiece = null; });
 
-// gc.addEventListener('click',function(e){
-  var rc=gc.getBoundingClientRect();
-  handleClick((e.clientX-rc.left)*(W/rc.width),(e.clientY-rc.top)*(H/rc.height));
-});
-
-// Mobile touch handlers: touch to highlight group, release to pop!
-var tStartX=0, tStartY=0;
-gc.addEventListener('touchstart',function(e){
-  e.preventDefault(); ensureAudio();
-  var t=e.touches[0], rc=gc.getBoundingClientRect();
-  tStartX=t.clientX; tStartY=t.clientY;
-  setHover((t.clientX-rc.left)*(W/rc.width),(t.clientY-rc.top)*(H/rc.height));
-},{passive:false});
-gc.addEventListener('touchmove',function(e){
-  e.preventDefault();
-  var t=e.touches[0], rc=gc.getBoundingClientRect();
-  setHover((t.clientX-rc.left)*(W/rc.width),(t.clientY-rc.top)*(H/rc.height));
-},{passive:false});
-gc.addEventListener('touchend',function(e){
-  e.preventDefault();
-  var t=e.changedTouches[0], rc=gc.getBoundingClientRect();
-  var dx=t.clientX-tStartX, dy=t.clientY-tStartY;
-  if(Math.hypot(dx,dy)<30){
-    handleClick((t.clientX-rc.left)*(W/rc.width),(t.clientY-rc.top)*(H/rc.height));
-  }
-  hoverGrp=new Set();
-},{passive:false});
+// Classic tap-to-pop click & touch listeners replaced by unified Block Blast Pointer Events
 
 document.getElementById('btn-s').onclick=function(){ensureAudio();startGame();};
 document.getElementById('btn-h').onclick=function(){showOv('ov-how');};

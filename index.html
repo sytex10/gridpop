@@ -1180,7 +1180,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v29_buttons_fixed';
+  var BUILD_ID = 'gp_build_v30_dupfix';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -4547,7 +4547,7 @@ window.AdMobBridge.preloadRewarded();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=27', { updateViaCache: 'none' }).catch(function(e){
+    navigator.serviceWorker.register('./sw.js?v=30', { updateViaCache: 'none' }).catch(function(e){
       console.log('SW reg:', e);
     });
   });
@@ -4707,34 +4707,6 @@ function addCareerLightning(){
   var s = loadCareerStats();
   s.lightningUsed++;
   saveCareerStats(s);
-}
-
-// Local high scores fallback
-function loadLocalLeaderboard(){
-  try{
-    var raw = localStorage.getItem('gp_local_ranks');
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
-  return [
-    { name: getPlayerName(), score: getBest(), level: getLvlNum(getBest()), date: 'Personal Best', isSelf: true }
-  ];
-}
-
-function recordLeaderboardEntry(finalScore, finalLevel){
-  if(finalScore <= 0) return;
-  var list = loadLocalLeaderboard();
-  var today = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric' });
-  list.push({
-    name: getPlayerName(),
-    score: finalScore,
-    level: finalLevel,
-    date: today,
-    isSelf: true
-  });
-  list.sort(function(a,b){ return b.score - a.score; });
-  list = list.slice(0, 5);
-  try{ localStorage.setItem('gp_local_ranks', JSON.stringify(list)); }catch(e){}
-  syncScoreToCloud(finalScore, finalLevel);
 }
 
 function openRanks(){

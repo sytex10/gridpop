@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v35-cascade';
+const CACHE_NAME = 'gridpop-v36-arcadereborn';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

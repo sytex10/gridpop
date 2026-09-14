@@ -1195,7 +1195,7 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v36_arcadereborn';
+  var BUILD_ID = 'gp_build_v37_gravity_juice';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -2813,33 +2813,37 @@ function findCluster(startR, startC) {
   return cluster;
 }
 
-// ⬇️ Column-by-Column Natural Gravity Drop (Falling only, no artificial refill)
+// ⬇️ Column-by-Column Natural Gravity Drop (Foolproof 2-Pointer Fall)
 function applyGravityOnly(animate) {
   var anyFell = false;
   for (var c = 0; c < COLS; c++) {
-    var emptyCount = 0;
-    // Scan from bottom to top
+    var writeR = ROWS - 1;
     for (var r = ROWS - 1; r >= 0; r--) {
-      if (grid[r][c] === null) {
-        emptyCount++;
-      } else if (emptyCount > 0) {
-        var targetR = r + emptyCount;
-        anyFell = true;
-        if (animate) {
-          var startY = PAD + TOP_BAR_H + r * (SZ + GAP);
-          var endY = PAD + TOP_BAR_H + targetR * (SZ + GAP);
-          fallingBlocks.push({
-            col: c,
-            fromR: r,
-            toR: targetR,
-            data: grid[r][c],
-            y: startY,
-            targetY: endY,
-            vy: 0
-          });
+      if (grid[r][c] !== null) {
+        if (r !== writeR) {
+          anyFell = true;
+          var blockData = grid[r][c];
+          grid[writeR][c] = blockData;
+          grid[r][c] = null;
+          if (animate) {
+            var startY = PAD + TOP_BAR_H + r * (SZ + GAP);
+            var endY = PAD + TOP_BAR_H + writeR * (SZ + GAP);
+            var colName = getCellColor(blockData);
+            fallingBlocks.push({
+              col: c,
+              fromR: r,
+              toR: writeR,
+              data: blockData,
+              y: startY,
+              targetY: endY,
+              vy: 2.0,
+              squash: 0,
+              hasLanded: false,
+              color: colName
+            });
+          }
         }
-        grid[targetR][c] = grid[r][c];
-        grid[r][c] = null;
+        writeR--;
       }
     }
   }
@@ -2848,6 +2852,9 @@ function applyGravityOnly(animate) {
 
 // ⬇️ Periodic Top-Down Inflow (Gravity Row Drop from Ceiling)
 function dropNewRowFromTop() {
+  // Always ensure existing board has no floating gaps before dropping
+  applyGravityOnly(false);
+
   var fullCols = 0;
   for (var c = 0; c < COLS; c++) {
     if (grid[0][c] !== null) fullCols++;
@@ -2860,21 +2867,22 @@ function dropNewRowFromTop() {
   var rowToDrop = (nextRow && nextRow.length === COLS) ? nextRow : mkRow();
 
   for (var c = 0; c < COLS; c++) {
-    var topOccupied = ROWS;
-    for (var r = 0; r < ROWS; r++) {
-      if (grid[r][c] !== null) {
-        topOccupied = r;
+    // Find lowest empty cell in this column
+    var targetR = -1;
+    for (var r = ROWS - 1; r >= 0; r--) {
+      if (grid[r][c] === null) {
+        targetR = r;
         break;
       }
     }
 
-    if (topOccupied === 0) continue;
+    if (targetR === -1) continue; // Column already completely full
 
-    var targetR = topOccupied - 1;
     var blockData = rowToDrop[c];
-
-    var startY = PAD + TOP_BAR_H - (SZ + GAP);
+    var startY = PAD + TOP_BAR_H - (SZ + GAP) * 1.5 - (Math.random() * 8);
     var targetY = PAD + TOP_BAR_H + targetR * (SZ + GAP);
+    var colName = getCellColor(blockData);
+
     fallingBlocks.push({
       col: c,
       fromR: -1,
@@ -2882,14 +2890,17 @@ function dropNewRowFromTop() {
       data: blockData,
       y: startY,
       targetY: targetY,
-      vy: 0
+      vy: 2.5 + Math.random() * 1.2,
+      squash: 0,
+      hasLanded: false,
+      color: colName
     });
     grid[targetR][c] = blockData;
   }
 
   sndRow();
   vib(18);
-  shake(4);
+  shake(5);
   updDanger();
   updPreview();
 }
@@ -3331,33 +3342,88 @@ function render(){
     }
   }
 
-  // ── Update & Draw Falling Cascade Blocks (60fps Smooth Easing & Bounce) ──
+  // ── Update & Draw Falling Cascade Blocks (Juicy 60fps Gravity & Tactile Squash Bounce) ──
   for(var fi = fallingBlocks.length - 1; fi >= 0; fi--) {
     var fb = fallingBlocks[fi];
-    fb.vy += 2.2; // Gravity acceleration
-    fb.y += fb.vy;
+    
+    if (!fb.hasLanded) {
+      fb.vy += 2.4; // Crisper gravity acceleration
+      fb.vy = Math.min(fb.vy, 25);
+      fb.y += fb.vy;
 
-    if(fb.y >= fb.targetY) {
-      fb.y = fb.targetY;
-      if(Math.abs(fb.vy) > 3.8) {
-        fb.vy = -fb.vy * 0.22; // Tactile landing bounce!
-      } else {
+      if(fb.y >= fb.targetY) {
+        fb.y = fb.targetY;
+        fb.hasLanded = true;
+        fb.squash = 0.24; // 24% tactile horizontal impact squash!
+
+        // Spawn 4 landing impact dust/spark particles
+        var lcx = PAD + fb.col * (SZ + GAP) + SZ / 2;
+        var lcy = fb.targetY + SZ;
+        for (var lp = 0; lp < 4; lp++) {
+          var lAng = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.75;
+          var lSpd = Math.random() * 3.5 + 1.5;
+          parts.push({
+            x: lcx + (Math.random() - 0.5) * SZ * 0.6,
+            y: lcy,
+            vx: Math.cos(lAng) * lSpd,
+            vy: Math.sin(lAng) * lSpd,
+            life: 0.45,
+            dc: 0.06,
+            sz: Math.random() * 3 + 1.5,
+            col: [PAL[fb.color] ? PAL[fb.color].f : '#ffd32a', '#ffffff', '#ffd32a'][lp % 3]
+          });
+        }
+        // Tactile sound & haptic
+        beep(220, 'triangle', 0.035, 0.04, 150);
+        vib(10);
+      }
+    } else {
+      // Spring recovery from impact squash
+      fb.squash += (0 - fb.squash) * 0.32;
+      if (Math.abs(fb.squash) < 0.02) {
         fallingBlocks.splice(fi, 1);
       }
     }
 
-    // Draw falling block with active shader
     var bx = PAD + fb.col * (SZ + GAP);
     var by = fb.y;
     var rawCell = fb.data;
     var colName = getCellColor(rawCell);
     var p = PAL[colName] || PAL.BLUE;
     var style = getActiveBlockStyle();
-    drawSingleBlockShader(ctx, bx, by, SZ, p, style, false);
+
+    // 💨 Aerodynamic wind trail behind fast falling blocks
+    if (!fb.hasLanded && fb.vy > 6) {
+      ctx.save();
+      var trailH = Math.min(fb.vy * 2.2, SZ * 1.5);
+      var trGrad = ctx.createLinearGradient(0, by - trailH, 0, by);
+      trGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+      trGrad.addColorStop(1, p.f ? (p.f + '44') : 'rgba(255, 255, 255, 0.25)');
+      ctx.fillStyle = trGrad;
+      ctx.fillRect(bx + 4, by - trailH, SZ - 8, trailH);
+      ctx.restore();
+    }
+
+    // 🎨 Render block with squash & stretch transform
+    ctx.save();
+    var centerBX = bx + SZ / 2;
+    var centerBY = by + SZ / 2;
+    ctx.translate(centerBX, centerBY);
+
+    var scaleX = 1 + (fb.squash || 0);
+    var scaleY = 1 - (fb.squash || 0);
+    if (!fb.hasLanded && fb.vy > 6) {
+      scaleX = 0.93; // Aerodynamic stretch
+      scaleY = 1.09;
+    }
+    ctx.scale(scaleX, scaleY);
+
+    drawSingleBlockShader(ctx, -SZ / 2, -SZ / 2, SZ, p, style, false);
 
     if(typeof rawCell === 'object' && rawCell !== null && rawCell.special) {
-      drawSpecialEmblem(ctx, bx + SZ/2, by + SZ/2, SZ, rawCell.special, rawCell.hp, rawCell.maxHp);
+      drawSpecialEmblem(ctx, 0, 0, SZ, rawCell.special, rawCell.hp, rawCell.maxHp);
     }
+    ctx.restore();
   }
 
   
@@ -3648,20 +3714,19 @@ function renderSF(){
 
 // UI
 function onLevelUp(lvl) {
-  var emptyCells = [];
-  for (var r = 0; r < ROWS; r++) {
-    for (var c = 0; c < COLS; c++) {
-      if (grid[r][c] === null) emptyCells.push({ r: r, c: c });
-    }
-  }
-  if (emptyCells.length >= 2) {
-    emptyCells.sort(function(){ return Math.random() - 0.5; });
-    var crHp = lvl >= 4 ? 3 : 2;
-    grid[emptyCells[0].r][emptyCells[0].c] = { color: 'BLUE', special: 'crystal', hp: crHp, maxHp: crHp };
-    grid[emptyCells[1].r][emptyCells[1].c] = { color: 'YELLOW', special: 'gold', hp: 1 };
-    beep(580, 'sine', 0.25, 0.22, 920);
-    floats.push({ x: W / 2, y: GRID_H * 0.35, vy: -1.6, life: 1.8, text: '💎 LEVEL ' + lvl + ' OBJECTIVES SPAWNED!', color: '#2ed2ff', sz: 20, isWarning: false });
-  }
+  var crHp = lvl >= 4 ? 3 : 2;
+  if (!nextRow || nextRow.length !== COLS) nextRow = mkRow();
+
+  // 💎 Level Hedefleri: Havada boşlukta rastgele belirmek yerine bir sonraki tavan sırasına enjekte edilir, yerçekimiyle doğalca düşer!
+  var idx1 = Math.floor(Math.random() * COLS);
+  var idx2 = (idx1 + Math.floor(Math.random() * (COLS - 1)) + 1) % COLS;
+  nextRow[idx1] = { color: 'BLUE', special: 'crystal', hp: crHp, maxHp: crHp };
+  nextRow[idx2] = { color: 'YELLOW', special: 'gold', hp: 1 };
+
+  beep(580, 'sine', 0.25, 0.22, 920);
+  shake(10);
+  floats.push({ x: W / 2, y: GRID_H * 0.35, vy: -1.6, life: 2.0, text: '💎 LEVEL ' + lvl + ': CRYSTAL & GOLD INCOMING!', color: '#2ed2ff', sz: 20, isWarning: false });
+  updPreview();
 }
 
 function updUI(){
@@ -4611,6 +4676,20 @@ function loop(ts){
       var tb = document.getElementById('tb');
       if(tb) tb.style.width = Math.min(100, (blitzTimer / 60) * 100) + '%';
     } else {
+      // 🛡️ Otomatik Yerçekimi Emniyet Kilidi: Tahtada altında boşluk olan hiçbir blok havada asılı kalamaz!
+      if (state === ST.PLAY && fallingBlocks.length === 0 && !specialAnim && !wildAnim) {
+        var needsGravity = false;
+        for (var gc = 0; gc < COLS; gc++) {
+          var foundEmpty = false;
+          for (var gr = ROWS - 1; gr >= 0; gr--) {
+            if (grid[gr][gc] === null) foundEmpty = true;
+            else if (foundEmpty) { needsGravity = true; break; }
+          }
+          if (needsGravity) break;
+        }
+        if (needsGravity) applyGravityOnly(true);
+      }
+
       // ⬇️ Periodic Top-Down Inflow (Gravity Row Drop from Ceiling)
       if (state === ST.PLAY && !specialAnim && !wildAnim) {
         elapsed += dt;

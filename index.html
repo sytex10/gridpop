@@ -880,6 +880,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
       <div class="ov hidden" id="ov-shop">
         <div class="shop-header">
           <div class="shop-title">🛍️ SHOP</div>
+          <button class="shop-btn" id="btn-dev-cheat" onclick="devUnlockEverything()" style="display:none;padding:4px 8px;font-size:10px;background:#ff3ea525;color:#ff3ea5;border:1px solid #ff3ea566;border-radius:12px;cursor:pointer" title="Developer access only for Sytex">⚡ UNLOCK ALL (SYTEX)</button>
           <div class="shop-coin-pill">🪙 <span class="coin-val">0</span></div>
           <button class="icon-btn shop-close" id="btn-shop-close" title="Close">✕</button>
         </div>
@@ -908,6 +909,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
           <span class="ptb-lbl">👤 Player Tag:</span>
           <input type="text" id="player-tag-input" maxlength="12" placeholder="Your Name" autocomplete="off" spellcheck="false">
           <button class="icon-btn ptb-save" id="btn-save-tag" title="Save Tag">✓</button>
+          <button class="icon-btn ptb-sync" id="btn-sync-device" onclick="openDeviceSyncModal()" title="Link Device / Transfer Account" style="width:26px;height:26px;font-size:12px;background:#ffd32a22;border-color:#ffd32a55;color:#ffd32a;flex-shrink:0;">🔑</button>
         </div>
         <div class="ranks-tabs">
           <button class="ranks-tab active" id="tab-ranks-global">🌐 World Top 20</button>
@@ -3121,10 +3123,85 @@ function checkDailyBonus(){
 }
 
 function applyCustomEquippedTheme(){
-  if(UserState.equippedTheme && UserState.equippedTheme!=='theme_default'){
-    var found=SHOP_DATA.themes.find(function(t){return t.id===UserState.equippedTheme;});
+  if(UserState.equippedTheme && UserState.equippedTheme !== 'theme_default'){
+    var found = SHOP_DATA.themes.find(function(t){ return t.id === UserState.equippedTheme; });
     if(found && found.data){
       applyTheme(found.data);
+    }
+  } else {
+    // Cosmic Shift (Original Dynamic Level Progression)
+    document.body.style.backgroundImage = 'none';
+    var tIdx = (typeof level !== 'undefined' ? level : 1) % THEMES.length;
+    applyTheme(THEMES[tIdx]);
+  }
+}
+
+function devUnlockEverything(){
+  if(getPlayerName().toLowerCase() !== 'sytex'){
+    showToast('🔒 Access restricted: Only Sytex can activate Developer Mode!');
+    return;
+  }
+  ensureAudio();
+  sndBuy();
+  UserState.coins = 999999;
+  UserState.unlockedBlocks = SHOP_DATA.blocks.map(function(b){ return b.id; });
+  UserState.unlockedThemes = SHOP_DATA.themes.map(function(t){ return t.id; });
+  UserState.unlockedSounds = SHOP_DATA.sounds.map(function(s){ return s.id; });
+  UserState.boosterCombo = 50;
+  UserState.boosterLightning = 50;
+  UserState.boosterDoubleCoins = 50;
+  saveUserState();
+  updateCoinDisplays();
+  renderShop();
+  showToast('🚀 SYTEX VERIFIED: All 18 Blocks, Themes, Sounds & 999,999 Coins Unlocked!');
+}
+window.devUnlockEverything = devUnlockEverything;
+
+function openDeviceSyncModal(){
+  ensureAudio();
+  var myId = getPlayerId();
+  var myName = getPlayerName();
+  var action = prompt("🔑 Device Link & Account Sync:\n\nYour Account Key:\n" + myId + "\n\nTo link this device to your existing account, paste your Account Key below (or leave blank to copy yours):", "");
+  if(action && action.trim()){
+    var targetId = action.trim();
+    if(targetId.length < 5){
+      showToast('⚠️ Invalid Account Key!');
+      return;
+    }
+    localStorage.setItem('gp_player_id', targetId);
+    if(firestore){
+      firestore.collection('leaderboard').doc(targetId).get().then(function(doc){
+        if(doc.exists && doc.data().name){
+          var restoredName = doc.data().name;
+          localStorage.setItem('gp_player_name', restoredName);
+          localStorage.setItem('gp_player_name_norm', restoredName.toLowerCase());
+          var inp = document.getElementById('player-tag-input');
+          if(inp) inp.value = restoredName;
+          showToast('✓ Synced account for ' + restoredName + '!');
+        } else {
+          showToast('✓ Account Key applied: ' + targetId);
+        }
+        renderShop();
+        renderRanksView();
+      }).catch(function(){
+        showToast('✓ Account Key applied: ' + targetId);
+        renderShop();
+        renderRanksView();
+      });
+    } else {
+      showToast('✓ Account Key applied: ' + targetId);
+      renderShop();
+      renderRanksView();
+    }
+  } else if(action === ""){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(myId).then(function(){
+        showToast('📋 Account Key copied to clipboard! Paste it on your other device.');
+      }).catch(function(){
+        showToast('Your Account Key: ' + myId);
+      });
+    } else {
+      showToast('Your Account Key: ' + myId);
     }
   }
 }
@@ -3206,6 +3283,11 @@ function closeShop(){
 
 function renderShop(){
   updateCoinDisplays();
+  var devBtn = document.getElementById('btn-dev-cheat');
+  if(devBtn){
+    var isSytex = (getPlayerName().toLowerCase() === 'sytex');
+    devBtn.style.display = isSytex ? 'inline-block' : 'none';
+  }
   var container=document.getElementById('shop-items-container');
   if(!container) return;
   container.innerHTML='';
@@ -3945,6 +4027,25 @@ function saveTagFromInput(){
       var data = doc.data();
       // If claimed by another player:
       if(data.playerId && data.playerId !== pid){
+        // 🔐 SPECIAL SYTEX PIN VERIFICATION FOR NEW DEVICES:
+        if(norm === 'sytex'){
+          var pass = prompt("🔐 Sytex Account Link:\nEnter Master PIN to link this new device (Default: 7777):");
+          if(pass === '7777'){
+            pid = data.playerId || pid;
+            localStorage.setItem('gp_player_id', pid);
+            localStorage.setItem('gp_player_name', orig);
+            localStorage.setItem('gp_player_name_norm', norm);
+            showToast('🎉 Welcome back, Sytex! Device linked successfully.');
+            if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
+            renderShop();
+            renderRanksView();
+            return;
+          } else {
+            showToast('❌ Incorrect PIN. Username "Sytex" is protected!');
+            if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
+            return;
+          }
+        }
         showToast('❌ "' + orig + '" is already taken! Try another.');
         if(btnSave){ btnSave.disabled = false; btnSave.textContent = '✓'; }
         return;

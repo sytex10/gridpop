@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-cache-v14-ranks-sounds-shaders';
+const CACHE_NAME = 'gridpop-cache-v16-sytex-device-sync';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

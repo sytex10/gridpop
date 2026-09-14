@@ -37,7 +37,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 .preview{display:flex;gap:3px;flex-wrap:nowrap;justify-content:center}
 .pc{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 #wrap{position:relative;width:420px;height:544px;aspect-ratio:627/812;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #2a2a5a,0 0 40px #7b5cff44,0 20px 60px #0009;transition:box-shadow .7s ease;touch-action:none}
-#gc{display:block;touch-action:none}
+#gc{width:100%!important;height:100%!important;object-fit:contain!important;display:block!important;touch-action:none!important}
 #danger{position:absolute;inset:0;background:linear-gradient(to bottom,#ff000033 0%,transparent 45%);pointer-events:none;opacity:0;transition:opacity .3s}
 .icon-btn{width:36px;height:36px;border:1px solid #ffffff18;border-radius:50%;background:#ffffff15;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;transition:background .2s,transform .15s,border-color .2s;line-height:1;color:#fff;backdrop-filter:blur(6px)}
 .icon-btn:hover{background:#ffffff28;border-color:#ffffff33;transform:scale(1.06)}
@@ -1037,6 +1037,18 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 }
 
 button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !important; pointer-events: auto !important; -webkit-tap-highlight-color: transparent; cursor: pointer; }
+
+/* 🔥 Fever / Overdrive Super Mode Aura */
+.fever-active #wrap {
+  box-shadow: 0 0 25px #ffd32a, 0 0 60px #ff7b0099, 0 20px 60px #0009 !important;
+  border-color: #ffd32a !important;
+  animation: feverPulse 1.2s infinite alternate ease-in-out !important;
+}
+@keyframes feverPulse {
+  0% { filter: drop-shadow(0 0 10px #ffd32a88); }
+  100% { filter: drop-shadow(0 0 25px #ff7b00cc); }
+}
+
 </style>
   <!-- Firebase SDK for Realtime Global Leaderboard -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1182,7 +1194,7 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v32_syntaxfix';
+  var BUILD_ID = 'gp_build_v33_uniqueness';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -1587,6 +1599,30 @@ var dockPieces = [null, null, null];
 var draggedPiece = null; // { piece, index, startX, startY, curX, curY }
 var TOUCH_OFFSET_Y = 85; // 📱 Touch Offset: Floats 85px above finger so board is never blocked!
 var blastStreak = 0;
+
+// ── 🔥 GridPop Unique Systems: Power-Ups, Fever & Synergy ──
+var feverMeter = 0;       // 0 to 100
+var feverActive = false;  // is Fever Mode active?
+var feverMovesLeft = 0;   // 3 turns in Fever Mode
+var ELEMENT_NAMES = {
+  RED: 'PYRO', BLUE: 'HYDRO', YELLOW: 'VOLT',
+  GREEN: 'GAIA', PURPLE: 'VOID', ORANGE: 'SOLAR', PINK: 'COSMIC'
+};
+
+function getCell(r, c) {
+  if (r < 0 || r >= ROWS || c < 0 || c >= COLS || !grid || !grid[r]) return null;
+  var v = grid[r][c];
+  if (!v) return null;
+  if (typeof v === 'string') return { color: v, special: null, hp: 1 };
+  return v;
+}
+
+function getCellColor(cell) {
+  if (!cell) return null;
+  if (typeof cell === 'string') return cell;
+  return cell.color || 'BLUE';
+}
+
 var lastBlastTime = 0;
 
 function getActiveBlockStyle() {
@@ -1666,13 +1702,37 @@ function generateFairPieces(g) {
     }
 
     var color = colorKeys[Math.floor(Math.random() * colorKeys.length)];
-    newPieces.push({
+    var pieceData = {
       shape: shapeObj.matrix,
       name: shapeObj.name,
       color: color,
       scale: 1,
-      alpha: 1
-    });
+      alpha: 1,
+      special: null
+    };
+
+    // ⚡ 22% Chance to attach a Special Power-Up tile to one filled cell of the piece!
+    if (Math.random() < 0.22) {
+      var filledCoords = [];
+      for (var pr = 0; pr < shapeObj.matrix.length; pr++) {
+        for (var pc = 0; pc < shapeObj.matrix[pr].length; pc++) {
+          if (shapeObj.matrix[pr][pc] === 1) filledCoords.push({ r: pr, c: pc });
+        }
+      }
+      if (filledCoords.length > 0) {
+        var targetCoord = filledCoords[Math.floor(Math.random() * filledCoords.length)];
+        var roll = Math.random();
+        var spType = 'bomb'; // 40% Bomb
+        if (roll > 0.85) spType = 'gold';       // 15% Gold Coin
+        else if (roll > 0.65) spType = 'rainbow'; // 20% Rainbow
+        else if (roll > 0.35) spType = 'lightning'; // 30% Lightning
+        
+        pieceData.special = { r: targetCoord.r, c: targetCoord.c, type: spType };
+        if (spType === 'rainbow') pieceData.color = 'WILD';
+      }
+    }
+
+    newPieces.push(pieceData);
   }
 
   // 🛡️ İyi Niyet Kuralı: En az 1 parçanın kesinlikle sığabileceği garanti edilir!
@@ -2441,6 +2501,116 @@ function drawSingleBlockShader(tCtx, x, y, size, p, style, isH){
   }
 }
 
+
+// ── 🎨 Special Power-Up Tile Badges & Shaders ──
+function drawSpecialEmblem(ctx, cx, cy, sz, specialType, hp, maxHp) {
+  ctx.save();
+  var now = performance.now() * 0.003;
+  if (specialType === 'bomb') {
+    // 💣 Bomb Icon & Pulsing Halo
+    var pulse = Math.sin(now * 4) * 0.15 + 1.0;
+    ctx.fillStyle = '#ff4757';
+    ctx.shadowColor = '#ff4757';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(cx, cy, sz * 0.26 * pulse, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Bomb fuse & flame spark
+    ctx.strokeStyle = '#ffd32a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx + sz * 0.12, cy - sz * 0.16, sz * 0.14, 0, Math.PI * 0.9);
+    ctx.stroke();
+
+    // Fuse spark
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(cx + sz * 0.22, cy - sz * 0.24, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Mini 💣 symbol
+    ctx.font = 'bold ' + Math.round(sz * 0.32) + 'px Outfit, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('💣', cx, cy + 1);
+  }
+  else if (specialType === 'lightning') {
+    // ⚡ Electric Neon Bolt
+    ctx.font = 'bold ' + Math.round(sz * 0.44) + 'px Outfit, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = '#00f6ff';
+    ctx.shadowBlur = 14;
+    ctx.fillText('⚡', cx, cy);
+  }
+  else if (specialType === 'rainbow') {
+    // 🌈 Prismatic Spinning Star
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(now * 1.5);
+    ctx.font = 'bold ' + Math.round(sz * 0.40) + 'px Outfit, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = '#ff3ea5';
+    ctx.shadowBlur = 16;
+    ctx.fillText('🌈', 0, 0);
+    ctx.restore();
+  }
+  else if (specialType === 'gold') {
+    // 🪙 Shimmering Gold Coin Emblem
+    ctx.fillStyle = '#ffd32a';
+    ctx.shadowColor = '#ffd32a';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(cx, cy, sz * 0.28, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.font = 'bold ' + Math.round(sz * 0.32) + 'px Outfit, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#222';
+    ctx.fillText('🪙', cx, cy);
+  }
+  else if (specialType === 'crystal') {
+    // 💎 Multifaceted Gem with Cracks
+    ctx.fillStyle = '#2ed2ff';
+    ctx.shadowColor = '#00f6ff';
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    var crR = sz * 0.30;
+    ctx.moveTo(cx, cy - crR);
+    ctx.lineTo(cx + crR, cy);
+    ctx.lineTo(cx, cy + crR);
+    ctx.lineTo(cx - crR, cy);
+    ctx.closePath();
+    ctx.fill();
+
+    // Crack lines if damaged
+    if (hp && maxHp && hp < maxHp) {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx - crR * 0.4, cy - crR * 0.3);
+      ctx.lineTo(cx + crR * 0.1, cy);
+      ctx.lineTo(cx - crR * 0.2, cy + crR * 0.5);
+      ctx.stroke();
+    }
+
+    ctx.font = 'bold ' + Math.round(sz * 0.30) + 'px Outfit, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('💎', cx, cy);
+  }
+  ctx.restore();
+}
+
 function drawBlock(r,c){
   var col=grid[r][c]; if(!col)return;
   var x=PAD+c*(SZ+GAP), y=PAD+r*(SZ+GAP);
@@ -2490,6 +2660,12 @@ function drawBlock(r,c){
 
   drawSingleBlockShader(ctx, x, y, SZ, p, style, isH);
 
+  // Overlay Special Power-Up Emblem if cell has special type
+  var cellObj = getCell(r, c);
+  if (cellObj && cellObj.special) {
+    drawSpecialEmblem(ctx, x + SZ/2, y + SZ/2, SZ, cellObj.special, cellObj.hp, cellObj.maxHp);
+  }
+
   if(isWobbling){
     // Parlayan kırmızı elektrik çerçeve
     ctx.save();
@@ -2533,6 +2709,54 @@ function render(){
 
   // ⚡ Şimşek Taşı ve Yıldırım Efektleri (Ortaya uçuş, gökten inen yıldırımlar, çatallı arklar ve şok dalgaları)
   
+  // ── 🔥 Draw Overdrive Gauge (Fever Meter) ──
+  var gaugeY = dockY - 13;
+  var gaugeW = W - PAD * 2;
+  var gaugeH = 7;
+  ctx.save();
+  // Bar bg
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+  if (ctx.roundRect) ctx.roundRect(PAD, gaugeY, gaugeW, gaugeH, 4);
+  else ctx.rect(PAD, gaugeY, gaugeW, gaugeH);
+  ctx.fill();
+
+  // Bar fill
+  var fillPct = feverActive ? (feverMovesLeft / 3) : (feverMeter / 100);
+  if (fillPct > 0) {
+    var fGrad = ctx.createLinearGradient(PAD, gaugeY, PAD + gaugeW * fillPct, gaugeY);
+    if (feverActive) {
+      fGrad.addColorStop(0, '#ff3838');
+      fGrad.addColorStop(0.5, '#ff9f1a');
+      fGrad.addColorStop(1, '#ffd32a');
+    } else {
+      fGrad.addColorStop(0, '#7b5cff');
+      fGrad.addColorStop(1, '#00f6ff');
+    }
+    ctx.fillStyle = fGrad;
+    ctx.shadowColor = feverActive ? '#ffd32a' : '#00f6ff';
+    ctx.shadowBlur = feverActive ? 14 : 6;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(PAD, gaugeY, gaugeW * fillPct, gaugeH, 4);
+    else ctx.rect(PAD, gaugeY, gaugeW * fillPct, gaugeH);
+    ctx.fill();
+  }
+
+  // Label text
+  ctx.font = 'bold 11px Outfit, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  if (feverActive) {
+    ctx.fillStyle = '#ffd32a';
+    ctx.shadowColor = '#ff7b00';
+    ctx.shadowBlur = 8;
+    ctx.fillText('🔥 OVERDRIVE ACTIVE: ' + feverMovesLeft + ' MOVES LEFT (2X SCORE)', W / 2, gaugeY - 2);
+  } else {
+    ctx.fillStyle = feverMeter >= 75 ? '#00f6ff' : 'rgba(255, 255, 255, 0.55)';
+    ctx.shadowBlur = 0;
+    ctx.fillText('⚡ OVERDRIVE CHARGE: ' + Math.round(feverMeter) + '%', W / 2, gaugeY - 2);
+  }
+  ctx.restore();
+
   // ── 🧩 Draw Dock Slots & Pieces ──
   var dockY = GRID_H + 10;
   ctx.save();
@@ -2588,6 +2812,9 @@ function render(){
             var by = startY + pr * (miniSZ + miniGap);
             var pal = PAL[piece.color] || PAL.BLUE;
             drawSingleBlockShader(ctx, bx, by, miniSZ, pal, getActiveBlockStyle(), false);
+            if (piece.special && piece.special.r === pr && piece.special.c === pc) {
+              drawSpecialEmblem(ctx, bx + miniSZ/2, by + miniSZ/2, miniSZ, piece.special.type, 1, 1);
+            }
           }
         }
       }
@@ -2646,6 +2873,9 @@ function render(){
           var dby = dStartY + dr * (SZ + GAP);
           var dpal = PAL[p.color] || PAL.BLUE;
           drawSingleBlockShader(ctx, dbx, dby, SZ, dpal, getActiveBlockStyle(), false);
+          if (p.special && p.special.r === dr && p.special.c === dc) {
+            drawSpecialEmblem(ctx, dbx + SZ/2, dby + SZ/2, SZ, p.special.type, 1, 1);
+          }
         }
       }
     }
@@ -2873,7 +3103,29 @@ function renderSF(){
 }
 
 // UI
+function onLevelUp(lvl) {
+  var emptyCells = [];
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      if (grid[r][c] === null) emptyCells.push({ r: r, c: c });
+    }
+  }
+  if (emptyCells.length >= 2) {
+    emptyCells.sort(function(){ return Math.random() - 0.5; });
+    var crHp = lvl >= 4 ? 3 : 2;
+    grid[emptyCells[0].r][emptyCells[0].c] = { color: 'BLUE', special: 'crystal', hp: crHp, maxHp: crHp };
+    grid[emptyCells[1].r][emptyCells[1].c] = { color: 'YELLOW', special: 'gold', hp: 1 };
+    beep(580, 'sine', 0.25, 0.22, 920);
+    floats.push({ x: W / 2, y: GRID_H * 0.35, vy: -1.6, life: 1.8, text: '💎 LEVEL ' + lvl + ' OBJECTIVES SPAWNED!', color: '#2ed2ff', sz: 20, isWarning: false });
+  }
+}
+
 function updUI(){
+  var newLvl = getLvlNum(score);
+  if (newLvl > level && state === ST.PLAY) {
+    level = newLvl;
+    onLevelUp(level);
+  }
   document.getElementById('sc').textContent=score.toLocaleString('en-US');
   document.getElementById('lv').textContent=level;
   var b=updateBest(score);
@@ -3160,6 +3412,7 @@ function startGame(){
   }
   state=ST.PLAY; lastT=performance.now();
   blastStreak = 0; lastBlastTime = 0; draggedPiece = null;
+  feverMeter = 0; feverActive = false; feverMovesLeft = 0; document.body.classList.remove('fever-active');
   dockPieces = generateFairPieces(grid);
   var cbElem = document.getElementById('cb-val');
   if (cbElem) cbElem.textContent = '0x';
@@ -3513,8 +3766,35 @@ function checkAndBlastLines() {
   var cbElem = document.getElementById('cb-val');
   if (cbElem) cbElem.textContent = blastStreak + 'x';
 
+  // ── ✨ 1. Pure Color Synergy Check (ELEMENTAL PURGE) ──
+  var pureColorPurges = [];
+  fullRows.forEach(function(r) {
+    var firstCol = null;
+    var isPure = true;
+    for (var c = 0; c < COLS; c++) {
+      var colName = getCellColor(grid[r][c]);
+      if (colName === 'WILD') continue;
+      if (!firstCol) firstCol = colName;
+      else if (firstCol !== colName) { isPure = false; break; }
+    }
+    if (isPure && firstCol) pureColorPurges.push(firstCol);
+  });
+  fullCols.forEach(function(c) {
+    var firstCol = null;
+    var isPure = true;
+    for (var r = 0; r < ROWS; r++) {
+      var colName = getCellColor(grid[r][c]);
+      if (colName === 'WILD') continue;
+      if (!firstCol) firstCol = colName;
+      else if (firstCol !== colName) { isPure = false; break; }
+    }
+    if (isPure && firstCol) pureColorPurges.push(firstCol);
+  });
+
   // Identify all unique cleared cells
   var clearedCells = {};
+  var specialTriggers = [];
+
   fullRows.forEach(function(r) {
     for (var c = 0; c < COLS; c++) {
       clearedCells[r * 100 + c] = [r, c];
@@ -3528,22 +3808,29 @@ function checkAndBlastLines() {
 
   var cellList = [];
   for (var k in clearedCells) {
-    cellList.push(clearedCells[k]);
+    var pos = clearedCells[k];
+    cellList.push(pos);
+    var cellData = getCell(pos[0], pos[1]);
+    if (cellData && cellData.special) {
+      specialTriggers.push({ r: pos[0], c: pos[1], type: cellData.special, color: cellData.color });
+    }
   }
 
   // Audio & Visual scoring
   ensureAudio();
-  var lineScore = totalLines * 120 * blastStreak;
-  if (totalLines >= 2) lineScore += (totalLines - 1) * 200 * blastStreak;
+  var mult = feverActive ? 2 : 1;
+  var lineScore = (totalLines * 120 * blastStreak) * mult;
+  if (totalLines >= 2) lineScore += ((totalLines - 1) * 200 * blastStreak) * mult;
   score += lineScore;
   addCoins(totalLines * 3, false);
   addCareerBlocks(cellList.length);
   checkRecordCelebration(score);
 
-  // Explosive particles
+  // ── 💥 Process Regular Cleared Cells & Particles ──
   cellList.forEach(function(pos) {
     var r = pos[0], c = pos[1];
-    var col = grid[r][c] || 'BLUE';
+    var cell = grid[r][c];
+    var col = getCellColor(cell) || 'BLUE';
     var cx = PAD + c * (SZ + GAP) + SZ / 2;
     var cy = PAD + r * (SZ + GAP) + SZ / 2;
     grid[r][c] = null;
@@ -3561,6 +3848,154 @@ function checkAndBlastLines() {
       });
     }
   });
+
+  // ── 💣 / ⚡ / 🌈 / 🪙 2. Execute Special Power-Up Effects ──
+  specialTriggers.forEach(function(sp) {
+    var sr = sp.r, sc = sp.c;
+    var scx = PAD + sc * (SZ + GAP) + SZ / 2;
+    var scy = PAD + sr * (SZ + GAP) + SZ / 2;
+
+    if (sp.type === 'bomb') {
+      // 💣 3x3 TNT Explosion!
+      var bombCleared = 0;
+      for (var br = Math.max(0, sr - 1); br <= Math.min(ROWS - 1, sr + 1); br++) {
+        for (var bc = Math.max(0, sc - 1); bc <= Math.min(COLS - 1, sc + 1); bc++) {
+          if (grid[br][bc] !== null) {
+            var bcx = PAD + bc * (SZ + GAP) + SZ / 2;
+            var bcy = PAD + br * (SZ + GAP) + SZ / 2;
+            grid[br][bc] = null;
+            bombCleared++;
+            for (var bp = 0; bp < 9; bp++) {
+              var bang = Math.random() * Math.PI * 2, bsp = Math.random() * 6 + 3;
+              parts.push({ x: bcx, y: bcy, vx: Math.cos(bang)*bsp, vy: Math.sin(bang)*bsp, color: bp%2===0?'#ff4757':'#ffa502', life: 1.1, r: 4 });
+            }
+          }
+        }
+      }
+      beep(95, 'sawtooth', 0.28, 0.22, 60);
+      shake(20);
+      var bBonus = 150 * mult;
+      score += bBonus;
+      floats.push({ x: scx, y: scy, vy: -1.8, life: 1.4, text: '💣 TNT 3x3 BLAST! +' + bBonus, color: '#ff4757', sz: 20, isWarning: false });
+    }
+    else if (sp.type === 'lightning') {
+      // ⚡ Full Cross Line Wipeout!
+      var ltCleared = 0;
+      for (var lc = 0; lc < COLS; lc++) {
+        if (grid[sr][lc] !== null) { grid[sr][lc] = null; ltCleared++; }
+      }
+      for (var lr = 0; lr < ROWS; lr++) {
+        if (grid[lr][sc] !== null) { grid[lr][sc] = null; ltCleared++; }
+      }
+      beep(550, 'sawtooth', 0.22, 0.18, 850);
+      shake(22);
+      var ltBonus = 200 * mult;
+      score += ltBonus;
+      floats.push({ x: scx, y: scy, vy: -1.8, life: 1.4, text: '⚡ LIGHTNING CROSS! +' + ltBonus, color: '#00f6ff', sz: 20, isWarning: false });
+    }
+    else if (sp.type === 'rainbow') {
+      // 🌈 Prismatic Wipeout: Vaporize all blocks of most frequent color!
+      var colorCounts = {};
+      for (var gr = 0; gr < ROWS; gr++) {
+        for (var gc = 0; gc < COLS; gc++) {
+          if (grid[gr][gc]) {
+            var colName = getCellColor(grid[gr][gc]);
+            if (colName !== 'WILD' && colName !== 'CRYSTAL') {
+              colorCounts[colName] = (colorCounts[colName] || 0) + 1;
+            }
+          }
+        }
+      }
+      var maxCol = null, maxCnt = 0;
+      for (var ck in colorCounts) {
+        if (colorCounts[ck] > maxCnt) { maxCnt = colorCounts[ck]; maxCol = ck; }
+      }
+      if (maxCol) {
+        for (var gr = 0; gr < ROWS; gr++) {
+          for (var gc = 0; gc < COLS; gc++) {
+            if (grid[gr][gc] && getCellColor(grid[gr][gc]) === maxCol) {
+              var rbcx = PAD + gc * (SZ + GAP) + SZ / 2;
+              var rbcy = PAD + gr * (SZ + GAP) + SZ / 2;
+              grid[gr][gc] = null;
+              for (var rbp = 0; rbp < 8; rbp++) {
+                var rbang = Math.random() * Math.PI * 2, rbsp = Math.random() * 5 + 2;
+                parts.push({ x: rbcx, y: rbcy, vx: Math.cos(rbang)*rbsp, vy: Math.sin(rbang)*rbsp, color: PAL[maxCol]?PAL[maxCol].f:'#ff3ea5', life: 1.0, r: 3.5 });
+              }
+            }
+          }
+        }
+        beep(720, 'sine', 0.25, 0.2, 980);
+        shake(18);
+        var rbBonus = 250 * mult;
+        score += rbBonus;
+        floats.push({ x: scx, y: scy, vy: -1.8, life: 1.4, text: '🌈 ' + maxCol + ' WIPEOUT! +' + rbBonus, color: '#ff3ea5', sz: 20, isWarning: false });
+      }
+    }
+    else if (sp.type === 'gold') {
+      // 🪙 Gold Block: +10 Shop Coins!
+      addCoins(10, true);
+      beep(620, 'triangle', 0.15, 0.18, 880);
+      floats.push({ x: scx, y: scy, vy: -1.8, life: 1.4, text: '+10 🪙 GOLD BONUS!', color: '#ffd32a', sz: 20, isWarning: false });
+    }
+  });
+
+  // ── 💎 3. Crystal Damage & Shatter Check ──
+  for (var cr = 0; cr < ROWS; cr++) {
+    for (var cc = 0; cc < COLS; cc++) {
+      var cCell = getCell(cr, cc);
+      if (cCell && cCell.special === 'crystal') {
+        var isAdjacent = cellList.some(function(pos){
+          return Math.abs(pos[0] - cr) + Math.abs(pos[1] - cc) <= 1;
+        });
+        if (isAdjacent) {
+          cCell.hp--;
+          var ccx = PAD + cc * (SZ + GAP) + SZ / 2;
+          var ccy = PAD + cr * (SZ + GAP) + SZ / 2;
+          if (cCell.hp <= 0) {
+            grid[cr][cc] = null;
+            var crBonus = 500 * mult;
+            score += crBonus;
+            beep(780, 'sine', 0.25, 0.2, 1100);
+            shake(22);
+            for (var cp = 0; cp < 14; cp++) {
+              var cpan = Math.random() * Math.PI * 2, cpsp = Math.random() * 6 + 3;
+              parts.push({ x: ccx, y: ccy, vx: Math.cos(cpan)*cpsp, vy: Math.sin(cpan)*cpsp, color: '#2ed2ff', life: 1.2, r: 4 });
+            }
+            floats.push({ x: ccx, y: ccy, vy: -1.8, life: 1.5, text: '💎 CRYSTAL SHATTERED! +' + crBonus, color: '#2ed2ff', sz: 20, isWarning: false });
+          } else {
+            beep(380, 'triangle', 0.08, 0.12, 480);
+            floats.push({ x: ccx, y: ccy, vy: -1.2, life: 1.0, text: '💎 CRACKED! (' + cCell.hp + ' HP)', color: '#8aeeff', sz: 16, isWarning: false });
+          }
+        }
+      }
+    }
+  }
+
+  // ── ✨ 4. Handle Pure Color Synergy Bonus ──
+  if (pureColorPurges.length > 0) {
+    pureColorPurges.forEach(function(purCol) {
+      var pBonus = 500 * mult;
+      score += pBonus;
+      addCoins(10, true);
+      feverMeter = Math.min(100, feverMeter + 50);
+      var pName = ELEMENT_NAMES[purCol] || 'ELEMENTAL';
+      beep(680, 'sine', 0.22, 0.22, 920);
+      shake(24);
+      flash(PAL[purCol] ? PAL[purCol].f : '#ffd32a', 0.5);
+      floats.push({ x: W/2, y: GRID_H * 0.45, vy: -1.8, life: 1.6, text: '✨ ' + pName + ' PURGE! +' + pBonus, color: PAL[purCol]?PAL[purCol].f:'#ffd32a', sz: 23, isWarning: false });
+    });
+  }
+
+  // ── 🔥 5. Update Fever / Overdrive Meter & Activation ──
+  feverMeter = Math.min(100, feverMeter + totalLines * 25 + (blastStreak > 1 ? 15 : 0));
+  if (feverMeter >= 100 && !feverActive) {
+    feverActive = true;
+    feverMovesLeft = 3;
+    document.body.classList.add('fever-active');
+    shake(25);
+    beep(520, 'triangle', 0.3, 0.25, 840);
+    floats.push({ x: W/2, y: GRID_H * 0.28, vy: -2.0, life: 1.8, text: '🔥 OVERDRIVE ACTIVATED! (3 SUPER TURNS - 2X SCORE)', color: '#ffd32a', sz: 21, isWarning: false });
+  }
 
   // Sound: Satisfying ascending pitch based on streak
   var pitch = 260 + Math.min(blastStreak, 8) * 85;
@@ -3588,7 +4023,6 @@ function checkAndBlastLines() {
   updUI();
   return totalLines;
 }
-
 function gameOver(){
 
   clearGameSession();
@@ -3840,15 +4274,59 @@ function handlePointerUp(e) {
     for (var r = 0; r < shRows; r++) {
       for (var c = 0; c < shCols; c++) {
         if (sh[r][c] === 1) {
-          grid[targetR + r][targetC + c] = p.color;
+          if (p.special && p.special.r === r && p.special.c === c) {
+            grid[targetR + r][targetC + c] = { color: p.color, special: p.special.type, hp: 1 };
+          } else {
+            grid[targetR + r][targetC + c] = p.color;
+          }
           placedCellsCount++;
         }
       }
     }
 
-    score += placedCellsCount * 10;
+    var mult = feverActive ? 2 : 1;
+    score += placedCellsCount * 10 * mult;
     addCareerBlocks(placedCellsCount);
     checkRecordCelebration(score);
+
+    // 🔥 Fever Mode: Decrement turn and fire Overdrive Seismic Pulse!
+    if (feverActive) {
+      feverMovesLeft--;
+      // Overdrive Seismic Pulse: Vaporize 2 random crowded blocks from the board!
+      var crowdedCells = [];
+      for (var fbr = 0; fbr < ROWS; fbr++) {
+        for (var fbc = 0; fbc < COLS; fbc++) {
+          if (grid[fbr][fbc] && (fbr < targetR || fbr >= targetR + shRows || fbc < targetC || fbc >= targetC + shCols)) {
+            crowdedCells.push({ r: fbr, c: fbc });
+          }
+        }
+      }
+      if (crowdedCells.length > 0) {
+        crowdedCells.sort(function(){ return Math.random() - 0.5; });
+        var vaporizeCount = Math.min(2, crowdedCells.length);
+        for (var vi = 0; vi < vaporizeCount; vi++) {
+          var vc = crowdedCells[vi];
+          var vcx = PAD + vc.c * (SZ + GAP) + SZ / 2;
+          var vcy = PAD + vc.r * (SZ + GAP) + SZ / 2;
+          grid[vc.r][vc.c] = null;
+          for (var vp = 0; vp < 8; vp++) {
+            var ang = Math.random() * Math.PI * 2, sp = Math.random() * 4 + 2;
+            parts.push({ x: vcx, y: vcy, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, color: '#ffd32a', life: 0.8, r: 3 });
+          }
+        }
+        beep(480, 'sine', 0.1, 0.15, 620);
+        floats.push({ x: W/2, y: GRID_H * 0.35, vy: -1.4, life: 1.1, text: '⚡ SEISMIC PULSE! (-2 BLOCKS)', color: '#ffd32a', sz: 19, isWarning: false });
+      }
+
+      if (feverMovesLeft <= 0) {
+        feverActive = false;
+        feverMeter = 0;
+        document.body.classList.remove('fever-active');
+        floats.push({ x: W/2, y: GRID_H * 0.42, vy: -1.2, life: 1.2, text: '⚡ OVERDRIVE COMPLETE', color: '#ff7b00', sz: 18, isWarning: false });
+      } else {
+        floats.push({ x: W/2, y: GRID_H * 0.42, vy: -1.2, life: 1.0, text: '🔥 ' + feverMovesLeft + ' SUPER MOVES LEFT! (2X)', color: '#ffd32a', sz: 18, isWarning: false });
+      }
+    }
 
     ensureAudio();
     beep(180, 'triangle', 0.08, 0.09, 240);

@@ -700,7 +700,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
   100%{opacity:0;transform:translate(-50%,-15px)}
 }
 
-/* 📱 Mobil Uyumlu Düzen (KESİNLİKLE KAYDIRMASIZ, KUSURSUZ SABİT EKRAN DÜZENİ) */
+/* 📱 Mobil Uyumlu Düzen (HER TELEFONA VE EKRAN BOYUTUNA OTOMATİK UYUM SAĞLAYAN SİSTEM) */
 @media (max-width: 768px), (max-height: 768px) {
   html, body {
     position: fixed !important;
@@ -733,8 +733,8 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
     box-sizing: border-box !important;
     padding-top: max(6px, env(safe-area-inset-top)) !important;
     padding-bottom: max(6px, env(safe-area-inset-bottom)) !important;
-    padding-left: max(6px, env(safe-area-inset-left)) !important;
-    padding-right: max(6px, env(safe-area-inset-right)) !important;
+    padding-left: max(8px, env(safe-area-inset-left)) !important;
+    padding-right: max(8px, env(safe-area-inset-right)) !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
     touch-action: none !important;
@@ -743,14 +743,14 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
   #stage-box {
     width: 100% !important;
-    max-width: min(calc(100vw - 12px), 430px) !important;
+    max-width: min(calc(100vw - clamp(16px, 4.5vw, 24px)), 430px) !important;
     height: auto !important;
     max-height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 5px !important;
+    gap: clamp(4px, 1.2vh, 8px) !important;
     box-sizing: border-box !important;
     margin: auto auto !important;
     overflow: hidden !important;
@@ -759,9 +759,9 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
   #top-bar {
     width: 100% !important;
-    height: 36px !important;
-    min-height: 36px !important;
-    max-height: 36px !important;
+    height: clamp(34px, 5vh, 40px) !important;
+    min-height: 32px !important;
+    max-height: 42px !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -771,24 +771,24 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
   }
 
   #brand-tag {
-    font-size: 20px !important;
+    font-size: clamp(18px, 5vw, 22px) !important;
     letter-spacing: 0.5px !important;
   }
 
   #header-actions {
-    gap: 6px !important;
+    gap: clamp(4px, 1.5vw, 8px) !important;
   }
 
   #coin-badge {
-    padding: 4px 10px !important;
-    font-size: 12px !important;
+    padding: clamp(3px, 0.8vh, 5px) clamp(8px, 2.5vw, 12px) !important;
+    font-size: clamp(11.5px, 3.2vw, 13px) !important;
     border-radius: 16px !important;
   }
 
   .icon-btn {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 13px !important;
+    width: clamp(30px, 8vw, 36px) !important;
+    height: clamp(30px, 8vw, 36px) !important;
+    font-size: clamp(12px, 3.5vw, 15px) !important;
   }
 
   #game-stage {
@@ -797,26 +797,27 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
     height: auto !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 5px !important;
+    gap: clamp(4px, 1.2vh, 8px) !important;
     flex-shrink: 0 !important;
     margin: 0 auto !important;
     overflow: hidden !important;
   }
 
-  /* Üst Bilgi Kartları (Score, Level, Best, Next) */
+  /* 🌟 Akıllı Orantılı Üst Bilgi Kartları (Score, Level, Best, Next) */
+  /* Level tek hane olduğu için 0.72fr verilerek sıkışma engellendi, Next'e geniş 1.38fr açıldı */
   #sidebar {
     width: 100% !important;
     display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr 1.25fr !important;
-    gap: 5px !important;
+    grid-template-columns: 1.05fr 0.72fr 1.05fr 1.38fr !important;
+    gap: clamp(4px, 1.2vw, 7px) !important;
     flex-shrink: 0 !important;
     box-sizing: border-box !important;
   }
 
   .card {
-    padding: 5px 3px !important;
-    border-radius: 9px !important;
-    min-height: 42px !important;
+    padding: clamp(3px, 0.8vh, 6px) clamp(2px, 0.8vw, 4px) !important;
+    border-radius: clamp(8px, 2.2vw, 12px) !important;
+    min-height: clamp(36px, 5.5vh, 46px) !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -826,19 +827,19 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
   }
 
   .card h3 {
-    font-size: 8px !important;
+    font-size: clamp(7.5px, 2vw, 9px) !important;
     letter-spacing: 0.8px !important;
     margin-bottom: 2px !important;
     white-space: nowrap !important;
   }
 
   .val {
-    font-size: clamp(13px, 4vw, 16px) !important;
+    font-size: clamp(12.5px, 3.8vw, 17px) !important;
     line-height: 1.1 !important;
   }
 
   .bar-bg {
-    height: 4px !important;
+    height: clamp(3.5px, 0.8vh, 5px) !important;
     margin-bottom: 2px !important;
     border-radius: 2px !important;
   }
@@ -850,21 +851,21 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
   }
 
   .pc {
-    width: 7px !important;
-    height: 7px !important;
+    width: clamp(6px, 1.8vw, 8px) !important;
+    height: clamp(6px, 1.8vw, 8px) !important;
     border-radius: 2px !important;
   }
 
-  /* 🎯 Oyun Tahtası (#wrap) - Dikeyde ve Yatayda Sıfır Kaydırma Garantili Kare */
+  /* 🎯 Oyun Tahtası (#wrap) - Her Ekrana Otomatik Uyum Sağlayan Dinamik Kare */
   #wrap {
-    --avail-h: calc(100dvh - 114px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-    --avail-w: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    --avail-h: calc(100dvh - clamp(98px, 15vh, 124px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    --avail-w: calc(100vw - clamp(16px, 4.5vw, 24px) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
     width: min(var(--avail-h), var(--avail-w), 430px) !important;
     height: min(var(--avail-h), var(--avail-w), 430px) !important;
     max-width: min(var(--avail-h), var(--avail-w), 430px) !important;
     max-height: min(var(--avail-h), var(--avail-w), 430px) !important;
     aspect-ratio: 1 / 1 !important;
-    border-radius: 16px !important;
+    border-radius: clamp(12px, 3.5vw, 18px) !important;
     display: block !important;
     flex-shrink: 0 !important;
     position: relative !important;
@@ -882,10 +883,10 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
     touch-action: none !important;
   }
 
-  /* 🌟 Başlangıç & Oyun Sonu Menüleri (KESİNLİKLE KAYDIRMASIZ) */
+  /* 🌟 Başlangıç & Oyun Sonu Menüleri (Geniş, Ferah & Sıkışmasız) */
   .ov {
-    padding: 8px 10px !important;
-    gap: 4px !important;
+    padding: clamp(8px, 2.5vw, 14px) !important;
+    gap: clamp(4px, 1.2vh, 8px) !important;
     overflow: hidden !important;
     touch-action: none !important;
     overscroll-behavior: none !important;
@@ -895,52 +896,47 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
   }
 
   .ov h1 {
-    font-size: clamp(22px, 6.5vw, 30px) !important;
+    font-size: clamp(22px, 6.5vw, 32px) !important;
     line-height: 1 !important;
     margin: 0 !important;
   }
 
   .ov h2 {
-    font-size: clamp(18px, 5.5vw, 24px) !important;
+    font-size: clamp(18px, 5.5vw, 26px) !important;
     line-height: 1 !important;
     margin: 0 !important;
   }
 
   .ov p.tag {
-    font-size: clamp(9px, 2.5vw, 11px) !important;
+    font-size: clamp(9px, 2.5vw, 11.5px) !important;
     margin: 0 !important;
   }
 
+  /* Küçük ekranlarda menüyü sıkıştıran gereksiz 8 renk noktasını gizleyerek 25px ferahlık kazanılır */
   .dots {
-    gap: 3px !important;
-    margin: 2px 0 3px !important;
-  }
-
-  .dot {
-    width: 7px !important;
-    height: 7px !important;
+    display: none !important;
   }
 
   .mode-selector {
-    gap: 4px !important;
-    max-width: 250px !important;
-    margin: 2px 0 !important;
+    gap: clamp(3px, 1vw, 5px) !important;
+    max-width: 260px !important;
+    margin: clamp(2px, 0.8vh, 6px) 0 !important;
     padding: 3px !important;
     border-radius: 11px !important;
     width: 100% !important;
   }
 
   .mode-btn {
-    padding: 4px 4px !important;
-    font-size: 10px !important;
+    padding: clamp(4px, 1vh, 6px) clamp(3px, 1vw, 6px) !important;
+    font-size: clamp(9.5px, 2.6vw, 11px) !important;
     flex: 1 !important;
   }
 
   .btn-stack {
-    gap: 5px !important;
-    max-width: 230px !important;
+    gap: clamp(4px, 1vh, 7px) !important;
+    max-width: 240px !important;
     width: 100% !important;
-    margin-top: 2px !important;
+    margin-top: clamp(2px, 0.8vh, 6px) !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -948,49 +944,49 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
   .ov-sub-btns {
     display: flex !important;
-    gap: 5px !important;
+    gap: clamp(4px, 1.2vw, 6px) !important;
     width: 100% !important;
     justify-content: center !important;
   }
 
   .ov-sub-btns .btn {
     flex: 1 !important;
-    padding: 6px 2px !important;
-    font-size: 11px !important;
+    padding: clamp(5px, 1vh, 7px) 2px !important;
+    font-size: clamp(10px, 2.8vw, 11.5px) !important;
     border-radius: 18px !important;
     white-space: nowrap !important;
   }
 
   .btn {
-    padding: 7px 18px !important;
-    font-size: 13px !important;
+    padding: clamp(6px, 1.2vh, 9px) clamp(16px, 4vw, 24px) !important;
+    font-size: clamp(12px, 3.2vw, 14.5px) !important;
     border-radius: 20px !important;
   }
 
   .btn.ghost {
-    padding: 5px 12px !important;
-    font-size: 11px !important;
+    padding: clamp(4px, 1vh, 6px) clamp(10px, 3vw, 14px) !important;
+    font-size: clamp(10.5px, 2.8vw, 12px) !important;
   }
 
   .big-score {
-    font-size: clamp(28px, 8vw, 38px) !important;
+    font-size: clamp(26px, 7.5vw, 38px) !important;
     line-height: 1 !important;
     margin: 2px 0 !important;
   }
 
   .best-badge {
-    padding: 4px 14px !important;
-    min-width: 140px !important;
+    padding: 3px 12px !important;
+    min-width: 130px !important;
     margin: 2px 0 !important;
     border-radius: 9px !important;
   }
 
   .bb-title {
-    font-size: 8px !important;
+    font-size: 7.5px !important;
   }
 
   .bb-val {
-    font-size: 18px !important;
+    font-size: 17px !important;
   }
 
   .coin-reward {
@@ -999,7 +995,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
     margin: 2px 0 !important;
   }
 
-  /* 🛍️ Mağaza & Sıralama Modalları (Sadece İçerik Alanı Kaydırılabilir) */
+  /* 🛍️ Mağaza & Sıralama Modalları */
   #ov-shop {
     padding: 10px 8px !important;
     gap: 6px !important;
@@ -1192,7 +1188,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v25_stable_cooldown_block_anim';
+  var BUILD_ID = 'gp_build_v26_universal_adaptive_layout';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -4093,7 +4089,7 @@ window.AdMobBridge.preloadRewarded();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=25', { updateViaCache: 'none' }).catch(function(e){
+    navigator.serviceWorker.register('./sw.js?v=26', { updateViaCache: 'none' }).catch(function(e){
       console.log('SW reg:', e);
     });
   });

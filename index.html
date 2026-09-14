@@ -1090,7 +1090,8 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
           <button class="mode-btn" id="mbtn-zen" data-mode="zen">🧘 Zen Mode</button>
         </div>
         <div class="btn-stack" style="margin-top:2px">
-          <button class="btn" id="btn-s">PLAY</button>
+                  <button class="btn" id="btn-resume" style="display:none;background:linear-gradient(135deg,#00f6ff,#7b5cff);box-shadow:0 0 20px #00f6ff66;font-weight:900;margin-bottom:4px;width:100%;max-width:240px;animation:resumePulse 1.8s infinite">▶ RESUME GAME (<span id="resume-sc">0</span> pts)</button>
+        <button class="btn" id="btn-s">PLAY</button>
           <div class="ov-sub-btns">
             <button class="btn ghost btn-sm" id="btn-shop">🛍️ Shop</button>
             <button class="btn ghost btn-sm" id="btn-ranks">🏆 Ranks</button>
@@ -1191,7 +1192,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v23_no_scroll_fixed';
+  var BUILD_ID = 'gp_build_v24_tactical_cooldown_resume';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -1544,6 +1545,14 @@ var parts=[],nextRow=[],floats=[];
 var hoverGrp=new Set();
 var flashAlpha=0,flashColor='#ffffff';
 var comboCount=0,lastComboTime=0;
+
+// ⏱️ Tactical Cooldown, Misclick Penalty & Auto-Save Session Engine
+var moveCooldownUntil = 0;
+var MOVE_COOLDOWN_MS = 750; // 0.75s tactical cooldown
+var cooldownWarningPulse = 0;
+var misclickCell = null;
+var ACTIVE_SESSION_KEY = 'gp_active_session_v24';
+
 var wildAnim=null; // ⚡ Merkeze uçan & şimşek çakan joker animasyon durumu
 
 // Grid helpers
@@ -2534,6 +2543,7 @@ function updPreview(){
 function updDanger(){document.getElementById('danger').style.opacity=grid[0].some(function(x){return x;})?'1':'0';}
 
 function showOv(id){
+  if(id === 'ov-start') updateResumeButtonUI();
   ['ov-start','ov-how','ov-pause','ov-over','ov-shop','ov-ranks'].forEach(function(oid){
     var el=document.getElementById(oid);
     if(el) el.classList.toggle('hidden',oid!==id);
@@ -2696,7 +2706,96 @@ function countBlocks(){
   return count;
 }
 
+
+// 💾 Session Save, Resume & Cooldown Engine
+function saveGameSession(){
+  if(state !== ST.PLAY) return;
+  try {
+    var sessionData = {
+      score: score,
+      level: level,
+      currentMode: currentMode,
+      grid: grid,
+      nextRow: nextRow,
+      blitzTimer: blitzTimer,
+      savedAt: Date.now()
+    };
+    localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(sessionData));
+    updateResumeButtonUI();
+  } catch(e){}
+}
+
+function clearGameSession(){
+  try {
+    localStorage.removeItem(ACTIVE_SESSION_KEY);
+    updateResumeButtonUI();
+  } catch(e){}
+}
+
+function getActiveSession(){
+  try {
+    var raw = localStorage.getItem(ACTIVE_SESSION_KEY);
+    if(!raw) return null;
+    var data = JSON.parse(raw);
+    if(data && data.grid && data.grid.length === ROWS && typeof data.score === 'number'){
+      return data;
+    }
+  } catch(e){}
+  return null;
+}
+
+function updateResumeButtonUI(){
+  var btn = document.getElementById('btn-resume');
+  var scSpan = document.getElementById('resume-sc');
+  if(!btn) return;
+  var session = getActiveSession();
+  if(session && session.score > 0){
+    btn.style.display = 'block';
+    if(scSpan) scSpan.textContent = session.score.toLocaleString('en-US');
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+function resumeGameSession(){
+  var data = getActiveSession();
+  if(!data) return;
+  grid = data.grid;
+  score = data.score || 0;
+  level = data.level || 1;
+  currentMode = data.currentMode || 'classic';
+  if(data.nextRow && data.nextRow.length === COLS){
+    nextRow = data.nextRow;
+  } else {
+    nextRow = mkRow();
+  }
+  if(currentMode === 'blitz' && data.blitzTimer){
+    blitzTimer = data.blitzTimer;
+  }
+  applyModeTheme(currentMode);
+  ensureAudio();
+  beep(480, 'triangle', 0.1, 0.15, 880);
+  hideAll();
+  state = ST.PLAY;
+  lastT = performance.now();
+  lastSpawn = elapsed;
+  updUI();
+  updPreview();
+  updDanger();
+  showToast('▶ Resumed game at ' + score.toLocaleString('en-US') + ' pts!');
+}
+
+window.addEventListener('beforeunload', function(){
+  if(state === ST.PLAY) saveGameSession();
+});
+document.addEventListener('visibilitychange', function(){
+  if(document.hidden && state === ST.PLAY){
+    saveGameSession();
+  }
+});
+
 function startGame(){
+  clearGameSession();
   grid=mkGrid(); score=0; elapsed=0; lastSpawn=0;
   level=1; prevLevel=1; spawnInt=LVL[0].ms;
   activeColors=['RED','BLUE','YELLOW'];
@@ -2759,6 +2858,17 @@ function goMenu(){
 
 function handleClick(px,py){
   if(state!==ST.PLAY)return;
+
+  // ⏱️ Taktiksel Cooldown Kontrolü (Spam Tıklamayı Engelleme)
+  var now = performance.now();
+  if(now < moveCooldownUntil){
+    cooldownWarningPulse = 1.0;
+    ensureAudio();
+    beep(130, 'sawtooth', 0.04, 0.04, 90);
+    vib(15);
+    return;
+  }
+
   var c=Math.floor((px-PAD)/(SZ+GAP)), r=Math.floor((py-PAD)/(SZ+GAP));
   if(r<0||r>=ROWS||c<0||c>=COLS||!grid[r][c])return;
 
@@ -2809,7 +2919,29 @@ function handleClick(px,py){
   }
 
   var grp=bfs(grid,r,c);
-  if(grp.length < 2) return;
+  if(grp.length < 2){
+    // ⚠️ Hassasiyet ve Yanlış Tıklama Cezası (Misclick Penalty)
+    misclickCell = {r: r, c: c, t: performance.now()};
+    ensureAudio();
+    beep(110, 'square', 0.08, 0.08, 75);
+    vib(30);
+    var cellCenterX = PAD + c*(SZ+GAP) + SZ/2;
+    var cellCenterY = PAD + r*(SZ+GAP) + SZ/2;
+    if(currentMode === 'blitz'){
+      blitzTimer = Math.max(0, blitzTimer - 1.5);
+      floats.push({x: cellCenterX, y: cellCenterY - 20, vy: -1.4, life: 0.9, text: '⏱️ -1.5s (NEED 2+)', color: '#ff4757', sz: 14});
+    } else if(currentMode === 'classic'){
+      lastSpawn -= spawnInt * 0.12; // Bir sonraki sırayı %12 öne çeker!
+      floats.push({x: cellCenterX, y: cellCenterY - 20, vy: -1.4, life: 0.9, text: '⚠️ NEED 2+ CLUSTER', color: '#ff4757', sz: 14});
+    } else {
+      floats.push({x: cellCenterX, y: cellCenterY - 20, vy: -1.4, life: 0.9, text: '⚠️ NEED 2+', color: '#ff4757', sz: 14});
+    }
+    return;
+  }
+
+  // 🎯 Başarılı hamle: Cooldown başlat ve oyunu anlık kaydet!
+  moveCooldownUntil = performance.now() + MOVE_COOLDOWN_MS;
+  saveGameSession();
 
   // Combo
   var now=performance.now();
@@ -2995,6 +3127,7 @@ function reviveGame(){
 }
 
 function gameOver(){
+  clearGameSession();
   state=ST.OVER; ensureAudio(); sndOver(); vib([50, 70, 50, 70, 120]);
   if(UserState){
     UserState.boosterCombo = false;
@@ -3174,6 +3307,7 @@ function loop(ts){
       }
     }
     updShake();
+    if(cooldownWarningPulse > 0) cooldownWarningPulse = Math.max(0, cooldownWarningPulse - dt * 0.003);
     for(var i=parts.length-1;i>=0;i--){
       var p=parts[i];p.x+=p.vx*dt*.06;p.y+=p.vy*dt*.06;p.vy+=.08*dt*.06;p.life-=p.dc*dt*.06;
       if(p.life<=0)parts.splice(i,1);
@@ -3866,6 +4000,9 @@ if(tabBoosters) tabBoosters.onclick=function(){ switchShopTab('boosters'); };
 // Initialise Economy & Daily Bonus on load
 loadUserState();
 initModeButtons();
+var btnResume = document.getElementById('btn-resume');
+if(btnResume) btnResume.onclick = resumeGameSession;
+updateResumeButtonUI();
 setTimeout(checkDailyBonus, 600);
 
 requestAnimationFrame(loop);
@@ -3876,7 +4013,7 @@ window.AdMobBridge.preloadRewarded();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=23', { updateViaCache: 'none' }).catch(function(e){
+    navigator.serviceWorker.register('./sw.js?v=24', { updateViaCache: 'none' }).catch(function(e){
       console.log('SW reg:', e);
     });
   });

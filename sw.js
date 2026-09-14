@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v24-tactical-cooldown-resume';
+const CACHE_NAME = 'gridpop-v25-stable-cooldown-block-anim';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

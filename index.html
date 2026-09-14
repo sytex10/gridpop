@@ -20,7 +20,7 @@
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0a18;--panel:#121226;--g:#7b5cff;--dim:#6a6a9a}
-html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex;justify-content:center;align-items:center;font-family:'Outfit',sans-serif;color:#e8e8ff;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-touch-callout:none;transition:background .7s ease}
+html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background:var(--bg);display:flex;justify-content:center;align-items:center;font-family:'Outfit',sans-serif;color:#e8e8ff;overflow:hidden!important;overscroll-behavior:none!important;user-select:none;-webkit-user-select:none;touch-action:none!important;-webkit-touch-callout:none;transition:background .7s ease}
 #sf{position:fixed;inset:0;pointer-events:none;z-index:0}
 #app{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px}
 #stage-box{display:flex;flex-direction:column;gap:10px;width:fit-content;margin:0 auto}
@@ -700,297 +700,321 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   100%{opacity:0;transform:translate(-50%,-15px)}
 }
 
-/* 📱 Mobil Uyumlu Düzen (Kusursuz Orantılı, Boşluksuz ve Tam Ekran Ortalı Tasarım) */
+/* 📱 Mobil Uyumlu Düzen (KESİNLİKLE KAYDIRMASIZ, KUSURSUZ SABİT EKRAN DÜZENİ) */
 @media (max-width: 768px), (max-height: 768px) {
   html, body {
-    width: 100%;
-    height: 100%;
-    height: 100dvh;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
   #app {
-    width: 100%;
-    max-width: 440px;
-    height: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    padding-top: max(8px, env(safe-area-inset-top));
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
-    padding-left: max(6px, env(safe-area-inset-left));
-    padding-right: max(6px, env(safe-area-inset-right));
-    overflow: hidden;
-    gap: 0;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    padding-top: max(6px, env(safe-area-inset-top)) !important;
+    padding-bottom: max(6px, env(safe-area-inset-bottom)) !important;
+    padding-left: max(6px, env(safe-area-inset-left)) !important;
+    padding-right: max(6px, env(safe-area-inset-right)) !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
+    gap: 0 !important;
   }
 
   #stage-box {
-    width: 100%;
-    max-width: min(calc(100vw - 12px), 440px);
-    height: auto;
-    max-height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    box-sizing: border-box;
-    margin: 0 auto;
-    overflow: hidden;
+    width: 100% !important;
+    max-width: min(calc(100vw - 12px), 430px) !important;
+    height: auto !important;
+    max-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 5px !important;
+    box-sizing: border-box !important;
+    margin: auto auto !important;
+    overflow: hidden !important;
+    touch-action: none !important;
   }
 
   #top-bar {
-    width: 100%;
-    height: 36px;
-    min-height: 36px;
-    max-height: 36px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 4px;
-    box-sizing: border-box;
-    flex-shrink: 0;
+    width: 100% !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0 4px !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   #brand-tag {
-    font-size: 20px;
-    letter-spacing: 0.5px;
+    font-size: 20px !important;
+    letter-spacing: 0.5px !important;
   }
 
   #header-actions {
-    gap: 8px;
+    gap: 6px !important;
   }
 
   #coin-badge {
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: 16px;
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    border-radius: 16px !important;
   }
 
   .icon-btn {
-    width: 34px;
-    height: 34px;
-    font-size: 14px;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 13px !important;
   }
 
   #game-stage {
-    flex-direction: column;
-    width: 100%;
-    height: auto;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    flex-shrink: 1;
-    margin: 0 auto;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    flex-shrink: 0 !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
   }
 
   /* Üst Bilgi Kartları (Score, Level, Best, Next) */
   #sidebar {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1.25fr;
-    gap: 6px;
-    flex-shrink: 0;
-    box-sizing: border-box;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr 1.25fr !important;
+    gap: 5px !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .card {
-    padding: 6px 4px;
-    border-radius: 10px;
-    min-height: 44px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-sizing: border-box;
+    padding: 5px 3px !important;
+    border-radius: 9px !important;
+    min-height: 42px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
   }
 
   .card h3 {
-    font-size: 8px;
-    letter-spacing: 1px;
-    margin-bottom: 2px;
-    white-space: nowrap;
+    font-size: 8px !important;
+    letter-spacing: 0.8px !important;
+    margin-bottom: 2px !important;
+    white-space: nowrap !important;
   }
 
   .val {
-    font-size: clamp(14px, 4vw, 17px);
-    line-height: 1.1;
+    font-size: clamp(13px, 4vw, 16px) !important;
+    line-height: 1.1 !important;
   }
 
   .bar-bg {
-    height: 5px;
-    margin-bottom: 2px;
-    border-radius: 3px;
+    height: 4px !important;
+    margin-bottom: 2px !important;
+    border-radius: 2px !important;
   }
 
   .preview {
-    gap: 2px;
-    justify-content: center;
-    flex-wrap: nowrap;
+    gap: 2px !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
   }
 
   .pc {
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
+    width: 7px !important;
+    height: 7px !important;
+    border-radius: 2px !important;
   }
 
-  /* 🎯 Oyun Tahtası (#wrap) - Dikeyde ve Yatayda Kusursuz Orantılı Kare */
+  /* 🎯 Oyun Tahtası (#wrap) - Dikeyde ve Yatayda Sıfır Kaydırma Garantili Kare */
   #wrap {
-    --avail-h: calc(100dvh - 122px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    --avail-h: calc(100dvh - 114px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     --avail-w: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-    width: min(var(--avail-h), var(--avail-w), 440px);
-    height: min(var(--avail-h), var(--avail-w), 440px);
-    max-width: min(var(--avail-h), var(--avail-w), 440px);
-    max-height: min(var(--avail-h), var(--avail-w), 440px);
-    aspect-ratio: 1 / 1;
-    border-radius: 16px;
-    display: block;
-    flex-shrink: 0;
-    position: relative;
-    box-sizing: border-box;
-    margin: 0 auto;
+    width: min(var(--avail-h), var(--avail-w), 430px) !important;
+    height: min(var(--avail-h), var(--avail-w), 430px) !important;
+    max-width: min(var(--avail-h), var(--avail-w), 430px) !important;
+    max-height: min(var(--avail-h), var(--avail-w), 430px) !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 16px !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    touch-action: none !important;
   }
 
   #gc {
     width: 100% !important;
     height: 100% !important;
-    object-fit: contain;
-    display: block;
-    touch-action: none;
+    object-fit: contain !important;
+    display: block !important;
+    touch-action: none !important;
   }
 
-  /* 🌟 Başlangıç & Oyun Sonu Menüleri (Tahta İçinde Kusursuz Orantı) */
+  /* 🌟 Başlangıç & Oyun Sonu Menüleri (KESİNLİKLE KAYDIRMASIZ) */
   .ov {
-    padding: clamp(8px, 2.5vw, 14px);
-    gap: clamp(4px, 1.2vh, 8px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: inherit;
-    box-sizing: border-box;
-    justify-content: center;
+    padding: 8px 10px !important;
+    gap: 4px !important;
+    overflow: hidden !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+    border-radius: inherit !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
   }
 
   .ov h1 {
-    font-size: clamp(26px, 7.5vw, 36px);
-    line-height: 1;
+    font-size: clamp(22px, 6.5vw, 30px) !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+  }
+
+  .ov h2 {
+    font-size: clamp(18px, 5.5vw, 24px) !important;
+    line-height: 1 !important;
+    margin: 0 !important;
   }
 
   .ov p.tag {
-    font-size: clamp(9.5px, 2.8vw, 11.5px);
-    margin-top: -3px;
+    font-size: clamp(9px, 2.5vw, 11px) !important;
+    margin: 0 !important;
   }
 
   .dots {
-    gap: 4px;
-    margin: 2px 0 4px;
+    gap: 3px !important;
+    margin: 2px 0 3px !important;
   }
 
   .dot {
-    width: 8px;
-    height: 8px;
+    width: 7px !important;
+    height: 7px !important;
   }
 
   .mode-selector {
-    gap: 5px;
-    max-width: 260px;
-    margin: 1px 0;
-    padding: 3px;
-    border-radius: 11px;
+    gap: 4px !important;
+    max-width: 250px !important;
+    margin: 2px 0 !important;
+    padding: 3px !important;
+    border-radius: 11px !important;
+    width: 100% !important;
   }
 
   .mode-btn {
-    padding: 5px 5px;
-    font-size: 10.5px;
+    padding: 4px 4px !important;
+    font-size: 10px !important;
+    flex: 1 !important;
   }
 
   .btn-stack {
-    gap: 5px;
-    max-width: 220px;
-    margin-top: 2px;
+    gap: 5px !important;
+    max-width: 230px !important;
+    width: 100% !important;
+    margin-top: 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .ov-sub-btns {
+    display: flex !important;
+    gap: 5px !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .ov-sub-btns .btn {
+    flex: 1 !important;
+    padding: 6px 2px !important;
+    font-size: 11px !important;
+    border-radius: 18px !important;
+    white-space: nowrap !important;
   }
 
   .btn {
-    padding: 7px 18px;
-    font-size: 13px;
-    border-radius: 22px;
+    padding: 7px 18px !important;
+    font-size: 13px !important;
+    border-radius: 20px !important;
   }
 
   .btn.ghost {
-    padding: 5px 15px;
-    font-size: 11.5px;
+    padding: 5px 12px !important;
+    font-size: 11px !important;
   }
 
   .big-score {
-    font-size: clamp(30px, 8.5vw, 42px);
-    line-height: 1;
+    font-size: clamp(28px, 8vw, 38px) !important;
+    line-height: 1 !important;
+    margin: 2px 0 !important;
   }
 
   .best-badge {
-    padding: 4px 14px;
-    min-width: 130px;
-    margin: 1px 0 3px;
-    border-radius: 10px;
+    padding: 4px 14px !important;
+    min-width: 140px !important;
+    margin: 2px 0 !important;
+    border-radius: 9px !important;
   }
 
   .bb-title {
-    font-size: 8.5px;
+    font-size: 8px !important;
   }
 
   .bb-val {
-    font-size: 17px;
+    font-size: 18px !important;
   }
 
   .coin-reward {
-    padding: 3px 10px;
-    font-size: 12px;
-    margin: 1px 0 3px;
+    padding: 3px 10px !important;
+    font-size: 11px !important;
+    margin: 2px 0 !important;
   }
 
-  /* 🛍️ Mağaza, 🏆 Liderlik Tablosu ve ❔ Nasıl Oynanır: Mobilde Tam Ekran Modalı */
-  #ov-shop, #ov-ranks, #ov-how {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100% !important;
-    height: 100dvh !important;
-    max-width: 100vw !important;
-    max-height: 100dvh !important;
-    border-radius: 0 !important;
-    z-index: 9999 !important;
-    padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-right)) !important;
-    box-sizing: border-box !important;
-    background: #0d0d1af8 !important;
-    backdrop-filter: blur(14px) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    align-items: stretch !important;
-    gap: 8px !important;
+  /* 🛍️ Mağaza & Sıralama Modalları (Sadece İçerik Alanı Kaydırılabilir) */
+  #ov-shop {
+    padding: 10px 8px !important;
+    gap: 6px !important;
+    overflow: hidden !important;
   }
 
-  #ov-shop.hidden, #ov-ranks.hidden, #ov-how.hidden {
-    display: none !important;
-  }
-
-  .shop-list {
+  .shop-items-container {
     flex: 1 1 auto !important;
     max-height: none !important;
     height: auto !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    padding-bottom: 24px !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+    padding-bottom: 20px !important;
   }
 
   .ranks-content {
@@ -999,18 +1023,20 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
     height: auto !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    padding-bottom: 24px !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+    padding-bottom: 20px !important;
   }
 
   .how-grid {
-    max-width: 320px;
-    margin: 0 auto;
-    gap: 8px 10px;
+    max-width: 300px !important;
+    margin: 0 auto !important;
+    gap: 6px 8px !important;
   }
 
   .ht {
-    font-size: 13px;
-    line-height: 1.35;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
   }
 }
 </style>
@@ -1047,7 +1073,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
       <div class="ov" id="ov-start">
         <h1>GridPop</h1>
         <p class="tag" style="margin-top:-4px">Pop color blocks & conquer the storm!</p>
-        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:#7b5cff;text-transform:uppercase;margin-top:-2px">⚡ ARCADE v2.2 (BALANCED)</div>
+        
         <div class="dots">
           <div class="dot" style="background:#ff4757;box-shadow:0 0 8px #ff475799" title="Red"></div>
           <div class="dot" style="background:#2ed2ff;box-shadow:0 0 8px #2ed2ff99" title="Blue"></div>
@@ -1065,9 +1091,11 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
         </div>
         <div class="btn-stack" style="margin-top:2px">
           <button class="btn" id="btn-s">PLAY</button>
-          <button class="btn ghost" id="btn-shop">🛍️ Shop</button>
-          <button class="btn ghost" id="btn-ranks">🏆 Global Ranks</button>
-          <button class="btn ghost" id="btn-h">❔ How to Play</button>
+          <div class="ov-sub-btns">
+            <button class="btn ghost btn-sm" id="btn-shop">🛍️ Shop</button>
+            <button class="btn ghost btn-sm" id="btn-ranks">🏆 Ranks</button>
+            <button class="btn ghost btn-sm" id="btn-h">❔ Help</button>
+          </div>
         </div>
       </div>
       <div class="ov hidden" id="ov-how">
@@ -1101,9 +1129,11 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
         <button class="btn" id="btn-challenge" style="background:linear-gradient(135deg,#ff3ea5,#b44fff);box-shadow:0 4px 20px #ff3ea555;font-size:14px;padding:8px 22px;margin:2px 0 4px;font-weight:800;width:100%;max-width:250px">⚔️ Challenge Friends</button>
         <div class="btn-stack" style="margin-top:4px">
           <button class="btn" id="btn-re">Play Again</button>
-          <button class="btn ghost" id="btn-shop-over">🛍️ Shop</button>
-          <button class="btn ghost" id="btn-ranks-over">🏆 Global Ranks</button>
-          <button class="btn ghost" id="btn-m">Main Menu</button>
+          <div class="ov-sub-btns">
+            <button class="btn ghost btn-sm" id="btn-shop-over">🛍️ Shop</button>
+            <button class="btn ghost btn-sm" id="btn-ranks-over">🏆 Ranks</button>
+            <button class="btn ghost btn-sm" id="btn-m">🏠 Menu</button>
+          </div>
         </div>
       </div>
       <div class="ov hidden" id="ov-shop">
@@ -1161,7 +1191,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v22_perfect_proportions';
+  var BUILD_ID = 'gp_build_v23_no_scroll_fixed';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -1260,6 +1290,21 @@ gc.width=W; gc.height=H;
 var sf=document.getElementById('sf');
 var sf2=sf.getContext('2d');
 sf.width=innerWidth; sf.height=innerHeight;
+
+// 🛑 Lock all screen scrolling on mobile (Game is 100% fixed)
+document.addEventListener('touchmove', function(e) {
+  var scrollable = e.target.closest('.shop-items-container, .ranks-content, .how-grid');
+  if (!scrollable) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
+window.addEventListener('scroll', function() {
+  if (window.scrollY !== 0 || window.scrollX !== 0) {
+    window.scrollTo(0, 0);
+  }
+});
+
 window.addEventListener('resize', function(){
   if(sf){
     sf.width = window.innerWidth;
@@ -3831,7 +3876,7 @@ window.AdMobBridge.preloadRewarded();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=22', { updateViaCache: 'none' }).catch(function(e){
+    navigator.serviceWorker.register('./sw.js?v=23', { updateViaCache: 'none' }).catch(function(e){
       console.log('SW reg:', e);
     });
   });

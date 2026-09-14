@@ -697,7 +697,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   100%{opacity:0;transform:translate(-50%,-15px)}
 }
 
-/* 📱 Mobil Uyumlu Düzen (Tüm Telefon Ekranlarına %100 Kusursuz Sığma & Sıfır Taşma) */
+/* 📱 Mobil Uyumlu Düzen (Kusursuz Orantılı, Boşluksuz ve Tam Ekran Ortalı Tasarım) */
 @media (max-width: 768px), (max-height: 768px) {
   html, body {
     width: 100%;
@@ -719,11 +719,11 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
     max-height: 100dvh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     box-sizing: border-box;
-    padding-top: max(4px, env(safe-area-inset-top));
-    padding-bottom: max(4px, env(safe-area-inset-bottom));
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
     padding-left: max(6px, env(safe-area-inset-left));
     padding-right: max(6px, env(safe-area-inset-right));
     overflow: hidden;
@@ -732,13 +732,14 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 
   #stage-box {
     width: 100%;
-    height: 100%;
+    max-width: min(calc(100vw - 12px), 440px);
+    height: auto;
     max-height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     box-sizing: border-box;
     margin: 0 auto;
     overflow: hidden;
@@ -746,9 +747,9 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 
   #top-bar {
     width: 100%;
-    height: 32px;
-    min-height: 32px;
-    max-height: 32px;
+    height: 36px;
+    min-height: 36px;
+    max-height: 36px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -758,24 +759,24 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   }
 
   #brand-tag {
-    font-size: clamp(16px, 4.5vw, 19px);
+    font-size: 20px;
     letter-spacing: 0.5px;
   }
 
   #header-actions {
-    gap: 6px;
+    gap: 8px;
   }
 
   #coin-badge {
-    padding: 3px 8px;
-    font-size: 11px;
-    border-radius: 14px;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 16px;
   }
 
   .icon-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 13px;
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
   }
 
   #game-stage {
@@ -784,27 +785,25 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
     height: auto;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 8px;
     flex-shrink: 1;
     margin: 0 auto;
   }
 
-  /* Üst Bilgi Kartları (Score, Level, Best/Time, Next) */
+  /* Üst Bilgi Kartları (Score, Level, Best, Next) */
   #sidebar {
-    --side-max-w: calc(100vw - 16px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
     width: 100%;
-    max-width: min(var(--side-max-w), 440px);
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1.25fr;
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
     box-sizing: border-box;
   }
 
   .card {
-    padding: 3px 2px;
-    border-radius: 9px;
-    min-height: 38px;
+    padding: 6px 4px;
+    border-radius: 10px;
+    min-height: 44px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -814,21 +813,21 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   }
 
   .card h3 {
-    font-size: 7.5px;
-    letter-spacing: 0.8px;
-    margin-bottom: 1px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
     white-space: nowrap;
   }
 
   .val {
-    font-size: clamp(12px, 3.6vw, 15px);
+    font-size: clamp(14px, 4vw, 17px);
     line-height: 1.1;
   }
 
   .bar-bg {
-    height: 4px;
+    height: 5px;
     margin-bottom: 2px;
-    border-radius: 2px;
+    border-radius: 3px;
   }
 
   .preview {
@@ -838,21 +837,21 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   }
 
   .pc {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 2px;
   }
 
-  /* 🎯 Oyun Tahtası (#wrap) - Dikey ve Yatayda Her Telefona Asla Taşmayan Dinamik Kare */
+  /* 🎯 Oyun Tahtası (#wrap) - Dikeyde ve Yatayda Kusursuz Orantılı Kare */
   #wrap {
-    --avail-h: calc(100dvh - 120px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-    --avail-w: calc(100vw - 16px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    --avail-h: calc(100dvh - 122px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    --avail-w: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
     width: min(var(--avail-h), var(--avail-w), 440px);
     height: min(var(--avail-h), var(--avail-w), 440px);
     max-width: min(var(--avail-h), var(--avail-w), 440px);
     max-height: min(var(--avail-h), var(--avail-w), 440px);
     aspect-ratio: 1 / 1;
-    border-radius: 14px;
+    border-radius: 16px;
     display: block;
     flex-shrink: 0;
     position: relative;
@@ -870,8 +869,8 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
 
   /* 🌟 Başlangıç & Oyun Sonu Menüleri (Tahta İçinde Kusursuz Orantı) */
   .ov {
-    padding: clamp(6px, 2vw, 12px);
-    gap: clamp(3px, 1vh, 6px);
+    padding: clamp(8px, 2.5vw, 14px);
+    gap: clamp(4px, 1.2vh, 8px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: inherit;
@@ -880,82 +879,82 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
   }
 
   .ov h1 {
-    font-size: clamp(24px, 7vw, 34px);
+    font-size: clamp(26px, 7.5vw, 36px);
     line-height: 1;
   }
 
   .ov p.tag {
-    font-size: clamp(9px, 2.7vw, 11px);
+    font-size: clamp(9.5px, 2.8vw, 11.5px);
     margin-top: -3px;
   }
 
   .dots {
-    gap: 3.5px;
-    margin: 2px 0 3px;
+    gap: 4px;
+    margin: 2px 0 4px;
   }
 
   .dot {
-    width: 7.5px;
-    height: 7.5px;
+    width: 8px;
+    height: 8px;
   }
 
   .mode-selector {
-    gap: 4px;
-    max-width: 250px;
+    gap: 5px;
+    max-width: 260px;
     margin: 1px 0;
     padding: 3px;
-    border-radius: 10px;
+    border-radius: 11px;
   }
 
   .mode-btn {
-    padding: 4.5px 4px;
-    font-size: 10px;
+    padding: 5px 5px;
+    font-size: 10.5px;
   }
 
   .btn-stack {
-    gap: 4px;
-    max-width: 210px;
-    margin-top: 1px;
+    gap: 5px;
+    max-width: 220px;
+    margin-top: 2px;
   }
 
   .btn {
-    padding: 6.5px 16px;
-    font-size: 12.5px;
-    border-radius: 20px;
+    padding: 7px 18px;
+    font-size: 13px;
+    border-radius: 22px;
   }
 
   .btn.ghost {
-    padding: 4.5px 14px;
-    font-size: 11px;
+    padding: 5px 15px;
+    font-size: 11.5px;
   }
 
   .big-score {
-    font-size: clamp(28px, 8vw, 38px);
+    font-size: clamp(30px, 8.5vw, 42px);
     line-height: 1;
   }
 
   .best-badge {
-    padding: 3px 12px;
-    min-width: 120px;
-    margin: 1px 0 2px;
-    border-radius: 9px;
+    padding: 4px 14px;
+    min-width: 130px;
+    margin: 1px 0 3px;
+    border-radius: 10px;
   }
 
   .bb-title {
-    font-size: 8px;
+    font-size: 8.5px;
   }
 
   .bb-val {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .coin-reward {
-    padding: 2px 9px;
-    font-size: 11px;
-    margin: 1px 0 2px;
+    padding: 3px 10px;
+    font-size: 12px;
+    margin: 1px 0 3px;
   }
 
-  /* 🛍️ Mağaza, 🏆 Liderlik Tablosu ve ❔ Nasıl Oynanır: Mobilde Geniş ve Ferah Tam Ekran Modalı */
+  /* 🛍️ Mağaza, 🏆 Liderlik Tablosu ve ❔ Nasıl Oynanır: Mobilde Tam Ekran Modalı */
   #ov-shop, #ov-ranks, #ov-how {
     position: fixed !important;
     inset: 0 !important;
@@ -1011,7 +1010,7 @@ html,body{width:100%;height:100%;height:100dvh;background:var(--bg);display:flex
     line-height: 1.35;
   }
 }
-  </style>
+</style>
   <!-- Firebase SDK for Realtime Global Leaderboard -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>

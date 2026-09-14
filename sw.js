@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v30-dupfix';
+const CACHE_NAME = 'gridpop-v31-onclick';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

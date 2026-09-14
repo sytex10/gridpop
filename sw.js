@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v23-no-scroll-fixed';
+const CACHE_NAME = 'gridpop-v24-tactical-cooldown-resume';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

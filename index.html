@@ -1290,7 +1290,7 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v37_gravity_juice';
+  var BUILD_ID = 'gp_build_v38_pure_lightning';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -3166,36 +3166,9 @@ function popCluster(tapR, tapC) {
   addCareerBlocks(cluster.length);
   checkRecordCelebration(score);
 
-  // Check adjacent obstacles (Crystals / Gold)
-  cluster.forEach(function(pos) {
-    var adjDirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-    adjDirs.forEach(function(d) {
-      var ar = pos.r + d[0], ac = pos.c + d[1];
-      var adjCell = getCell(ar, ac);
-      if (adjCell && adjCell.special === 'crystal') {
-        adjCell.hp--;
-        var acx = PAD + ac * (SZ + GAP) + SZ / 2;
-        var acy = PAD + TOP_BAR_H + ar * (SZ + GAP) + SZ / 2;
-        if (adjCell.hp <= 0) {
-          grid[ar][ac] = null;
-          score += 500 * mult;
-          beep(780, 'sine', 0.25, 0.2, 1100);
-          floats.push({ x: acx, y: acy, vy: -1.8, life: 1.4, text: '💎 CRYSTAL SHATTERED! +500', color: '#2ed2ff', sz: 19, isWarning: false });
-        }
-      }
-      else if (adjCell && adjCell.special === 'gold') {
-        grid[ar][ac] = null;
-        addCoins(10, true);
-        beep(620, 'triangle', 0.15, 0.18, 880);
-      }
-    });
-  });
-
-  // Determine Power-Up Synthesis
+  // ⚡ SADECE YILDIRIM (ONLY LIGHTNING): 5 veya daha fazla blok patlatıldığında efsanevi Şimşek Taşı sentezlenir!
   var powerUpType = null;
-  if (cluster.length >= 9) powerUpType = 'rainbow';
-  else if (cluster.length >= 7) powerUpType = 'lightning';
-  else if (cluster.length >= 5) powerUpType = 'bomb';
+  if (cluster.length >= 5) powerUpType = 'lightning';
 
   // Clear cells and spawn particles
   var avgX = 0, avgY = 0;
@@ -3206,9 +3179,12 @@ function popCluster(tapR, tapC) {
     avgX += cx; avgY += cy;
 
     if (r === tapR && c === tapC && powerUpType) {
-      // Synthesize power-up right at the tapped cell!
-      if (powerUpType === 'rainbow') grid[r][c] = { color: 'WILD', special: 'rainbow', hp: 1 };
-      else grid[r][c] = { color: targetCol, special: powerUpType, hp: 1 };
+      // ⚡ Tıklanan noktada güçlü bir Şimşek Taşı sentezle!
+      grid[r][c] = { color: targetCol, special: 'lightning', hp: 1 };
+      // Şimşek sentez kıvılcımları ve haptik
+      beep(620, 'sine', 0.18, 0.15, 960);
+      vib(22);
+      floats.push({ x: cx, y: cy - 14, vy: -1.5, life: 1.2, text: '⚡ LIGHTNING SYNTHESIS!', color: '#00f6ff', sz: 17, isWarning: false });
     } else {
       grid[r][c] = null;
     }
@@ -3809,18 +3785,16 @@ function renderSF(){
 
 // UI
 function onLevelUp(lvl) {
-  var crHp = lvl >= 4 ? 3 : 2;
   if (!nextRow || nextRow.length !== COLS) nextRow = mkRow();
 
-  // 💎 Level Hedefleri: Havada boşlukta rastgele belirmek yerine bir sonraki tavan sırasına enjekte edilir, yerçekimiyle doğalca düşer!
-  var idx1 = Math.floor(Math.random() * COLS);
-  var idx2 = (idx1 + Math.floor(Math.random() * (COLS - 1)) + 1) % COLS;
-  nextRow[idx1] = { color: 'BLUE', special: 'crystal', hp: crHp, maxHp: crHp };
-  nextRow[idx2] = { color: 'YELLOW', special: 'gold', hp: 1 };
+  // ⚡ Seviye Atlama Hediyesi: Tavan sırasına bir adet güçlü Şimşek Taşı eklenir!
+  var idx = Math.floor(Math.random() * COLS);
+  var rollCol = pick(activeColors);
+  nextRow[idx] = { color: rollCol, special: 'lightning', hp: 1 };
 
-  beep(580, 'sine', 0.25, 0.22, 920);
-  shake(10);
-  floats.push({ x: W / 2, y: GRID_H * 0.35, vy: -1.6, life: 2.0, text: '💎 LEVEL ' + lvl + ': CRYSTAL & GOLD INCOMING!', color: '#2ed2ff', sz: 20, isWarning: false });
+  beep(650, 'sine', 0.25, 0.22, 1050);
+  shake(12);
+  floats.push({ x: W / 2, y: GRID_H * 0.35, vy: -1.6, life: 2.0, text: '⚡ LEVEL ' + lvl + ': BONUS LIGHTNING INCOMING!', color: '#00f6ff', sz: 20, isWarning: false });
   updPreview();
 }
 

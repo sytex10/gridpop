@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v26-universal-adaptive-layout';
+const CACHE_NAME = 'gridpop-v27-block-blast-master';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

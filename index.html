@@ -1048,7 +1048,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
     <div id="brand-tag">GridPop</div>
     <div id="header-actions">
       <div id="coin-badge" title="Coin Balance (Click to open Shop)">🪙 <span class="coin-val">0</span></div>
-      <button class="icon-btn hidden" id="pbtn" aria-label="Pause" title="Pause">⏸</button>
+      <button class="icon-btn hidden" id="pbtn" aria-label="Pause" title="Pause" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof togglePause==='function')togglePause()">⏸</button>
       <button class="icon-btn" id="mute" aria-label="Mute" title="Mute/Unmute">🔊</button>
     </div>
   </div>
@@ -1082,12 +1082,12 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
         </div>
 
         <div class="btn-stack" style="margin-top:2px">
-                  <button class="btn" id="btn-resume" style="display:none;background:linear-gradient(135deg,#00f6ff,#7b5cff);box-shadow:0 0 20px #00f6ff66;font-weight:900;margin-bottom:4px;width:100%;max-width:240px;animation:resumePulse 1.8s infinite">▶ RESUME GAME (<span id="resume-sc">0</span> pts)</button>
-        <button class="btn" id="btn-s">PLAY</button>
+                  <button class="btn" id="btn-resume" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof resumeGameSession==='function')resumeGameSession()" style="display:none;background:linear-gradient(135deg,#00f6ff,#7b5cff);box-shadow:0 0 20px #00f6ff66;font-weight:900;margin-bottom:4px;width:100%;max-width:240px;animation:resumePulse 1.8s infinite">▶ RESUME GAME (<span id="resume-sc">0</span> pts)</button>
+        <button class="btn" id="btn-s" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof startGame==='function')startGame()">PLAY</button>
           <div class="ov-sub-btns">
-            <button class="btn ghost btn-sm" id="btn-shop">🛍️ Shop</button>
-            <button class="btn ghost btn-sm" id="btn-ranks">🏆 Ranks</button>
-            <button class="btn ghost btn-sm" id="btn-h">❔ Help</button>
+            <button class="btn ghost btn-sm" id="btn-shop" onclick="if(typeof openShop==='function')openShop()">🛍️ Shop</button>
+            <button class="btn ghost btn-sm" id="btn-ranks" onclick="if(typeof openRanks==='function')openRanks()">🏆 Ranks</button>
+            <button class="btn ghost btn-sm" id="btn-h" onclick="if(typeof showOv==='function')showOv('ov-how')">❔ Help</button>
           </div>
         </div>
       </div>
@@ -1100,13 +1100,13 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
           <div class="hi">🌈</div><div class="ht">Level up to unlock new colors (Green, Purple, Orange, Pink) & cosmic themes!</div>
           <div class="hi">⏸</div><div class="ht">Tap the pause button to pause the game.</div>
         </div>
-        <button class="btn" id="btn-hb">Got it!</button>
+        <button class="btn" id="btn-hb" onclick="if(typeof showOv==='function')showOv('ov-start')">Got it!</button>
       </div>
       <div class="ov hidden" id="ov-pause">
         <div class="ptitle">⏸ PAUSED</div>
         <div class="brow" style="margin-top:10px">
-          <button class="btn" id="btn-r">Resume</button>
-          <button class="btn ghost" id="btn-q">Main Menu</button>
+          <button class="btn" id="btn-r" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof togglePause==='function')togglePause()">Resume</button>
+          <button class="btn ghost" id="btn-q" onclick="if(typeof goMenu==='function')goMenu()">Main Menu</button>
         </div>
       </div>
       <div class="ov hidden" id="ov-over">
@@ -1117,15 +1117,15 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
           <div class="bb-title" id="bb-title">BEST SCORE</div>
           <div class="bb-val" id="bb-val">0</div>
         </div>
-        <button class="btn" id="btn-revive" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px;width:100%;max-width:250px">🎬 1 Extra Life (Continue)</button>
+        <button class="btn" id="btn-revive" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof window!=='undefined'&&window.AdMobBridge)window.AdMobBridge.showRewarded(reviveGame)" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px;width:100%;max-width:250px">🎬 1 Extra Life (Continue)</button>
         <div id="coin-reward-badge" class="coin-reward" style="display:none"></div>
         <button class="btn" id="btn-challenge" style="background:linear-gradient(135deg,#ff3ea5,#b44fff);box-shadow:0 4px 20px #ff3ea555;font-size:14px;padding:8px 22px;margin:2px 0 4px;font-weight:800;width:100%;max-width:250px">⚔️ Challenge Friends</button>
         <div class="btn-stack" style="margin-top:4px">
-          <button class="btn" id="btn-re">Play Again</button>
+          <button class="btn" id="btn-re" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof startGame==='function')startGame()">Play Again</button>
           <div class="ov-sub-btns">
-            <button class="btn ghost btn-sm" id="btn-shop-over">🛍️ Shop</button>
-            <button class="btn ghost btn-sm" id="btn-ranks-over">🏆 Ranks</button>
-            <button class="btn ghost btn-sm" id="btn-m">🏠 Menu</button>
+            <button class="btn ghost btn-sm" id="btn-shop-over" onclick="if(typeof openShop==='function')openShop()">🛍️ Shop</button>
+            <button class="btn ghost btn-sm" id="btn-ranks-over" onclick="if(typeof openRanks==='function')openRanks()">🏆 Ranks</button>
+            <button class="btn ghost btn-sm" id="btn-m" onclick="if(typeof goMenu==='function')goMenu()">🏠 Menu</button>
           </div>
         </div>
       </div>
@@ -1180,7 +1180,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v30_dupfix';
+  var BUILD_ID = 'gp_build_v31_onclick';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -1191,7 +1191,6 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
   }
 })();
 
-'use strict';
 // ── Constants ──
 var COLS=8,ROWS=8,SZ=70,GAP=5,PAD=16;
 var GRID_W = COLS*SZ + (COLS-1)*GAP + PAD*2; // 627
@@ -4547,7 +4546,7 @@ window.AdMobBridge.preloadRewarded();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=30', { updateViaCache: 'none' }).catch(function(e){
+    navigator.serviceWorker.register('./sw.js?v=31', { updateViaCache: 'none' }).catch(function(e){
       console.log('SW reg:', e);
     });
   });

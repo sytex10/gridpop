@@ -1192,7 +1192,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v24_tactical_cooldown_resume';
+  var BUILD_ID = 'gp_build_v25_stable_cooldown_block_anim';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -1548,7 +1548,7 @@ var comboCount=0,lastComboTime=0;
 
 // ⏱️ Tactical Cooldown, Misclick Penalty & Auto-Save Session Engine
 var moveCooldownUntil = 0;
-var MOVE_COOLDOWN_MS = 750; // 0.75s tactical cooldown
+var MOVE_COOLDOWN_MS = 380; // Snappy & stable 0.38s tactical cooldown // 0.75s tactical cooldown
 var cooldownWarningPulse = 0;
 var misclickCell = null;
 var ACTIVE_SESSION_KEY = 'gp_active_session_v24';
@@ -2293,8 +2293,25 @@ function drawBlock(r,c){
   var x=PAD+c*(SZ+GAP), y=PAD+r*(SZ+GAP);
   var isH=hoverGrp.has(r*100+c);
 
+  // ⚠️ Yanlış (Tekil) Bloğa Basıldığında Titreme, Neon Çerçeve ve ✕ Animasyonu
+  var isMisclick = (misclickCell && misclickCell.r === r && misclickCell.c === c);
+  var nowT = performance.now();
+  var isWobbling = (isMisclick && (nowT - misclickCell.t < 480));
+
+  if(isWobbling){
+    var progress = (nowT - misclickCell.t) / 480;
+    var wobbleX = Math.sin(progress * Math.PI * 8) * (1 - progress) * 8;
+    var scaleY = 1 + Math.sin(progress * Math.PI * 4) * (1 - progress) * 0.12;
+    var scaleX = 1 - Math.sin(progress * Math.PI * 4) * (1 - progress) * 0.12;
+    ctx.save();
+    ctx.translate(x + SZ/2 + wobbleX, y + SZ/2);
+    ctx.scale(scaleX, scaleY);
+    ctx.translate(-(x + SZ/2), -(y + SZ/2));
+  }
+
   if(col==='WILD'){
     drawWildStone(x+SZ/2, y+SZ/2, SZ, 1, 0, 1);
+    if(isWobbling) ctx.restore();
     return;
   }
 
@@ -2319,6 +2336,33 @@ function drawBlock(r,c){
   else if(UserState.equippedBlock==='block_celestial') style='celestial';
 
   drawSingleBlockShader(ctx, x, y, SZ, p, style, isH);
+
+  if(isWobbling){
+    // Parlayan kırmızı elektrik çerçeve
+    ctx.save();
+    ctx.strokeStyle = '#ff3860';
+    ctx.lineWidth = 3.5;
+    ctx.shadowColor = '#ff0055';
+    ctx.shadowBlur = 14;
+    ctx.strokeRect(x + 1, y + 1, SZ - 2, SZ - 2);
+
+    // Bloğun tam ortasında parlayan beyaz-kırmızı ✕ işareti
+    var s = SZ * 0.22;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = 'round';
+    ctx.shadowColor = '#ff0055';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(x + SZ/2 - s, y + SZ/2 - s);
+    ctx.lineTo(x + SZ/2 + s, y + SZ/2 + s);
+    ctx.moveTo(x + SZ/2 + s, y + SZ/2 - s);
+    ctx.lineTo(x + SZ/2 - s, y + SZ/2 + s);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.restore(); // Transform restore
+  }
 }
 
 function drawEmpty(r,c){
@@ -2500,10 +2544,43 @@ function render(){
   ctx.textAlign='center';
   floats.forEach(function(t){
     ctx.globalAlpha=Math.max(0,t.life);
-    ctx.fillStyle=t.color;
-    ctx.font='bold '+t.sz+'px Outfit,sans-serif';
-    ctx.shadowColor=t.color; ctx.shadowBlur=12;
-    ctx.fillText(t.text,t.x,t.y);
+    if(t.isWarning){
+      // 🚨 Belirgin, parlayan neon hap (pill) uyarı rozeti
+      ctx.save();
+      ctx.font = '900 ' + (t.sz || 15) + 'px Outfit,sans-serif';
+      var textW = ctx.measureText(t.text).width;
+      var padX = 14, padY = 7;
+      var boxW = textW + padX * 2;
+      var boxH = t.sz + padY * 2;
+      var boxX = t.x - boxW / 2;
+      var boxY = t.y - boxH + 4;
+
+      ctx.shadowColor = '#ff4757';
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = 'rgba(18, 5, 12, 0.92)';
+      ctx.strokeStyle = '#ff4757';
+      ctx.lineWidth = 2.5;
+
+      ctx.beginPath();
+      if(ctx.roundRect){
+        ctx.roundRect(boxX, boxY, boxW, boxH, 16);
+      } else {
+        ctx.rect(boxX, boxY, boxW, boxH);
+      }
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#ff4757';
+      ctx.shadowBlur = 8;
+      ctx.fillText(t.text, t.x, t.y);
+      ctx.restore();
+    } else {
+      ctx.fillStyle=t.color;
+      ctx.font='bold '+t.sz+'px Outfit,sans-serif';
+      ctx.shadowColor=t.color; ctx.shadowBlur=12;
+      ctx.fillText(t.text,t.x,t.y);
+    }
   });
   if(flashAlpha>0.005){
     ctx.globalAlpha=flashAlpha; ctx.fillStyle=flashColor;
@@ -2920,21 +2997,24 @@ function handleClick(px,py){
 
   var grp=bfs(grid,r,c);
   if(grp.length < 2){
-    // ⚠️ Hassasiyet ve Yanlış Tıklama Cezası (Misclick Penalty)
+    // ⚠️ Hassasiyet ve Yanlış Tıklama (Dengeli & Belirgin Uyarı)
     misclickCell = {r: r, c: c, t: performance.now()};
     ensureAudio();
-    beep(110, 'square', 0.08, 0.08, 75);
-    vib(30);
+    beep(140, 'triangle', 0.07, 0.08, 100);
+    vib(25);
     var cellCenterX = PAD + c*(SZ+GAP) + SZ/2;
     var cellCenterY = PAD + r*(SZ+GAP) + SZ/2;
+    var warnX = Math.min(Math.max(cellCenterX, 115), W - 115);
+    var warnY = Math.max(cellCenterY - 26, 42);
+
     if(currentMode === 'blitz'){
-      blitzTimer = Math.max(0, blitzTimer - 1.5);
-      floats.push({x: cellCenterX, y: cellCenterY - 20, vy: -1.4, life: 0.9, text: '⏱️ -1.5s (NEED 2+)', color: '#ff4757', sz: 14});
+      blitzTimer = Math.max(0, blitzTimer - 0.5);
+      floats.push({x: warnX, y: warnY, vy: -1.2, life: 1.2, text: '⚠️ NEED 2+ BLOCKS! (-0.5s)', color: '#ff4757', sz: 15, isWarning: true});
     } else if(currentMode === 'classic'){
-      lastSpawn -= spawnInt * 0.12; // Bir sonraki sırayı %12 öne çeker!
-      floats.push({x: cellCenterX, y: cellCenterY - 20, vy: -1.4, life: 0.9, text: '⚠️ NEED 2+ CLUSTER', color: '#ff4757', sz: 14});
+      lastSpawn -= spawnInt * 0.04; // Dengeli hafif %4 hızlanma
+      floats.push({x: warnX, y: warnY, vy: -1.2, life: 1.2, text: '⚠️ NEED 2+ BLOCKS!', color: '#ff4757', sz: 15, isWarning: true});
     } else {
-      floats.push({x: cellCenterX, y: cellCenterY - 20, vy: -1.4, life: 0.9, text: '⚠️ NEED 2+', color: '#ff4757', sz: 14});
+      floats.push({x: warnX, y: warnY, vy: -1.2, life: 1.2, text: '⚠️ NEED 2+ BLOCKS!', color: '#ff4757', sz: 15, isWarning: true});
     }
     return;
   }
@@ -4013,7 +4093,7 @@ window.AdMobBridge.preloadRewarded();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=24', { updateViaCache: 'none' }).catch(function(e){
+    navigator.serviceWorker.register('./sw.js?v=25', { updateViaCache: 'none' }).catch(function(e){
       console.log('SW reg:', e);
     });
   });

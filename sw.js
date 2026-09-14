@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-cache-v17-sounds-restored';
+const CACHE_NAME = 'gridpop-cache-v18-perfect-mobile-fit';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

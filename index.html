@@ -964,6 +964,101 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
     border-radius: 20px !important;
   }
 
+  /* 🏆 Game Over Modal Compact & Pixel-Perfect Fit */
+  #ov-over {
+    justify-content: center !important;
+    padding: clamp(8px, 1.8vh, 14px) clamp(10px, 3vw, 18px) !important;
+    gap: clamp(3px, 0.8vh, 5px) !important;
+    overflow: hidden !important;
+  }
+
+  #ov-over h2 {
+    font-size: clamp(13px, 3.4vw, 16px) !important;
+    font-weight: 800 !important;
+    letter-spacing: 2px !important;
+    margin: 0 !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+  }
+
+  #ov-over .big-score {
+    font-size: clamp(32px, 8vw, 42px) !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+  }
+
+  #ov-over p.tag {
+    font-size: clamp(8.5px, 2.2vw, 10.5px) !important;
+    margin: 0 0 2px 0 !important;
+  }
+
+  #ov-over .best-badge {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 1px !important;
+    padding: clamp(3px, 0.6vh, 5px) clamp(12px, 3vw, 18px) !important;
+    margin: 0 0 3px 0 !important;
+    min-width: 130px !important;
+  }
+
+  #ov-over .bb-title {
+    font-size: 8.5px !important;
+    letter-spacing: 1.2px !important;
+  }
+
+  #ov-over .bb-val {
+    font-size: clamp(14px, 3.6vw, 18px) !important;
+    line-height: 1.1 !important;
+  }
+
+  #ov-over #btn-revive {
+    font-size: clamp(11.5px, 2.8vw, 13px) !important;
+    padding: clamp(6px, 1vh, 8px) clamp(12px, 3vw, 18px) !important;
+    margin: 0 !important;
+    max-width: 240px !important;
+    width: 100% !important;
+  }
+
+  #ov-over .coin-reward {
+    margin: 0 !important;
+    padding: 2px 8px !important;
+    font-size: 11px !important;
+  }
+
+  #ov-over #btn-challenge {
+    font-size: clamp(11.5px, 2.8vw, 13px) !important;
+    padding: clamp(6px, 1vh, 8px) clamp(12px, 3vw, 18px) !important;
+    margin: 0 !important;
+    max-width: 240px !important;
+    width: 100% !important;
+  }
+
+  #ov-over .btn-stack {
+    gap: clamp(3px, 0.8vh, 5px) !important;
+    margin-top: 1px !important;
+    max-width: 240px !important;
+    width: 100% !important;
+  }
+
+  #ov-over #btn-re {
+    font-size: clamp(12.5px, 3.2vw, 14px) !important;
+    padding: clamp(6px, 1.1vh, 8px) 16px !important;
+    width: 100% !important;
+  }
+
+  #ov-over .ov-sub-btns {
+    display: flex !important;
+    gap: clamp(3px, 1vw, 5px) !important;
+    width: 100% !important;
+  }
+
+  #ov-over .ov-sub-btns .btn {
+    flex: 1 !important;
+    padding: clamp(4px, 0.8vh, 6px) 2px !important;
+    font-size: clamp(10px, 2.5vw, 11px) !important;
+    margin: 0 !important;
+  }
+
   .btn.ghost {
     padding: clamp(4px, 1vh, 6px) clamp(10px, 3vw, 14px) !important;
     font-size: clamp(10.5px, 2.8vw, 12px) !important;
@@ -1132,10 +1227,10 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
           <div class="bb-title" id="bb-title">BEST SCORE</div>
           <div class="bb-val" id="bb-val">0</div>
         </div>
-        <button class="btn" id="btn-revive" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof window!=='undefined'&&window.AdMobBridge)window.AdMobBridge.showRewarded(reviveGame)" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55;margin:2px 0 4px;font-size:14px;padding:9px 22px;width:100%;max-width:250px">🎬 1 Extra Life (Continue)</button>
+        <button class="btn" id="btn-revive" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof window!=='undefined'&&window.AdMobBridge)window.AdMobBridge.showRewarded(reviveGame)" style="background:linear-gradient(135deg,#ffd32a,#ff7b00);color:#0a0a18;font-weight:900;box-shadow:0 4px 20px #ffd32a55">🎬 1 Extra Life (Continue)</button>
         <div id="coin-reward-badge" class="coin-reward" style="display:none"></div>
-        <button class="btn" id="btn-challenge" style="background:linear-gradient(135deg,#ff3ea5,#b44fff);box-shadow:0 4px 20px #ff3ea555;font-size:14px;padding:8px 22px;margin:2px 0 4px;font-weight:800;width:100%;max-width:250px">⚔️ Challenge Friends</button>
-        <div class="btn-stack" style="margin-top:4px">
+        <button class="btn" id="btn-challenge" style="background:linear-gradient(135deg,#ff3ea5,#b44fff);box-shadow:0 4px 20px #ff3ea555;font-weight:800">⚔️ Challenge Friends</button>
+        <div class="btn-stack">
           <button class="btn" id="btn-re" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof startGame==='function')startGame()">Play Again</button>
           <div class="ov-sub-btns">
             <button class="btn ghost btn-sm" id="btn-shop-over" onclick="if(typeof openShop==='function')openShop()">🛍️ Shop</button>

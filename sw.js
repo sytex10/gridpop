@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v38-pure-lightning';
+const CACHE_NAME = 'zapdrop-v39-official';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

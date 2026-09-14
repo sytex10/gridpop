@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v25-stable-cooldown-block-anim';
+const CACHE_NAME = 'gridpop-v26-universal-adaptive-layout';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

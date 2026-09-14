@@ -1194,7 +1194,7 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v33_uniqueness';
+  var BUILD_ID = 'gp_build_v34_drawfix';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -1221,7 +1221,9 @@ var PAL={
   PURPLE: {f:'#b44fff',h:'#d99fff',s:'#6a009a',g:'#b44fff66'},
   ORANGE: {f:'#ff7b00',h:'#ffb566',s:'#a34a00',g:'#ff7b0066'},
   PINK:   {f:'#ff3ea5',h:'#ff9dd2',s:'#aa005e',g:'#ff3ea566'},
-  WILD:   {f:'#ffffff',h:'#ffffff',s:'#aaaaaa',g:'#ffffff88'}
+  WILD:   {f:'#ffffff',h:'#ffffff',s:'#aaaaaa',g:'#ffffff88'},
+  GOLD:   {f:'#ffd32a',h:'#fff38a',s:'#c49a00',g:'#ffd32a66'},
+  CRYSTAL:{f:'#2ed2ff',h:'#8aeeff',s:'#007fbb',g:'#2ed2ff66'}
 };
 
 // Themes per level group: style, pageBg, panel, bg=canvas bg, grid=empty stroke, accent, wrapGlow, star
@@ -2612,7 +2614,9 @@ function drawSpecialEmblem(ctx, cx, cy, sz, specialType, hp, maxHp) {
 }
 
 function drawBlock(r,c){
-  var col=grid[r][c]; if(!col)return;
+  var rawCell=grid[r][c]; if(!rawCell)return;
+  var col=getCellColor(rawCell);
+  var cellObj=getCell(r,c);
   var x=PAD+c*(SZ+GAP), y=PAD+r*(SZ+GAP);
   var isH=hoverGrp.has(r*100+c);
 
@@ -2638,7 +2642,7 @@ function drawBlock(r,c){
     return;
   }
 
-  var p=PAL[col];
+  var p=PAL[col] || PAL.BLUE;
   var style=curTheme.style||'jelly';
   if(UserState.equippedBlock==='block_neon') style='cyber';
   else if(UserState.equippedBlock==='block_retro') style='retro';

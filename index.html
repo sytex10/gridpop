@@ -1080,11 +1080,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
           <div class="dot" style="background:#ff3ea5;box-shadow:0 0 8px #ff3ea599" title="Pink (Lv9)"></div>
           <div class="dot" style="background:#fff;box-shadow:0 0 8px #ffffff99" title="⚡ Lightning"></div>
         </div>
-        <div class="mode-selector">
-          <button class="mode-btn active" id="mbtn-classic" data-mode="classic">⚡ Classic</button>
-          <button class="mode-btn" id="mbtn-blitz" data-mode="blitz">⏱️ 60s Blitz</button>
-          <button class="mode-btn" id="mbtn-zen" data-mode="zen">🧘 Zen Mode</button>
-        </div>
+
         <div class="btn-stack" style="margin-top:2px">
                   <button class="btn" id="btn-resume" style="display:none;background:linear-gradient(135deg,#00f6ff,#7b5cff);box-shadow:0 0 20px #00f6ff66;font-weight:900;margin-bottom:4px;width:100%;max-width:240px;animation:resumePulse 1.8s infinite">▶ RESUME GAME (<span id="resume-sc">0</span> pts)</button>
         <button class="btn" id="btn-s">PLAY</button>
@@ -1172,11 +1168,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
           <button class="ranks-tab" id="tab-ranks-career">📊 Career</button>
           <button class="ranks-tab" id="tab-ranks-local">📱 Local</button>
         </div>
-        <div class="ranks-mode-selector" id="ranks-mode-selector">
-          <button class="ranks-mode-btn active" id="rmbtn-classic" onclick="switchRanksMode('classic')">⚡ Classic</button>
-          <button class="ranks-mode-btn" id="rmbtn-blitz" onclick="switchRanksMode('blitz')">⏱️ 60s Blitz</button>
-          <button class="ranks-mode-btn" id="rmbtn-zen" onclick="switchRanksMode('zen')">🧘 Zen Mode</button>
-        </div>
+
         <div class="ranks-content" id="ranks-content-area"></div>
       </div>
 
@@ -1188,7 +1180,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;background
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v27_block_blast_master';
+  var BUILD_ID = 'gp_build_v28_single_mode_master';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -2888,8 +2880,10 @@ function updUI(){
 }
 function updBar(f){document.getElementById('tb').style.width=(Math.max(0,f)*100)+'%';}
 function updPreview(){
+  var el=document.getElementById('pr');
+  if(!el) return;
   nextRow=mkRow();
-  var el=document.getElementById('pr'); el.innerHTML='';
+  el.innerHTML='';
   nextRow.forEach(function(col){
     var d=document.createElement('div');
     d.className='pc';
@@ -3152,23 +3146,14 @@ document.addEventListener('visibilitychange', function(){
 });
 
 function startGame(){
-  clearGameSession();
+  try { clearGameSession(); } catch(e){}
   grid=mkGrid(); score=0; elapsed=0; lastSpawn=0;
   level=1; prevLevel=1; spawnInt=LVL[0].ms;
   activeColors=['RED','BLUE','YELLOW'];
-  applyModeTheme(currentMode);
+  currentMode = 'classic';
+  applyModeTheme('classic');
   rowsSinceWild=0; parts=[]; floats=[]; shM=0; flashAlpha=0; wildAnim=null;
   hoverGrp=new Set(); comboCount=0; lastComboTime=0; hasRevived=false; hasCelebratedRecord=false;
-  if(currentMode === 'blitz'){
-    blitzTimer = 60;
-    var tb = document.getElementById('tb');
-    if(tb) tb.style.width = '100%';
-    showToast('⏱️ 60s Blitz Rush Started!');
-  } else if(currentMode === 'zen'){
-    var tb = document.getElementById('tb');
-    if(tb) tb.style.width = '100%';
-    showToast('🧘 Zen Mode: Take your time!');
-  }
   if(UserState && UserState.boosterCombo){
     showToast('🔥 Combo Surge Active: 1.5x on 4+ Clusters!');
   }
@@ -3177,7 +3162,10 @@ function startGame(){
   dockPieces = generateFairPieces(grid);
   var cbElem = document.getElementById('cb-val');
   if (cbElem) cbElem.textContent = '0x';
-  updPreview(); updUI(); hideAll();
+  var tb = document.getElementById('tb');
+  if (tb) tb.style.width = '100%';
+  updUI();
+  hideAll();
   var pbtn=document.getElementById('pbtn');
   if(pbtn){
     pbtn.classList.remove('hidden');
@@ -3203,9 +3191,7 @@ function goMenu(){
   state=ST.START; grid=mkGrid(); parts=[]; floats=[]; wildAnim=null;
   activeColors=['RED','BLUE','YELLOW'];
   applyModeTheme(currentMode);
-  document.querySelectorAll('.mode-btn').forEach(function(b){
-    b.classList.toggle('active', b.getAttribute('data-mode') === currentMode);
-  });
+
   showOv('ov-start');
   var pbtn=document.getElementById('pbtn');
   if(pbtn){
@@ -4688,7 +4674,7 @@ function loadLocalLeaderboard(m){
     var raw = localStorage.getItem(key);
     if(raw) return JSON.parse(raw);
   }catch(e){}
-  var myBest = getBest(mode);
+  var myBest = getBest('classic');
   return [
     { name: getPlayerName(), score: myBest, level: getLvlNum(myBest), date: 'Personal Best', isSelf: true }
   ];
@@ -4827,7 +4813,7 @@ function renderRanksView(){
 
 function renderGlobalRanks(cont){
   var mode = currentRanksMode || 'classic';
-  var modeTitle = (mode === 'blitz') ? '⏱️ 60s Blitz World Ranks' : ((mode === 'zen') ? '🧘 Zen Relax World Ranks' : '⚡ Classic World Ranks');
+  var modeTitle = '🏆 World Top 20';
   cont.innerHTML = '<div class="rank-spinner"><div class="spinner-icon"></div><span>Loading ' + modeTitle + '...</span></div>';
 
   var now = Date.now();

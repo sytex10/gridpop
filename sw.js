@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-v37-gravity-juice';
+const CACHE_NAME = 'gridpop-v38-pure-lightning';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

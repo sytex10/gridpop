@@ -7,11 +7,11 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>GridPop</title>
+  <title>ZapDrop: Block Blast</title>
   <meta name="theme-color" content="#0a0a18">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="GridPop">
+  <meta name="apple-mobile-web-app-title" content="ZapDrop">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
@@ -1155,7 +1155,7 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
 <div id="app">
   <div id="stage-box">
     <div id="top-bar">
-    <div id="brand-tag">GridPop</div>
+    <div id="brand-tag">ZapDrop</div>
     <div id="header-actions">
       <div id="coin-badge" title="Coin Balance (Click to open Shop)">🪙 <span class="coin-val">0</span></div>
       <button class="icon-btn hidden" id="pbtn" aria-label="Pause" title="Pause" onclick="if(typeof ensureAudio==='function')ensureAudio();if(typeof togglePause==='function')togglePause()">⏸</button>
@@ -1177,8 +1177,8 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
       <canvas id="gc"></canvas>
       <div id="danger"></div>
       <div class="ov" id="ov-start">
-        <h1>GridPop</h1>
-        <p class="tag" style="margin-top:-4px">Drag & Drop Blocks to Blast Rows & Columns!</p>
+        <h1>ZapDrop</h1>
+        <p class="tag" style="margin-top:-4px">Pop Clusters & Unleash Lightning Blasts!</p>
         
         <div class="dots">
           <div class="dot" style="background:#ff4757;box-shadow:0 0 8px #ff475799" title="Red"></div>
@@ -1290,7 +1290,7 @@ button, .btn, .icon-btn, .shop-tab, .ranks-tab { touch-action: manipulation !imp
 
 // ⚡ Auto Cache Invalidation & Fresh PWA Engine
 (function() {
-  var BUILD_ID = 'gp_build_v38_pure_lightning';
+  var BUILD_ID = 'zapdrop_v39_official';
   if (localStorage.getItem('gp_installed_build') !== BUILD_ID) {
     localStorage.setItem('gp_installed_build', BUILD_ID);
     if ('caches' in window) {
@@ -5978,12 +5978,12 @@ function challengeFriend(){
   ensureAudio();
   var finalScore = score || getBest();
   var finalLevel = getLvlNum(finalScore);
-  var msg = '🔥 I just scored ' + finalScore.toLocaleString('en-US') + ' points (Level ' + finalLevel + ') in GridPop Arcade! Can you beat my high score? Play now:';
+  var msg = '⚡ I just scored ' + finalScore.toLocaleString('en-US') + ' points (Level ' + finalLevel + ') in ZapDrop: Block Blast! Can you beat my high score? Play now:';
   var url = 'https://sytex10.github.io/gridpop/';
 
   if(navigator.share){
     navigator.share({
-      title: 'GridPop Arcade Challenge',
+      title: 'ZapDrop Arcade Challenge',
       text: msg,
       url: url
     }).catch(function(e){});

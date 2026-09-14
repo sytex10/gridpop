@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gridpop-cache-v19-balanced-mobile-proportions';
+const CACHE_NAME = 'gridpop-v22-network-first-fresh';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -15,12 +15,13 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
         console.warn('Cache addAll warning:', err);
       });
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
@@ -35,24 +36,40 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+  const req = event.request;
+  // Navigation / HTML document requests MUST ALWAYS be Network-First to guarantee latest code!
+  if (req.mode === 'navigate' || req.destination === 'document' || req.url.endsWith('/') || req.url.includes('index.html')) {
+    event.respondWith(
+      fetch(req, { cache: 'no-cache' })
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(req, responseToCache);
+            });
+          }
           return networkResponse;
+        })
+        .catch(() => {
+          return caches.match('./index.html');
+        })
+    );
+    return;
+  }
+
+  // Other static assets (images, fonts): Stale-While-Revalidate
+  event.respondWith(
+    caches.match(req).then((cachedResponse) => {
+      const fetchPromise = fetch(req).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(req, responseToCache);
+          });
         }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
         return networkResponse;
-      }).catch(() => {
-        // Offline fallback
-        return caches.match('./index.html');
-      });
+      }).catch(() => {});
+      return cachedResponse || fetchPromise;
     })
   );
 });

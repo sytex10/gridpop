@@ -1810,8 +1810,9 @@ function generateFairPieces(g) {
       special: null
     };
 
-    // ⚡ 22% Chance to attach a Special Power-Up tile to one filled cell of the piece!
-    if (Math.random() < 0.22) {
+    // ⚡ Special Power-Up spawn: Sadece Lightning ve Bomb (Gold/Rainbow kaldırıldı)
+    // Lightning: cluster patlama sonrası OR direkt parça spawn'da %18 şans
+    if (Math.random() < 0.18) {
       var filledCoords = [];
       for (var pr = 0; pr < shapeObj.matrix.length; pr++) {
         for (var pc = 0; pc < shapeObj.matrix[pr].length; pc++) {
@@ -1820,14 +1821,9 @@ function generateFairPieces(g) {
       }
       if (filledCoords.length > 0) {
         var targetCoord = filledCoords[Math.floor(Math.random() * filledCoords.length)];
-        var roll = Math.random();
-        var spType = 'bomb'; // 40% Bomb
-        if (roll > 0.85) spType = 'gold';       // 15% Gold Coin
-        else if (roll > 0.65) spType = 'rainbow'; // 20% Rainbow
-        else if (roll > 0.35) spType = 'lightning'; // 30% Lightning
-        
+        // %60 bomb, %40 lightning — sadece bu iki tip
+        var spType = Math.random() < 0.40 ? 'lightning' : 'bomb';
         pieceData.special = { r: targetCoord.r, c: targetCoord.c, type: spType };
-        if (spType === 'rainbow') pieceData.color = 'WILD';
       }
     }
 
@@ -2782,69 +2778,104 @@ function drawSpecialEmblem(ctx, cx, cy, sz, specialType, hp, maxHp) {
     ctx.fillText('💣', cx, cy + 1);
   }
   else if (specialType === 'lightning') {
-    // ⚡ Premium Canvas Lightning Block — Glowing Neon Bolt (No emoji)
-    var lt = performance.now() * 0.003;
-    var lPulse = Math.sin(lt * 3.2) * 0.5 + 0.5; // 0..1 oscillation
+    // ⚡ LIGHTNING BLOCK — Neon Sarı (#FFE600) Bolt + Cyan (#00E5FF) Kontour + 1.5s Pulse
+    var lT = performance.now() * 0.001;
+    // 1.5s period pulse: 0..1
+    var lPulse = Math.sin(lT * (Math.PI * 2 / 1.5)) * 0.5 + 0.5;
 
-    // Outer electric aura (pulsing cyan ring)
-    var auraR = sz * 0.54 + lPulse * sz * 0.08;
-    var auraGrad = ctx.createRadialGradient(cx, cy, sz * 0.15, cx, cy, auraR);
-    auraGrad.addColorStop(0, 'rgba(0, 240, 255, ' + (0.55 + lPulse * 0.3) + ')');
-    auraGrad.addColorStop(0.6, 'rgba(0, 180, 255, 0.18)');
-    auraGrad.addColorStop(1, 'rgba(0, 100, 255, 0)');
-    ctx.fillStyle = auraGrad;
-    ctx.beginPath();
-    ctx.arc(cx, cy, auraR, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Crisp vector lightning bolt (classic zig-zag shape)
-    var bw = sz * 0.42, bh = sz * 0.58;
+    // Dış Cyan hale (pulse ile genişleyip daralır)
+    var hR = sz * 0.50 + lPulse * sz * 0.07;
+    var hGrad = ctx.createRadialGradient(cx, cy, sz * 0.12, cx, cy, hR);
+    hGrad.addColorStop(0, 'rgba(0, 229, 255, ' + (0.35 + lPulse * 0.4) + ')');
+    hGrad.addColorStop(0.55, 'rgba(0, 160, 220, 0.12)');
+    hGrad.addColorStop(1,   'rgba(0, 80, 180, 0)');
     ctx.save();
-    // Outer glow pass
-    ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 18 + lPulse * 14;
-    ctx.fillStyle = 'rgba(0, 240, 255, ' + (0.55 + lPulse * 0.3) + ')';
+    ctx.fillStyle = hGrad;
     ctx.beginPath();
-    ctx.moveTo(cx + bw * 0.08, cy - bh * 0.5);
-    ctx.lineTo(cx - bw * 0.42, cy + bh * 0.04);
-    ctx.lineTo(cx - bw * 0.02, cy + bh * 0.04);
-    ctx.lineTo(cx - bw * 0.18, cy + bh * 0.5);
-    ctx.lineTo(cx + bw * 0.46, cy - bh * 0.04);
-    ctx.lineTo(cx + bw * 0.06, cy - bh * 0.04);
-    ctx.closePath();
-    ctx.fill();
-    // White-hot core pass
-    ctx.shadowColor = '#ffffff';
-    ctx.shadowBlur = 8;
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.moveTo(cx + bw * 0.08, cy - bh * 0.5);
-    ctx.lineTo(cx - bw * 0.42, cy + bh * 0.04);
-    ctx.lineTo(cx - bw * 0.02, cy + bh * 0.04);
-    ctx.lineTo(cx - bw * 0.18, cy + bh * 0.5);
-    ctx.lineTo(cx + bw * 0.46, cy - bh * 0.04);
-    ctx.lineTo(cx + bw * 0.06, cy - bh * 0.04);
-    ctx.closePath();
+    ctx.arc(cx, cy, hR, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    // Flickering micro-sparks around the bolt tip
-    if (Math.random() < 0.6) {
-      var sparkAngles = [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5];
-      var sparkIdx = Math.floor(Math.random() * sparkAngles.length);
-      var sAng = sparkAngles[sparkIdx] + (Math.random() - 0.5) * 0.8;
-      var sLen = sz * (0.18 + Math.random() * 0.14);
-      var sx1 = cx - bw * 0.18;
-      var sy1 = cy + bh * 0.5;
-      ctx.save();
-      ctx.strokeStyle = Math.random() < 0.5 ? '#00f0ff' : '#ffd32a';
-      ctx.lineWidth = 1.5;
-      ctx.shadowColor = '#00f0ff';
-      ctx.shadowBlur = 8;
-      ctx.globalAlpha = 0.6 + Math.random() * 0.4;
+    // Bolt path — klasik zig-zag yıldırım şekli
+    var bW = sz * 0.44, bH = sz * 0.60;
+    // Bolt noktaları (merkez = cx,cy)
+    // Üst-sağ -> orta-sol -> orta-sağ -> alt-sol
+    var bPts = [
+      [cx + bW * 0.14,  cy - bH * 0.50], // top-right
+      [cx - bW * 0.38,  cy + bH * 0.06], // mid-left
+      [cx + bW * 0.02,  cy + bH * 0.06], // mid-right pivot
+      [cx - bW * 0.14,  cy + bH * 0.50], // bottom-left
+      [cx + bW * 0.42,  cy - bH * 0.06], // mid-far-right
+      [cx + bW * 0.02,  cy - bH * 0.06]  // mid-right
+    ];
+
+    function drawBoltPath() {
       ctx.beginPath();
-      ctx.moveTo(sx1, sy1);
-      ctx.lineTo(sx1 + Math.cos(sAng) * sLen, sy1 + Math.sin(sAng) * sLen);
+      ctx.moveTo(bPts[0][0], bPts[0][1]);
+      ctx.lineTo(bPts[1][0], bPts[1][1]);
+      ctx.lineTo(bPts[2][0], bPts[2][1]);
+      ctx.lineTo(bPts[3][0], bPts[3][1]);
+      ctx.lineTo(bPts[4][0], bPts[4][1]);
+      ctx.lineTo(bPts[5][0], bPts[5][1]);
+      ctx.closePath();
+    }
+
+    ctx.save();
+
+    // ── Pass 1: Geniş Cyan Dış Glow ──
+    ctx.shadowColor = '#00E5FF';
+    ctx.shadowBlur  = 14 + lPulse * 16;
+    ctx.fillStyle   = '#00E5FF';
+    drawBoltPath();
+    ctx.fill();
+
+    // ── Pass 2: Orta Katman — Açık Cyan ──
+    ctx.shadowBlur  = 6;
+    ctx.fillStyle   = 'rgba(160, 240, 255, 0.9)';
+    drawBoltPath();
+    ctx.fill();
+
+    // ── Pass 3: Neon Sarı İç Çekirdek ──
+    ctx.shadowColor = '#FFE600';
+    ctx.shadowBlur  = 8 + lPulse * 8;
+    ctx.fillStyle   = '#FFE600';
+    // İç bolt biraz daha küçük
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(0.62, 0.62);
+    ctx.translate(-cx, -cy);
+    drawBoltPath();
+    ctx.fill();
+    ctx.restore();
+
+    // ── Pass 4: Saf Beyaz Ultra-Parlak Çekirdek (1px'e yakın) ──
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur  = 4;
+    ctx.fillStyle   = '#ffffff';
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(0.30, 0.30);
+    ctx.translate(-cx, -cy);
+    drawBoltPath();
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+
+    // ── Flickering micro-arc: bolt ucundan kıvılcım ──
+    if (Math.random() < 0.5) {
+      var mSpd = sz * (0.14 + Math.random() * 0.16);
+      var mAng = (Math.random() - 0.5) * Math.PI * 0.9 + Math.PI * 0.75;
+      var mX1 = bPts[3][0], mY1 = bPts[3][1];
+      ctx.save();
+      ctx.strokeStyle = Math.random() < 0.55 ? '#00E5FF' : '#FFE600';
+      ctx.lineWidth   = 1.4;
+      ctx.shadowColor = '#00E5FF';
+      ctx.shadowBlur  = 7;
+      ctx.globalAlpha = 0.55 + Math.random() * 0.45;
+      ctx.beginPath();
+      ctx.moveTo(mX1, mY1);
+      ctx.lineTo(mX1 + Math.cos(mAng) * mSpd, mY1 + Math.sin(mAng) * mSpd);
       ctx.stroke();
       ctx.restore();
     }
@@ -3172,6 +3203,24 @@ function triggerSpecialAnim(spType, tapR, tapC) {
   if (spType === 'lightning') {
     playThunderSound();
     beep(520, 'sawtooth', 0.25, 0.2, 880);
+    // ⚡ Patlama anında yoğun mavi + sarı kıvılcım patlaması
+    var sx0 = PAD + tapC * (SZ + GAP) + SZ / 2;
+    var sy0 = PAD + TOP_BAR_H + tapR * (SZ + GAP) + SZ / 2;
+    // Merkez büyük patlama: 20 mavi + 12 sarı kıvılcım
+    for (var si = 0; si < 20; si++) {
+      var sAng = Math.random() * Math.PI * 2;
+      var sSp  = 3.5 + Math.random() * 8.0;
+      parts.push({ x: sx0, y: sy0, vx: Math.cos(sAng) * sSp, vy: Math.sin(sAng) * sSp,
+        life: 0.80 + Math.random() * 0.5, dc: 0.022 + Math.random() * 0.018,
+        sz: 2.5 + Math.random() * 4.0, col: '#00E5FF' });
+    }
+    for (var si2 = 0; si2 < 12; si2++) {
+      var sAng2 = Math.random() * Math.PI * 2;
+      var sSp2  = 2.5 + Math.random() * 6.0;
+      parts.push({ x: sx0, y: sy0, vx: Math.cos(sAng2) * sSp2, vy: Math.sin(sAng2) * sSp2,
+        life: 0.60 + Math.random() * 0.4, dc: 0.028 + Math.random() * 0.02,
+        sz: 2.0 + Math.random() * 3.0, col: '#FFE600' });
+    }
   } else if (spType === 'bomb') {
     beep(120, 'sawtooth', 0.35, 0.3, 45);
     beep(60, 'triangle', 0.4, 0.35, 30);
@@ -3335,28 +3384,56 @@ function drawBlock(r,c){
     return;
   }
 
-  // ⚡ Lightning special block: draw with distinct dark + cyan border background
+  // ⚡ LIGHTNING BLOCK — Glossy Dark-Indigo + Nabız atan Neon Kenarlık
   if(cellObj && cellObj.special === 'lightning'){
-    var lt2 = performance.now() * 0.0025;
-    var lp2 = Math.sin(lt2 * 3.2) * 0.5 + 0.5;
+    var lT2 = performance.now() * 0.001;
+    // 1.5s pulse: 0..1
+    var lP2 = Math.sin(lT2 * (Math.PI * 2 / 1.5)) * 0.5 + 0.5;
+    var RD = 10; // corner radius
+
     ctx.save();
-    // Dark navy background
-    ctx.fillStyle = '#090c1a';
-    rr(x, y, SZ, SZ, 10);
+
+    // ── 1. Derin lacivert/mor glossy arka plan ──
+    var bgGrad = ctx.createLinearGradient(x, y, x + SZ, y + SZ);
+    bgGrad.addColorStop(0,   '#0d0f2e'); // üst-sol: koyu lacivert
+    bgGrad.addColorStop(0.5, '#0a0c26'); // orta: derin mor-siyah
+    bgGrad.addColorStop(1,   '#070916'); // alt-sağ: siyah-mor
+    rr(x, y, SZ, SZ, RD);
+    ctx.fillStyle = bgGrad;
     ctx.fill();
-    // Animated neon-cyan border
-    ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 12 + lp2 * 10;
-    ctx.strokeStyle = 'rgba(0, 220, 255, ' + (0.7 + lp2 * 0.3) + ')';
-    ctx.lineWidth = 2.5;
-    rr(x + 1, y + 1, SZ - 2, SZ - 2, 9);
-    ctx.stroke();
-    // Inner diagonal glint
-    ctx.globalAlpha = 0.12 + lp2 * 0.08;
-    ctx.fillStyle = '#00f0ff';
-    rr(x + 2, y + 2, SZ - 4, SZ - 4, 8);
-    ctx.fill();
+
+    // ── 2. Cam parlaklığı (specular/glossy highlight) ── üst-sol köşede
+    ctx.save();
+    rr(x, y, SZ, SZ, RD);
+    ctx.clip();
+    var specGrad = ctx.createLinearGradient(x, y, x + SZ * 0.6, y + SZ * 0.55);
+    specGrad.addColorStop(0,    'rgba(180, 200, 255, 0.18)');
+    specGrad.addColorStop(0.35, 'rgba(100, 140, 255, 0.08)');
+    specGrad.addColorStop(1,    'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = specGrad;
+    ctx.fillRect(x, y, SZ, SZ);
     ctx.restore();
+
+    // ── 3. İç Neon Sarı Parıltı (merkez aura) — pulse ile titriyor ──
+    var yGrad = ctx.createRadialGradient(x + SZ/2, y + SZ/2, 2, x + SZ/2, y + SZ/2, SZ * 0.44);
+    yGrad.addColorStop(0,    'rgba(255, 230, 0, ' + (0.10 + lP2 * 0.12) + ')');
+    yGrad.addColorStop(0.55, 'rgba(0, 229, 255, 0.05)');
+    yGrad.addColorStop(1,    'rgba(0, 0, 0, 0)');
+    rr(x, y, SZ, SZ, RD);
+    ctx.fillStyle = yGrad;
+    ctx.fill();
+
+    // ── 4. Nabız atan Neon Cyan kenarlık ──
+    ctx.shadowColor = '#00E5FF';
+    ctx.shadowBlur  = 10 + lP2 * 14;
+    ctx.strokeStyle = 'rgba(0, 229, 255, ' + (0.60 + lP2 * 0.40) + ')';
+    ctx.lineWidth   = 2.2;
+    rr(x + 1.1, y + 1.1, SZ - 2.2, SZ - 2.2, RD - 1);
+    ctx.stroke();
+
+    ctx.restore();
+
+    // ── 5. Bolt ikonunu üstüne çiz ──
     drawSpecialEmblem(ctx, x + SZ/2, y + SZ/2, SZ, 'lightning', cellObj.hp, cellObj.maxHp);
     if(isWobbling) ctx.restore();
     return;
@@ -3580,20 +3657,35 @@ function render(){
     }
     ctx.scale(scaleX, scaleY);
 
-    // ⚡ Lightning special: use dark + neon background instead of normal block shader
+    // ⚡ Lightning special: glossy dark-indigo background + neon border
     if(typeof rawCell === 'object' && rawCell !== null && rawCell.special === 'lightning'){
-      var flt2 = performance.now() * 0.0025;
-      var flp2 = Math.sin(flt2 * 3.2) * 0.5 + 0.5;
-      // Dark navy background
-      ctx.fillStyle = '#090c1a';
-      rr(-SZ/2, -SZ/2, SZ, SZ, 10);
+      var fLT = performance.now() * 0.001;
+      var fLP = Math.sin(fLT * (Math.PI * 2 / 1.5)) * 0.5 + 0.5;
+      var fRD = 10;
+      // Glossy dark background
+      var fbgG = ctx.createLinearGradient(-SZ/2, -SZ/2, SZ/2, SZ/2);
+      fbgG.addColorStop(0, '#0d0f2e');
+      fbgG.addColorStop(0.5, '#0a0c26');
+      fbgG.addColorStop(1, '#070916');
+      rr(-SZ/2, -SZ/2, SZ, SZ, fRD);
+      ctx.fillStyle = fbgG;
       ctx.fill();
-      // Neon cyan animated border
-      ctx.shadowColor = '#00f0ff';
-      ctx.shadowBlur = 12 + flp2 * 10;
-      ctx.strokeStyle = 'rgba(0, 220, 255, ' + (0.7 + flp2 * 0.3) + ')';
-      ctx.lineWidth = 2.5;
-      rr(-SZ/2 + 1, -SZ/2 + 1, SZ - 2, SZ - 2, 9);
+      // Specular glint
+      ctx.save();
+      rr(-SZ/2, -SZ/2, SZ, SZ, fRD);
+      ctx.clip();
+      var fSpecG = ctx.createLinearGradient(-SZ/2, -SZ/2, 0, 0);
+      fSpecG.addColorStop(0, 'rgba(180, 200, 255, 0.18)');
+      fSpecG.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = fSpecG;
+      ctx.fillRect(-SZ/2, -SZ/2, SZ, SZ);
+      ctx.restore();
+      // Neon cyan border pulse
+      ctx.shadowColor = '#00E5FF';
+      ctx.shadowBlur  = 10 + fLP * 14;
+      ctx.strokeStyle = 'rgba(0, 229, 255, ' + (0.60 + fLP * 0.40) + ')';
+      ctx.lineWidth   = 2.2;
+      rr(-SZ/2 + 1.1, -SZ/2 + 1.1, SZ - 2.2, SZ - 2.2, fRD - 1);
       ctx.stroke();
       ctx.restore();
       ctx.save();

@@ -2782,14 +2782,72 @@ function drawSpecialEmblem(ctx, cx, cy, sz, specialType, hp, maxHp) {
     ctx.fillText('💣', cx, cy + 1);
   }
   else if (specialType === 'lightning') {
-    // ⚡ Electric Neon Bolt
-    ctx.font = 'bold ' + Math.round(sz * 0.44) + 'px Outfit, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    // ⚡ Premium Canvas Lightning Block — Glowing Neon Bolt (No emoji)
+    var lt = performance.now() * 0.003;
+    var lPulse = Math.sin(lt * 3.2) * 0.5 + 0.5; // 0..1 oscillation
+
+    // Outer electric aura (pulsing cyan ring)
+    var auraR = sz * 0.54 + lPulse * sz * 0.08;
+    var auraGrad = ctx.createRadialGradient(cx, cy, sz * 0.15, cx, cy, auraR);
+    auraGrad.addColorStop(0, 'rgba(0, 240, 255, ' + (0.55 + lPulse * 0.3) + ')');
+    auraGrad.addColorStop(0.6, 'rgba(0, 180, 255, 0.18)');
+    auraGrad.addColorStop(1, 'rgba(0, 100, 255, 0)');
+    ctx.fillStyle = auraGrad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, auraR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Crisp vector lightning bolt (classic zig-zag shape)
+    var bw = sz * 0.42, bh = sz * 0.58;
+    ctx.save();
+    // Outer glow pass
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 18 + lPulse * 14;
+    ctx.fillStyle = 'rgba(0, 240, 255, ' + (0.55 + lPulse * 0.3) + ')';
+    ctx.beginPath();
+    ctx.moveTo(cx + bw * 0.08, cy - bh * 0.5);
+    ctx.lineTo(cx - bw * 0.42, cy + bh * 0.04);
+    ctx.lineTo(cx - bw * 0.02, cy + bh * 0.04);
+    ctx.lineTo(cx - bw * 0.18, cy + bh * 0.5);
+    ctx.lineTo(cx + bw * 0.46, cy - bh * 0.04);
+    ctx.lineTo(cx + bw * 0.06, cy - bh * 0.04);
+    ctx.closePath();
+    ctx.fill();
+    // White-hot core pass
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = 8;
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = '#00f6ff';
-    ctx.shadowBlur = 14;
-    ctx.fillText('⚡', cx, cy);
+    ctx.beginPath();
+    ctx.moveTo(cx + bw * 0.08, cy - bh * 0.5);
+    ctx.lineTo(cx - bw * 0.42, cy + bh * 0.04);
+    ctx.lineTo(cx - bw * 0.02, cy + bh * 0.04);
+    ctx.lineTo(cx - bw * 0.18, cy + bh * 0.5);
+    ctx.lineTo(cx + bw * 0.46, cy - bh * 0.04);
+    ctx.lineTo(cx + bw * 0.06, cy - bh * 0.04);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Flickering micro-sparks around the bolt tip
+    if (Math.random() < 0.6) {
+      var sparkAngles = [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5];
+      var sparkIdx = Math.floor(Math.random() * sparkAngles.length);
+      var sAng = sparkAngles[sparkIdx] + (Math.random() - 0.5) * 0.8;
+      var sLen = sz * (0.18 + Math.random() * 0.14);
+      var sx1 = cx - bw * 0.18;
+      var sy1 = cy + bh * 0.5;
+      ctx.save();
+      ctx.strokeStyle = Math.random() < 0.5 ? '#00f0ff' : '#ffd32a';
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 8;
+      ctx.globalAlpha = 0.6 + Math.random() * 0.4;
+      ctx.beginPath();
+      ctx.moveTo(sx1, sy1);
+      ctx.lineTo(sx1 + Math.cos(sAng) * sLen, sy1 + Math.sin(sAng) * sLen);
+      ctx.stroke();
+      ctx.restore();
+    }
   }
   else if (specialType === 'rainbow') {
     // 🌈 Prismatic Spinning Star
@@ -3105,6 +3163,8 @@ function triggerSpecialAnim(spType, tapR, tapC) {
     bonus: bonus,
     floatText: floatText,
     floatColor: floatColor,
+    tapRow: tapR,
+    tapCol: tapC,
     strikeDone: false
   };
 
@@ -3271,6 +3331,33 @@ function drawBlock(r,c){
 
   if(col==='WILD'){
     drawWildStone(x+SZ/2, y+SZ/2, SZ, 1, 0, 1);
+    if(isWobbling) ctx.restore();
+    return;
+  }
+
+  // ⚡ Lightning special block: draw with distinct dark + cyan border background
+  if(cellObj && cellObj.special === 'lightning'){
+    var lt2 = performance.now() * 0.0025;
+    var lp2 = Math.sin(lt2 * 3.2) * 0.5 + 0.5;
+    ctx.save();
+    // Dark navy background
+    ctx.fillStyle = '#090c1a';
+    rr(x, y, SZ, SZ, 10);
+    ctx.fill();
+    // Animated neon-cyan border
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 12 + lp2 * 10;
+    ctx.strokeStyle = 'rgba(0, 220, 255, ' + (0.7 + lp2 * 0.3) + ')';
+    ctx.lineWidth = 2.5;
+    rr(x + 1, y + 1, SZ - 2, SZ - 2, 9);
+    ctx.stroke();
+    // Inner diagonal glint
+    ctx.globalAlpha = 0.12 + lp2 * 0.08;
+    ctx.fillStyle = '#00f0ff';
+    rr(x + 2, y + 2, SZ - 4, SZ - 4, 8);
+    ctx.fill();
+    ctx.restore();
+    drawSpecialEmblem(ctx, x + SZ/2, y + SZ/2, SZ, 'lightning', cellObj.hp, cellObj.maxHp);
     if(isWobbling) ctx.restore();
     return;
   }
@@ -3469,7 +3556,11 @@ function render(){
       var trailH = Math.min(fb.vy * 2.2, SZ * 1.5);
       var trGrad = ctx.createLinearGradient(0, by - trailH, 0, by);
       trGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-      trGrad.addColorStop(1, p.f ? (p.f + '44') : 'rgba(255, 255, 255, 0.25)');
+      // Lightning block gets cyan trail
+      var trailColor = (typeof rawCell === 'object' && rawCell && rawCell.special === 'lightning')
+        ? 'rgba(0, 220, 255, 0.38)'
+        : (p.f ? (p.f + '44') : 'rgba(255, 255, 255, 0.25)');
+      trGrad.addColorStop(1, trailColor);
       ctx.fillStyle = trGrad;
       ctx.fillRect(bx + 4, by - trailH, SZ - 8, trailH);
       ctx.restore();
@@ -3489,12 +3580,34 @@ function render(){
     }
     ctx.scale(scaleX, scaleY);
 
-    drawSingleBlockShader(ctx, -SZ / 2, -SZ / 2, SZ, p, style, false);
-
-    if(typeof rawCell === 'object' && rawCell !== null && rawCell.special) {
-      drawSpecialEmblem(ctx, 0, 0, SZ, rawCell.special, rawCell.hp, rawCell.maxHp);
+    // ⚡ Lightning special: use dark + neon background instead of normal block shader
+    if(typeof rawCell === 'object' && rawCell !== null && rawCell.special === 'lightning'){
+      var flt2 = performance.now() * 0.0025;
+      var flp2 = Math.sin(flt2 * 3.2) * 0.5 + 0.5;
+      // Dark navy background
+      ctx.fillStyle = '#090c1a';
+      rr(-SZ/2, -SZ/2, SZ, SZ, 10);
+      ctx.fill();
+      // Neon cyan animated border
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 12 + flp2 * 10;
+      ctx.strokeStyle = 'rgba(0, 220, 255, ' + (0.7 + flp2 * 0.3) + ')';
+      ctx.lineWidth = 2.5;
+      rr(-SZ/2 + 1, -SZ/2 + 1, SZ - 2, SZ - 2, 9);
+      ctx.stroke();
+      ctx.restore();
+      ctx.save();
+      ctx.translate(centerBX, centerBY);
+      ctx.scale(scaleX, scaleY);
+      drawSpecialEmblem(ctx, 0, 0, SZ, 'lightning', rawCell.hp, rawCell.maxHp);
+      ctx.restore();
+    } else {
+      drawSingleBlockShader(ctx, -SZ / 2, -SZ / 2, SZ, p, style, false);
+      if(typeof rawCell === 'object' && rawCell !== null && rawCell.special) {
+        drawSpecialEmblem(ctx, 0, 0, SZ, rawCell.special, rawCell.hp, rawCell.maxHp);
+      }
+      ctx.restore();
     }
-    ctx.restore();
   }
 
   
@@ -3610,6 +3723,46 @@ function render(){
           ctx.stroke();
           ctx.restore();
         });
+
+        // ⚡ YATAY & DİKEY ELEKTRİK SÜPÜRME — Tahta çapında çapraz çizgiler
+        // Yalnızca tetiklenen satır ve sütun boyunca tam genişlikte sweep şeritleri
+        if(activeAnim.tapRow !== undefined && activeAnim.tapCol !== undefined){
+          var sweepProg = Math.min(stageProgress * 2.2, 1.0); // fast sweep
+          var sweepAlpha = Math.sin(stageProgress * Math.PI) * 0.92;
+          var boardLeft  = PAD;
+          var boardRight = PAD + COLS * (SZ + GAP) - GAP;
+          var boardTop   = PAD + TOP_BAR_H;
+          var boardBot   = PAD + TOP_BAR_H + ROWS * (SZ + GAP) - GAP;
+          var rowY = PAD + TOP_BAR_H + activeAnim.tapRow * (SZ + GAP) + SZ / 2;
+          var colX = PAD + activeAnim.tapCol * (SZ + GAP) + SZ / 2;
+
+          ctx.save();
+          ctx.globalAlpha = sweepAlpha;
+          // Horizontal row sweep (neon cyan band)
+          var hGrad = ctx.createLinearGradient(boardLeft, 0, boardRight, 0);
+          hGrad.addColorStop(0, 'rgba(0,240,255,0)');
+          hGrad.addColorStop(0.15, 'rgba(0,240,255,0.85)');
+          hGrad.addColorStop(0.5, 'rgba(255,255,255,0.95)');
+          hGrad.addColorStop(0.85, 'rgba(0,240,255,0.85)');
+          hGrad.addColorStop(1, 'rgba(0,240,255,0)');
+          ctx.fillStyle = hGrad;
+          ctx.shadowColor = '#00f0ff';
+          ctx.shadowBlur = 28;
+          ctx.fillRect(boardLeft, rowY - SZ * 0.18, boardRight - boardLeft, SZ * 0.36);
+
+          // Vertical col sweep (neon yellow band)
+          var vGrad = ctx.createLinearGradient(0, boardTop, 0, boardBot);
+          vGrad.addColorStop(0, 'rgba(255,211,42,0)');
+          vGrad.addColorStop(0.15, 'rgba(255,211,42,0.75)');
+          vGrad.addColorStop(0.5, 'rgba(255,255,255,0.9)');
+          vGrad.addColorStop(0.85, 'rgba(255,211,42,0.75)');
+          vGrad.addColorStop(1, 'rgba(255,211,42,0)');
+          ctx.fillStyle = vGrad;
+          ctx.shadowColor = '#ffd32a';
+          ctx.shadowBlur = 22;
+          ctx.fillRect(colX - SZ * 0.18, boardTop, SZ * 0.36, boardBot - boardTop);
+          ctx.restore();
+        }
 
         // Hedef bloklar arasında ağ şimşekleri
         if(activeAnim.targets.length > 1 && Math.random() < 0.75){

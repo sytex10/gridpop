@@ -2778,17 +2778,16 @@ function drawSpecialEmblem(ctx, cx, cy, sz, specialType, hp, maxHp) {
     ctx.fillText('💣', cx, cy + 1);
   }
   else if (specialType === 'lightning') {
-    // ⚡ LIGHTNING BLOCK — Neon Sarı (#FFE600) Bolt + Cyan (#00E5FF) Kontour + 1.5s Pulse
+    // ⚡ LIGHTNING BOLT — Zarif, tek renk: Soft Elektrik Moru Glow + Saf Beyaz Çekirdek
     var lT = performance.now() * 0.001;
-    // 1.5s period pulse: 0..1
-    var lPulse = Math.sin(lT * (Math.PI * 2 / 1.5)) * 0.5 + 0.5;
+    var lPulse = Math.sin(lT * (Math.PI * 2 / 1.5)) * 0.5 + 0.5; // 1.5s period
 
-    // Dış Cyan hale (pulse ile genişleyip daralır)
-    var hR = sz * 0.50 + lPulse * sz * 0.07;
-    var hGrad = ctx.createRadialGradient(cx, cy, sz * 0.12, cx, cy, hR);
-    hGrad.addColorStop(0, 'rgba(0, 229, 255, ' + (0.35 + lPulse * 0.4) + ')');
-    hGrad.addColorStop(0.55, 'rgba(0, 160, 220, 0.12)');
-    hGrad.addColorStop(1,   'rgba(0, 80, 180, 0)');
+    // Soft mor/indigo aura (altta, hafif)
+    var hR = sz * 0.46 + lPulse * sz * 0.06;
+    var hGrad = ctx.createRadialGradient(cx, cy, sz * 0.08, cx, cy, hR);
+    hGrad.addColorStop(0,   'rgba(130, 80, 255, ' + (0.28 + lPulse * 0.22) + ')');
+    hGrad.addColorStop(0.5, 'rgba(80,  40, 200, 0.10)');
+    hGrad.addColorStop(1,   'rgba(40,  20, 120, 0)');
     ctx.save();
     ctx.fillStyle = hGrad;
     ctx.beginPath();
@@ -2796,19 +2795,16 @@ function drawSpecialEmblem(ctx, cx, cy, sz, specialType, hp, maxHp) {
     ctx.fill();
     ctx.restore();
 
-    // Bolt path — klasik zig-zag yıldırım şekli
+    // Bolt path — klasik zig-zag
     var bW = sz * 0.44, bH = sz * 0.60;
-    // Bolt noktaları (merkez = cx,cy)
-    // Üst-sağ -> orta-sol -> orta-sağ -> alt-sol
     var bPts = [
-      [cx + bW * 0.14,  cy - bH * 0.50], // top-right
-      [cx - bW * 0.38,  cy + bH * 0.06], // mid-left
-      [cx + bW * 0.02,  cy + bH * 0.06], // mid-right pivot
-      [cx - bW * 0.14,  cy + bH * 0.50], // bottom-left
-      [cx + bW * 0.42,  cy - bH * 0.06], // mid-far-right
-      [cx + bW * 0.02,  cy - bH * 0.06]  // mid-right
+      [cx + bW * 0.14,  cy - bH * 0.50],
+      [cx - bW * 0.38,  cy + bH * 0.06],
+      [cx + bW * 0.02,  cy + bH * 0.06],
+      [cx - bW * 0.14,  cy + bH * 0.50],
+      [cx + bW * 0.42,  cy - bH * 0.06],
+      [cx + bW * 0.02,  cy - bH * 0.06]
     ];
-
     function drawBoltPath() {
       ctx.beginPath();
       ctx.moveTo(bPts[0][0], bPts[0][1]);
@@ -2822,60 +2818,57 @@ function drawSpecialEmblem(ctx, cx, cy, sz, specialType, hp, maxHp) {
 
     ctx.save();
 
-    // ── Pass 1: Geniş Cyan Dış Glow ──
-    ctx.shadowColor = '#00E5FF';
-    ctx.shadowBlur  = 14 + lPulse * 16;
-    ctx.fillStyle   = '#00E5FF';
+    // ── Pass 1: Geniş, yumuşak mor glow hale ──
+    ctx.shadowColor = 'rgba(160, 100, 255, 0.9)';
+    ctx.shadowBlur  = 18 + lPulse * 14;
+    ctx.fillStyle   = 'rgba(150, 100, 255, 0.55)';
     drawBoltPath();
     ctx.fill();
 
-    // ── Pass 2: Orta Katman — Açık Cyan ──
-    ctx.shadowBlur  = 6;
-    ctx.fillStyle   = 'rgba(160, 240, 255, 0.9)';
-    drawBoltPath();
-    ctx.fill();
-
-    // ── Pass 3: Neon Sarı İç Çekirdek ──
-    ctx.shadowColor = '#FFE600';
-    ctx.shadowBlur  = 8 + lPulse * 8;
-    ctx.fillStyle   = '#FFE600';
-    // İç bolt biraz daha küçük
+    // ── Pass 2: Orta — soğuk mavi/beyaz ──
+    ctx.shadowColor = 'rgba(200, 220, 255, 0.8)';
+    ctx.shadowBlur  = 8;
+    ctx.fillStyle   = 'rgba(210, 225, 255, 0.85)';
     ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(0.62, 0.62);
-    ctx.translate(-cx, -cy);
+    ctx.translate(cx, cy); ctx.scale(0.75, 0.75); ctx.translate(-cx, -cy);
     drawBoltPath();
     ctx.fill();
     ctx.restore();
 
-    // ── Pass 4: Saf Beyaz Ultra-Parlak Çekirdek (1px'e yakın) ──
+    // ── Pass 3: Saf Beyaz Çekirdek ──
     ctx.shadowColor = '#ffffff';
-    ctx.shadowBlur  = 4;
+    ctx.shadowBlur  = 10 + lPulse * 6;
     ctx.fillStyle   = '#ffffff';
     ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(0.30, 0.30);
-    ctx.translate(-cx, -cy);
+    ctx.translate(cx, cy); ctx.scale(0.46, 0.46); ctx.translate(-cx, -cy);
     drawBoltPath();
     ctx.fill();
     ctx.restore();
 
     ctx.restore();
 
-    // ── Flickering micro-arc: bolt ucundan kıvılcım ──
-    if (Math.random() < 0.5) {
-      var mSpd = sz * (0.14 + Math.random() * 0.16);
-      var mAng = (Math.random() - 0.5) * Math.PI * 0.9 + Math.PI * 0.75;
-      var mX1 = bPts[3][0], mY1 = bPts[3][1];
+    // ── İnce mor kenarlk stroke (SVG contour gibi) ──
+    ctx.save();
+    ctx.strokeStyle = 'rgba(180, 140, 255, ' + (0.50 + lPulse * 0.35) + ')';
+    ctx.lineWidth   = 1.2;
+    ctx.shadowColor = 'rgba(200, 160, 255, 0.6)';
+    ctx.shadowBlur  = 5;
+    drawBoltPath();
+    ctx.stroke();
+    ctx.restore();
+
+    // ── Micro-arc: bolt ucundan hafif kıvılcım ──
+    if (Math.random() < 0.4) {
+      var mSpd = sz * (0.12 + Math.random() * 0.14);
+      var mAng = (Math.random() - 0.5) * Math.PI * 0.8 + Math.PI * 0.75;
       ctx.save();
-      ctx.strokeStyle = Math.random() < 0.55 ? '#00E5FF' : '#FFE600';
-      ctx.lineWidth   = 1.4;
-      ctx.shadowColor = '#00E5FF';
-      ctx.shadowBlur  = 7;
-      ctx.globalAlpha = 0.55 + Math.random() * 0.45;
+      ctx.strokeStyle = 'rgba(200, 180, 255, ' + (0.4 + Math.random() * 0.4) + ')';
+      ctx.lineWidth   = 1.2;
+      ctx.shadowColor = 'rgba(180, 140, 255, 0.7)';
+      ctx.shadowBlur  = 6;
       ctx.beginPath();
-      ctx.moveTo(mX1, mY1);
-      ctx.lineTo(mX1 + Math.cos(mAng) * mSpd, mY1 + Math.sin(mAng) * mSpd);
+      ctx.moveTo(bPts[3][0], bPts[3][1]);
+      ctx.lineTo(bPts[3][0] + Math.cos(mAng) * mSpd, bPts[3][1] + Math.sin(mAng) * mSpd);
       ctx.stroke();
       ctx.restore();
     }
@@ -3203,23 +3196,19 @@ function triggerSpecialAnim(spType, tapR, tapC) {
   if (spType === 'lightning') {
     playThunderSound();
     beep(520, 'sawtooth', 0.25, 0.2, 880);
-    // ⚡ Patlama anında yoğun mavi + sarı kıvılcım patlaması
+    // ⚡ Patlama anında mor + beyaz kıvılcım patlaması
     var sx0 = PAD + tapC * (SZ + GAP) + SZ / 2;
     var sy0 = PAD + TOP_BAR_H + tapR * (SZ + GAP) + SZ / 2;
-    // Merkez büyük patlama: 20 mavi + 12 sarı kıvılcım
-    for (var si = 0; si < 20; si++) {
+    for (var si = 0; si < 18; si++) {
       var sAng = Math.random() * Math.PI * 2;
-      var sSp  = 3.5 + Math.random() * 8.0;
+      var sSp  = 3.0 + Math.random() * 7.0;
+      // Mor-lila kıvılcımlar
+      var sCol = Math.random() < 0.6
+        ? 'rgba(200, 170, 255, 0.9)'
+        : '#ffffff';
       parts.push({ x: sx0, y: sy0, vx: Math.cos(sAng) * sSp, vy: Math.sin(sAng) * sSp,
-        life: 0.80 + Math.random() * 0.5, dc: 0.022 + Math.random() * 0.018,
-        sz: 2.5 + Math.random() * 4.0, col: '#00E5FF' });
-    }
-    for (var si2 = 0; si2 < 12; si2++) {
-      var sAng2 = Math.random() * Math.PI * 2;
-      var sSp2  = 2.5 + Math.random() * 6.0;
-      parts.push({ x: sx0, y: sy0, vx: Math.cos(sAng2) * sSp2, vy: Math.sin(sAng2) * sSp2,
-        life: 0.60 + Math.random() * 0.4, dc: 0.028 + Math.random() * 0.02,
-        sz: 2.0 + Math.random() * 3.0, col: '#FFE600' });
+        life: 0.75 + Math.random() * 0.5, dc: 0.024 + Math.random() * 0.018,
+        sz: 2.2 + Math.random() * 3.5, col: sCol });
     }
   } else if (spType === 'bomb') {
     beep(120, 'sawtooth', 0.35, 0.3, 45);
@@ -3829,30 +3818,33 @@ function render(){
           var colX = PAD + activeAnim.tapCol * (SZ + GAP) + SZ / 2;
 
           ctx.save();
-          ctx.globalAlpha = sweepAlpha;
-          // Horizontal row sweep (neon cyan band)
-          var hGrad = ctx.createLinearGradient(boardLeft, 0, boardRight, 0);
-          hGrad.addColorStop(0, 'rgba(0,240,255,0)');
-          hGrad.addColorStop(0.15, 'rgba(0,240,255,0.85)');
-          hGrad.addColorStop(0.5, 'rgba(255,255,255,0.95)');
-          hGrad.addColorStop(0.85, 'rgba(0,240,255,0.85)');
-          hGrad.addColorStop(1, 'rgba(0,240,255,0)');
-          ctx.fillStyle = hGrad;
-          ctx.shadowColor = '#00f0ff';
-          ctx.shadowBlur = 28;
-          ctx.fillRect(boardLeft, rowY - SZ * 0.18, boardRight - boardLeft, SZ * 0.36);
+          ctx.globalAlpha = sweepAlpha * 0.72; // daha hafif
 
-          // Vertical col sweep (neon yellow band)
-          var vGrad = ctx.createLinearGradient(0, boardTop, 0, boardBot);
-          vGrad.addColorStop(0, 'rgba(255,211,42,0)');
-          vGrad.addColorStop(0.15, 'rgba(255,211,42,0.75)');
-          vGrad.addColorStop(0.5, 'rgba(255,255,255,0.9)');
-          vGrad.addColorStop(0.85, 'rgba(255,211,42,0.75)');
-          vGrad.addColorStop(1, 'rgba(255,211,42,0)');
-          ctx.fillStyle = vGrad;
-          ctx.shadowColor = '#ffd32a';
-          ctx.shadowBlur = 22;
-          ctx.fillRect(colX - SZ * 0.18, boardTop, SZ * 0.36, boardBot - boardTop);
+          // Yatay sweep — İnce, keskin, beyaz/elektrik moru hat
+          var hGrd = ctx.createLinearGradient(boardLeft, 0, boardRight, 0);
+          hGrd.addColorStop(0,    'rgba(160, 120, 255, 0)');
+          hGrd.addColorStop(0.12, 'rgba(190, 160, 255, 0.65)');
+          hGrd.addColorStop(0.5,  'rgba(255, 255, 255, 0.82)');
+          hGrd.addColorStop(0.88, 'rgba(190, 160, 255, 0.65)');
+          hGrd.addColorStop(1,    'rgba(160, 120, 255, 0)');
+          ctx.fillStyle = hGrd;
+          ctx.shadowColor = 'rgba(200, 180, 255, 0.5)';
+          ctx.shadowBlur = 12;
+          // İnce bant: SZ * 0.09 (yaklaşık 4-5px)
+          ctx.fillRect(boardLeft, rowY - SZ * 0.09, boardRight - boardLeft, SZ * 0.18);
+
+          // Dikey sweep — aynı renk paleti
+          var vGrd = ctx.createLinearGradient(0, boardTop, 0, boardBot);
+          vGrd.addColorStop(0,    'rgba(160, 120, 255, 0)');
+          vGrd.addColorStop(0.12, 'rgba(190, 160, 255, 0.55)');
+          vGrd.addColorStop(0.5,  'rgba(255, 255, 255, 0.75)');
+          vGrd.addColorStop(0.88, 'rgba(190, 160, 255, 0.55)');
+          vGrd.addColorStop(1,    'rgba(160, 120, 255, 0)');
+          ctx.fillStyle = vGrd;
+          ctx.shadowColor = 'rgba(200, 180, 255, 0.4)';
+          ctx.shadowBlur = 10;
+          ctx.fillRect(colX - SZ * 0.09, boardTop, SZ * 0.18, boardBot - boardTop);
+
           ctx.restore();
         }
 

@@ -1712,8 +1712,38 @@ function getCell(r, c) {
   if (r < 0 || r >= ROWS || c < 0 || c >= COLS || !grid || !grid[r]) return null;
   var v = grid[r][c];
   if (!v) return null;
+  if (v === 'WILD') return { color: 'BLUE', special: 'lightning', hp: 1 };
   if (typeof v === 'string') return { color: v, special: null, hp: 1 };
+  if (v && v.color === 'WILD') v.special = 'lightning';
   return v;
+}
+
+// 🛡️ Sıkışma & Şimşek Kontrolü: Yıldırım sadece tahta sıkıştığında ve tek olarak belirsin
+function isBoardCrowded() {
+  if (!grid) return false;
+  var filled = 0;
+  var reachedUpper = false;
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      if (grid[r] && grid[r][c] !== null) {
+        filled++;
+        if (r <= 4) reachedUpper = true; // Üst 5 sıraya ulaştıysa oyun sıkışmıştır
+      }
+    }
+  }
+  return reachedUpper || (filled / (ROWS * COLS) > 0.48);
+}
+
+function hasLightningOnBoard() {
+  if (!grid) return false;
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      var cell = grid[r] && grid[r][c];
+      if (cell === 'WILD') return true;
+      if (typeof cell === 'object' && cell !== null && cell.special === 'lightning') return true;
+    }
+  }
+  return false;
 }
 
 function getCellColor(cell) {
@@ -1913,9 +1943,11 @@ function mkRow(){
   }
 
   rowsSinceWild++;
-  if(rowsSinceWild >= wildFreq){
+  // ⚡ Sıkışma Kuralı: Sürekli yıldırım gelmesin, tahta sıkıştığında nadir kurtarıcı olarak gelsin
+  if(rowsSinceWild >= 16 && isBoardCrowded() && !hasLightningOnBoard()){
     rowsSinceWild = 0;
-    row[Math.floor(Math.random() * COLS)] = 'WILD';
+    var rollCol = pick(activeColors);
+    row[Math.floor(Math.random() * COLS)] = { color: rollCol, special: 'lightning', hp: 1 };
   }
   return row;
 }
@@ -2141,9 +2173,9 @@ function drawElectricSunburst(cx, cy, count, radius, rot, alpha){
     ctx.save();
     ctx.rotate(a);
     var rg=ctx.createLinearGradient(0, 0, len, 0);
-    rg.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-    rg.addColorStop(0.35, 'rgba(0, 229, 255, 0.45)');
-    rg.addColorStop(1, 'rgba(0, 100, 255, 0)');
+    rg.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+    rg.addColorStop(0.35, 'rgba(195, 170, 255, 0.42)');
+    rg.addColorStop(1, 'rgba(120, 80, 230, 0)');
     ctx.fillStyle=rg;
     ctx.beginPath();
     ctx.moveTo(0, -w/2);
@@ -2158,89 +2190,86 @@ function drawElectricSunburst(cx, cy, count, radius, rot, alpha){
 
 // Çift Katmanlı Yıldırım Taşı Çizici (Hem tabloda hem havada uçarken kullanılır)
 function drawWildStone(cx, cy, sz, scale, rot, alpha){
-  var t0=performance.now()*.0025;
-  var pulse=Math.sin(t0*2)*.35+.65;
-  var pulse2=Math.sin(t0*1.7+1)*.5+.5;
-  var rd=10;
+  var t0 = performance.now() * 0.0025;
+  var pulse = Math.sin(t0 * 2) * 0.35 + 0.65;
+  var pulse2 = Math.sin(t0 * (Math.PI * 2 / 1.5)) * 0.5 + 0.5;
+  var rd = 10;
 
   ctx.save();
   ctx.translate(cx, cy);
   if(rot) ctx.rotate(rot);
-  if(scale && scale!==1) ctx.scale(scale, scale);
-  if(alpha!==undefined && alpha<1) ctx.globalAlpha*=alpha;
+  if(scale && scale !== 1) ctx.scale(scale, scale);
+  if(alpha !== undefined && alpha < 1) ctx.globalAlpha *= alpha;
 
-  var x=-sz/2, y=-sz/2;
+  var x = -sz/2, y = -sz/2;
 
-  // Dış elektrik arkları (Havada süzülürken ve merkezdeyken çıtırdar)
-  if(scale && scale>1.05){
+  // Dış elektrik arkları — zarif beyaz & soft lila
+  if(scale && scale > 1.05){
     ctx.save();
-    var arcCount=4;
-    for(var ai=0; ai<arcCount; ai++){
-      var ang=t0*4.5+ai*(Math.PI*2/arcCount);
-      var rIn=sz*0.52;
-      var rOut=sz*(0.85+Math.random()*0.38);
-      var p1x=Math.cos(ang)*rIn, p1y=Math.sin(ang)*rIn;
-      var p2x=Math.cos(ang+(Math.random()-0.5)*0.5)*rOut, p2y=Math.sin(ang+(Math.random()-0.5)*0.5)*rOut;
-      ctx.strokeStyle=Math.random()<0.5?'#00f0ff':'#ffd32a';
-      ctx.shadowColor='#00f0ff';
-      ctx.shadowBlur=12;
-      ctx.lineWidth=2.2;
+    var arcCount = 4;
+    for(var ai = 0; ai < arcCount; ai++){
+      var ang = t0 * 4.5 + ai * (Math.PI * 2 / arcCount);
+      var rIn = sz * 0.52;
+      var rOut = sz * (0.82 + Math.random() * 0.3);
+      var p1x = Math.cos(ang) * rIn, p1y = Math.sin(ang) * rIn;
+      var p2x = Math.cos(ang + (Math.random() - 0.5) * 0.5) * rOut, p2y = Math.sin(ang + (Math.random() - 0.5) * 0.5) * rOut;
+      ctx.strokeStyle = Math.random() < 0.5 ? 'rgba(215, 200, 255, 0.85)' : '#ffffff';
+      ctx.shadowColor = 'rgba(180, 140, 255, 0.7)';
+      ctx.shadowBlur = 10;
+      ctx.lineWidth = 1.8;
       ctx.beginPath();
       ctx.moveTo(p1x, p1y);
-      ctx.lineTo((p1x+p2x)*0.5+(Math.random()-0.5)*10, (p1y+p2y)*0.5+(Math.random()-0.5)*10);
+      ctx.lineTo((p1x + p2x) * 0.5 + (Math.random() - 0.5) * 6, (p1y + p2y) * 0.5 + (Math.random() - 0.5) * 6);
       ctx.lineTo(p2x, p2y);
       ctx.stroke();
     }
     ctx.restore();
   }
 
-  // Koyu arkaplan
+  // 1. Derin lacivert/mor glossy arka plan
+  var bgG = ctx.createLinearGradient(x, y, x + sz, y + sz);
+  bgG.addColorStop(0,   '#0d102e');
+  bgG.addColorStop(0.5, '#0a0c26');
+  bgG.addColorStop(1,   '#070817');
+  rr(x, y, sz, sz, rd);
+  ctx.fillStyle = bgG;
+  ctx.fill();
+
+  // 2. Cam parlaklığı (specular glint)
   ctx.save();
-  rr(x,y,sz,sz,rd);
-  ctx.fillStyle='#110826';
+  rr(x, y, sz, sz, rd);
+  ctx.clip();
+  var specG = ctx.createLinearGradient(x, y, x + sz * 0.6, y + sz * 0.55);
+  specG.addColorStop(0,    'rgba(200, 220, 255, 0.22)');
+  specG.addColorStop(0.35, 'rgba(130, 160, 255, 0.08)');
+  specG.addColorStop(1,    'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = specG;
+  ctx.fillRect(x, y, sz, sz);
+  ctx.restore();
+
+  // 3. Zarif Elektrik Moru Nabız Kenarlık (Gökkuşağı yerine şık ve sade)
+  ctx.save();
+  ctx.shadowColor = 'rgba(170, 130, 255, 0.8)';
+  ctx.shadowBlur  = 12 + pulse2 * 14;
+  ctx.strokeStyle = 'rgba(180, 145, 255, ' + (0.65 + pulse2 * 0.35) + ')';
+  ctx.lineWidth   = 2.2;
+  rr(x + 1.1, y + 1.1, sz - 2.2, sz - 2.2, rd - 1);
+  ctx.stroke();
+  ctx.restore();
+
+  // 4. Merkezi yumuşak mor iç aura
+  var ig = ctx.createRadialGradient(0, 0, 1, 0, 0, sz * 0.46);
+  ig.addColorStop(0,   'rgba(170, 130, 255, ' + (0.22 + pulse2 * 0.16) + ')');
+  ig.addColorStop(0.6, 'rgba(120, 80, 240, 0.06)');
+  ig.addColorStop(1,   'rgba(0, 0, 0, 0)');
+  ctx.save();
+  rr(x, y, sz, sz, rd);
+  ctx.fillStyle = ig;
   ctx.fill();
   ctx.restore();
 
-  // Dönen gökkuşağı kenarlık
-  var wc=['#ff4757','#ffd32a','#2ed2ff','#2ecc71','#7b5cff','#ff8a00'];
-  var ci=Math.floor((t0*.8)%wc.length);
-  var wg=ctx.createLinearGradient(x,y,x+sz,y+sz);
-  wg.addColorStop(0,wc[ci%wc.length]);
-  wg.addColorStop(.4,wc[(ci+2)%wc.length]);
-  wg.addColorStop(.8,wc[(ci+4)%wc.length]);
-  wg.addColorStop(1,wc[(ci+1)%wc.length]);
-  ctx.save();
-  ctx.shadowColor='#ffffff'; ctx.shadowBlur=22*pulse;
-  ctx.strokeStyle=wg; ctx.lineWidth=4.5;
-  rr(x,y,sz,sz,rd); ctx.stroke();
-  ctx.restore();
-
-  // Merkezi sarı iç parıltısı
-  var ig=ctx.createRadialGradient(0,0,1,0,0,sz*.5);
-  var ia=(.4*pulse2).toFixed(2);
-  ig.addColorStop(0,'rgba(255,240,100,'+ia+')');
-  ig.addColorStop(.6,'rgba(180,100,255,.08)');
-  ig.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.save();
-  rr(x,y,sz,sz,rd); ctx.fillStyle=ig; ctx.fill();
-  ctx.restore();
-
-  // Crisp vector lightning bolt with high-voltage core & plasma corona
-  ctx.save();
-  ctx.shadowColor='#ffffaa'; ctx.shadowBlur=26*pulse;
-  ctx.fillStyle='#ffffff';
-  ctx.beginPath();
-  var bw = sz * 0.44, bh = sz * 0.58;
-  ctx.moveTo(bw*0.08, -bh*0.5);
-  ctx.lineTo(-bw*0.42, bh*0.04);
-  ctx.lineTo(-bw*0.02, bh*0.04);
-  ctx.lineTo(-bw*0.18, bh*0.5);
-  ctx.lineTo(bw*0.46, -bh*0.04);
-  ctx.lineTo(bw*0.06, -bh*0.04);
-  ctx.closePath();
-  ctx.fill();
-  ctx.strokeStyle='#ffd32a'; ctx.lineWidth=2; ctx.stroke();
-  ctx.restore();
+  // 5. Keskin Saf Beyaz Çekirdekli Şimşek Sembolü
+  drawSpecialEmblem(ctx, 0, 0, sz, 'lightning', 1, 1);
 
   ctx.restore();
 }
@@ -3264,9 +3293,11 @@ function popCluster(tapR, tapC) {
   addCareerBlocks(cluster.length);
   checkRecordCelebration(score);
 
-  // ⚡ SADECE YILDIRIM (ONLY LIGHTNING): 5 veya daha fazla blok patlatıldığında efsanevi Şimşek Taşı sentezlenir!
+  // ⚡ SADECE OYUN SIKIŞTIĞINDA VE BÜYÜK KOMBODA (>= 7) ŞİMŞEK TAŞI SENTEZİ!
   var powerUpType = null;
-  if (cluster.length >= 5) powerUpType = 'lightning';
+  if (cluster.length >= 7 && isBoardCrowded() && !hasLightningOnBoard()) {
+    powerUpType = 'lightning';
+  }
 
   // Clear cells and spawn particles
   var avgX = 0, avgY = 0;
@@ -3277,12 +3308,10 @@ function popCluster(tapR, tapC) {
     avgX += cx; avgY += cy;
 
     if (r === tapR && c === tapC && powerUpType) {
-      // ⚡ Tıklanan noktada güçlü bir Şimşek Taşı sentezle!
+      // ⚡ Tıklanan noktada zarif bir Şimşek Taşı sentezle!
       grid[r][c] = { color: targetCol, special: 'lightning', hp: 1 };
-      // Şimşek sentez kıvılcımları ve haptik
       beep(620, 'sine', 0.18, 0.15, 960);
       vib(22);
-      floats.push({ x: cx, y: cy - 14, vy: -1.5, life: 1.2, text: '⚡ LIGHTNING SYNTHESIS!', color: '#00f6ff', sz: 17, isWarning: false });
     } else {
       grid[r][c] = null;
     }
@@ -3304,11 +3333,9 @@ function popCluster(tapR, tapC) {
   avgY /= cluster.length;
 
   if (powerUpType === 'rainbow') {
-    floats.push({ x: avgX, y: avgY - 20, vy: -1.8, life: 1.4, text: '🌈 PRISMATIC SYNTHESIS!', color: '#ff3ea5', sz: 20, isWarning: false });
-  } else if (powerUpType === 'lightning') {
-    floats.push({ x: avgX, y: avgY - 20, vy: -1.8, life: 1.4, text: '⚡ LIGHTNING SYNTHESIS!', color: '#00f6ff', sz: 20, isWarning: false });
+    floats.push({ x: avgX, y: avgY - 20, vy: -1.8, life: 1.4, text: '🌈 PRISMATIC!', color: '#ff3ea5', sz: 18, isWarning: false });
   } else if (powerUpType === 'bomb') {
-    floats.push({ x: avgX, y: avgY - 20, vy: -1.8, life: 1.4, text: '💣 TNT SYNTHESIS!', color: '#ff4757', sz: 20, isWarning: false });
+    floats.push({ x: avgX, y: avgY - 20, vy: -1.8, life: 1.4, text: '💣 TNT!', color: '#ff4757', sz: 18, isWarning: false });
   }
 
   // Sound: Satisfying ascending pitch
@@ -3403,19 +3430,19 @@ function drawBlock(r,c){
     ctx.fillRect(x, y, SZ, SZ);
     ctx.restore();
 
-    // ── 3. İç Neon Sarı Parıltı (merkez aura) — pulse ile titriyor ──
+    // ── 3. İç Mor/Lila Parıltı (merkez aura) — pulse ile titriyor ──
     var yGrad = ctx.createRadialGradient(x + SZ/2, y + SZ/2, 2, x + SZ/2, y + SZ/2, SZ * 0.44);
-    yGrad.addColorStop(0,    'rgba(255, 230, 0, ' + (0.10 + lP2 * 0.12) + ')');
-    yGrad.addColorStop(0.55, 'rgba(0, 229, 255, 0.05)');
+    yGrad.addColorStop(0,    'rgba(180, 140, 255, ' + (0.16 + lP2 * 0.16) + ')');
+    yGrad.addColorStop(0.55, 'rgba(120, 80, 240, 0.06)');
     yGrad.addColorStop(1,    'rgba(0, 0, 0, 0)');
     rr(x, y, SZ, SZ, RD);
     ctx.fillStyle = yGrad;
     ctx.fill();
 
-    // ── 4. Nabız atan Neon Cyan kenarlık ──
-    ctx.shadowColor = '#00E5FF';
+    // ── 4. Nabız atan Zarif Elektrik Moru kenarlık ──
+    ctx.shadowColor = 'rgba(170, 130, 255, 0.8)';
     ctx.shadowBlur  = 10 + lP2 * 14;
-    ctx.strokeStyle = 'rgba(0, 229, 255, ' + (0.60 + lP2 * 0.40) + ')';
+    ctx.strokeStyle = 'rgba(180, 145, 255, ' + (0.65 + lP2 * 0.35) + ')';
     ctx.lineWidth   = 2.2;
     rr(x + 1.1, y + 1.1, SZ - 2.2, SZ - 2.2, RD - 1);
     ctx.stroke();
@@ -3669,10 +3696,10 @@ function render(){
       ctx.fillStyle = fSpecG;
       ctx.fillRect(-SZ/2, -SZ/2, SZ, SZ);
       ctx.restore();
-      // Neon cyan border pulse
-      ctx.shadowColor = '#00E5FF';
+      // Soft violet border pulse
+      ctx.shadowColor = 'rgba(170, 130, 255, 0.8)';
       ctx.shadowBlur  = 10 + fLP * 14;
-      ctx.strokeStyle = 'rgba(0, 229, 255, ' + (0.60 + fLP * 0.40) + ')';
+      ctx.strokeStyle = 'rgba(180, 145, 255, ' + (0.65 + fLP * 0.35) + ')';
       ctx.lineWidth   = 2.2;
       rr(-SZ/2 + 1.1, -SZ/2 + 1.1, SZ - 2.2, SZ - 2.2, fRD - 1);
       ctx.stroke();
@@ -3762,42 +3789,41 @@ function render(){
       ctx.restore();
 
       if(!activeAnim.type || activeAnim.type === 'lightning'){
-        // Gökyüzünün tepesinden merkeze inen 2 devasa atmosferik yıldırım sütunu
-        drawLightning(ctx, W*0.22, 0, activeAnim.curX, activeAnim.curY, '#00f0ff', 7.5, true);
-        drawLightning(ctx, W*0.78, 0, activeAnim.curX, activeAnim.curY, '#ffd32a', 6.0, true);
+        // Gökyüzünün tepesinden merkeze inen zarif saf beyaz & mor elektrik arkı
+        drawLightning(ctx, W*0.35, 0, activeAnim.curX, activeAnim.curY, '#ffffff', 5.5, true);
+        drawLightning(ctx, W*0.65, 0, activeAnim.curX, activeAnim.curY, '#d4c2ff', 4.0, true);
 
         // Merkezden dönen 16 elektrik ışık huzmesi
         var rayAlpha=Math.sin(stageProgress*Math.PI)*0.85;
         drawElectricSunburst(activeAnim.cx, activeAnim.cy, 16, 260, performance.now()*0.0035, rayAlpha);
 
-        // Merkez çevresinde patlayan devasa beyaz/mavi/mor plazma aurası
+        // Merkez çevresinde patlayan devasa beyaz/mor plazma aurası
         ctx.save();
         var cg=ctx.createRadialGradient(activeAnim.cx, activeAnim.cy, 8, activeAnim.cx, activeAnim.cy, 130);
-        cg.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-        cg.addColorStop(0.28, 'rgba(0, 240, 255, 0.6)');
-        cg.addColorStop(0.65, 'rgba(120, 50, 255, 0.3)');
-        cg.addColorStop(1, 'rgba(0, 100, 255, 0)');
+        cg.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
+        cg.addColorStop(0.28, 'rgba(210, 190, 255, 0.7)');
+        cg.addColorStop(0.65, 'rgba(140, 90, 255, 0.3)');
+        cg.addColorStop(1, 'rgba(70, 20, 180, 0)');
         ctx.fillStyle=cg;
         ctx.beginPath();
         ctx.arc(activeAnim.cx, activeAnim.cy, 130, 0, Math.PI*2);
         ctx.fill();
         ctx.restore();
 
-        // Her hedef bloğa birincil ve ikincil çatallı yıldırım
+        // Her hedef bloğa tek bir keskin, şık elektrik deşarjı (çirkin sarılık/mavilik kaldırıldı)
         activeAnim.targets.forEach(function(tgt){
-          drawLightning(ctx, activeAnim.curX, activeAnim.curY, tgt.x, tgt.y, '#00f0ff', 6.5, true);
-          drawLightning(ctx, activeAnim.curX, activeAnim.curY, tgt.x, tgt.y, '#ffd32a', 3.5, false);
+          drawLightning(ctx, activeAnim.curX, activeAnim.curY, tgt.x, tgt.y, '#e5d9ff', 4.2, false);
 
           ctx.save();
-          ctx.shadowColor='#00f0ff';
-          ctx.shadowBlur=30;
+          ctx.shadowColor='rgba(190, 160, 255, 0.9)';
+          ctx.shadowBlur=24;
           ctx.fillStyle='#ffffff';
           ctx.beginPath();
-          var fsz = 16 + Math.random()*8;
-          ctx.arc(tgt.x, tgt.y, fsz*0.42, 0, Math.PI*2);
+          var fsz = 14 + Math.random()*6;
+          ctx.arc(tgt.x, tgt.y, fsz*0.38, 0, Math.PI*2);
           ctx.fill();
-          ctx.strokeStyle='rgba(255,255,255,0.9)';
-          ctx.lineWidth=2.5;
+          ctx.strokeStyle='rgba(255,255,255,0.95)';
+          ctx.lineWidth=2.0;
           ctx.beginPath();
           ctx.moveTo(tgt.x-fsz, tgt.y); ctx.lineTo(tgt.x+fsz, tgt.y);
           ctx.moveTo(tgt.x, tgt.y-fsz); ctx.lineTo(tgt.x, tgt.y+fsz);
@@ -3919,9 +3945,9 @@ function render(){
       var p3=(activeAnim.t-(activeAnim.dur1+activeAnim.dur2))/activeAnim.dur3;
       var fade=1-p3;
       ctx.save();
-      var sc1 = (activeAnim.type === 'bomb') ? 'rgba(255, 71, 87, ' : ((activeAnim.type === 'rainbow') ? 'rgba(255, 62, 165, ' : 'rgba(0, 240, 255, ');
-      var sc2 = (activeAnim.type === 'bomb') ? 'rgba(255, 165, 2, ' : ((activeAnim.type === 'rainbow') ? 'rgba(46, 210, 255, ' : 'rgba(255, 211, 42, ');
-      var glowCol = (activeAnim.type === 'bomb') ? '#ff4757' : ((activeAnim.type === 'rainbow') ? '#ff3ea5' : '#00f0ff');
+      var sc1 = (activeAnim.type === 'bomb') ? 'rgba(255, 71, 87, ' : ((activeAnim.type === 'rainbow') ? 'rgba(255, 62, 165, ' : 'rgba(180, 140, 255, ');
+      var sc2 = (activeAnim.type === 'bomb') ? 'rgba(255, 165, 2, ' : ((activeAnim.type === 'rainbow') ? 'rgba(46, 210, 255, ' : 'rgba(225, 210, 255, ');
+      var glowCol = (activeAnim.type === 'bomb') ? '#ff4757' : ((activeAnim.type === 'rainbow') ? '#ff3ea5' : '#bca0ff');
 
       ctx.strokeStyle=sc1+fade+')';
       ctx.shadowColor=glowCol;
@@ -4023,15 +4049,9 @@ function renderSF(){
 // UI
 function onLevelUp(lvl) {
   if (!nextRow || nextRow.length !== COLS) nextRow = mkRow();
-
-  // ⚡ Seviye Atlama Hediyesi: Tavan sırasına bir adet güçlü Şimşek Taşı eklenir!
-  var idx = Math.floor(Math.random() * COLS);
-  var rollCol = pick(activeColors);
-  nextRow[idx] = { color: rollCol, special: 'lightning', hp: 1 };
-
+  // Seviye atlandığında temiz ses ve hafif sarsıntı — ekranı devasa metinlerle doldurma
   beep(650, 'sine', 0.25, 0.22, 1050);
-  shake(12);
-  floats.push({ x: W / 2, y: GRID_H * 0.35, vy: -1.6, life: 2.0, text: '⚡ LEVEL ' + lvl + ': BONUS LIGHTNING INCOMING!', color: '#00f6ff', sz: 20, isWarning: false });
+  shake(8);
   updPreview();
 }
 

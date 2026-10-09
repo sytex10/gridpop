@@ -1,8 +1,9 @@
-const CACHE_NAME = 'zapdrop-v39-official';
+const CACHE_NAME = 'zapdrop-v40-official';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
+  './assets/game_logo.png',
   './assets/icon-192.png',
   './assets/icon-512.png',
   './assets/challenge_classic.jpg',
